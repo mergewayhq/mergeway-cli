@@ -23,9 +23,9 @@ jobs:
           make fmt-check
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v8
         with:
-          version: v1.55.2
+          version: v2.4.0
 
       - name: Run tests
         run: |
@@ -41,7 +41,7 @@ jobs:
 
       - name: Verify version command
         run: |
-          go run ./cmd/mw version
+          go run . version
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
