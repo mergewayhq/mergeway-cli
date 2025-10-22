@@ -1,0 +1,15 @@
+version: 1
+types:
+  Post:
+    definition:
+      id:
+        field: id
+      file_patterns:
+        - data/posts/*.badyaml
+      fields:
+        id:
+          type: string
+          required: true
+        title:
+          type: string
+          required: true

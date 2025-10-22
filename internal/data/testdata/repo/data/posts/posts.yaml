@@ -1,0 +1,14 @@
+items:
+  - id: Post-001
+    title: First Post
+    author: User-Alice
+    tags:
+      - Tag-Writing
+      - Tag-Product
+    body: Hello world
+  - id: Post-002
+    title: Second Post
+    author: User-Alice
+    tags:
+      - Tag-Writing
+    body: Another post

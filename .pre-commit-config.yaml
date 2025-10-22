@@ -1,0 +1,22 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-yaml
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        types: [yaml]
+        args:
+          - --format
+          - colored
+          - -d
+          - "{extends: relaxed, rules: {document-start: false}}"
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v1.61.0
+    hooks:
+      - id: golangci-lint
+        args: ["--config=.golangci.yml"]
+        pass_filenames: false
+

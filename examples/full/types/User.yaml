@@ -1,0 +1,21 @@
+types:
+  User:
+    definition:
+      id:
+        field: id
+      file_patterns:
+        - data/users/*.yaml
+        - data/users/*.json
+      fields:
+        id:
+          type: string
+          required: true
+        name:
+          type: string
+          required: true
+        email:
+          type: string
+          required: true
+        roles:
+          type: string
+          repeated: true

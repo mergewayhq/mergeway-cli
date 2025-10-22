@@ -1,0 +1,6 @@
+items:
+  - id: Post-001
+    title: First Post
+    author: User-Alice
+    tags:
+      - Tag-Docs

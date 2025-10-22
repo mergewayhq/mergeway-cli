@@ -1,0 +1,38 @@
+version: 1
+types:
+  User:
+    definition:
+      id:
+        field: id
+      file_patterns:
+        - data/users/*.yaml
+      fields:
+        id:
+          type: string
+          required: true
+  Post:
+    definition:
+      id:
+        field: id
+      file_patterns:
+        - data/posts/*.yaml
+      fields:
+        id:
+          type: string
+          required: true
+        author:
+          type: User
+          required: true
+        tags:
+          type: Tag
+          repeated: true
+  Tag:
+    definition:
+      id:
+        field: id
+      file_patterns:
+        - data/tags/*.yaml
+      fields:
+        id:
+          type: string
+          required: true

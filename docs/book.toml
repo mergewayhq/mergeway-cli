@@ -1,0 +1,14 @@
+[book]
+title = "Mergeway Documentation"
+description = "Developer and operator documentation for the Mergeway CLI."
+authors = ["Mergeway Team"]
+language = "en"
+multilingual = false
+src = "src"
+
+[output.html]
+default-theme = "light"
+site-url = "/"
+
+[output.html.fold]
+enable = true
