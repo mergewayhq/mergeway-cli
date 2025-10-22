@@ -67,3 +67,7 @@ For a deeper command reference, check `docs/cli-behavior.md`.
 ## Hacking on the CLI
 
 Contributor workflows, tooling, and release notes live in [`DEVELOPING.md`](DEVELOPING.md).
+
+## License
+
+Mergeway CLI is released under the [MIT License](LICENSE.md).
