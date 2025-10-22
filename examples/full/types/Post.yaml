@@ -1,0 +1,22 @@
+types:
+  Post:
+    definition:
+      id:
+        field: id
+      file_patterns:
+        - data/posts/*.yaml
+      fields:
+        id:
+          type: string
+          required: true
+        title:
+          type: string
+          required: true
+        author:
+          type: User
+          required: true
+        tags:
+          type: Tag
+          repeated: true
+        body:
+          type: string

@@ -1,0 +1,13 @@
+version: 1
+types:
+  Post:
+    definition:
+      id:
+        field: id
+      file_patterns:
+        - data/posts/*.yaml
+      fields:
+        id:
+          type: string
+        author:
+          type: User

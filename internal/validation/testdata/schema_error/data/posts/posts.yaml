@@ -1,0 +1,9 @@
+items:
+  - id: Post-001
+    author: User-Alice
+    tags: Tag-Docs
+  - id: Post-001
+    title: Duplicate Post
+    author: User-Alice
+    tags:
+      - Tag-Docs

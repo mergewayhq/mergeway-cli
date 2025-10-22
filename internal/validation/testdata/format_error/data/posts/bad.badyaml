@@ -1,0 +1,4 @@
+type: Post
+items:
+  - id Post-001
+    title: Missing Colon

@@ -1,0 +1,6 @@
+id: user-alice
+name: Alice Example
+email: alice@example.com
+roles:
+  - admin
+  - author

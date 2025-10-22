@@ -1,0 +1,14 @@
+types:
+  Tag:
+    definition:
+      id:
+        field: id
+      file_patterns:
+        - data/tags/*.yaml
+      fields:
+        id:
+          type: string
+          required: true
+        label:
+          type: string
+          required: true

@@ -1,0 +1,16 @@
+version: 1
+types:
+  Item:
+    definition:
+      id:
+        field: id
+      file_patterns:
+        - data/items/*.yaml
+      fields:
+        id:
+          type: string
+          required: true
+        tags:
+          type: string
+          repeated: true
+          unique: true
