@@ -14,7 +14,7 @@ repos:
           - -d
           - "{extends: relaxed, rules: {document-start: false}}"
   - repo: https://github.com/golangci/golangci-lint
-    rev: v1.61.0
+    rev: v2.4.0
     hooks:
       - id: golangci-lint
         args: ["--config=.golangci.yml"]
