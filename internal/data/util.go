@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/mergewayhq/mergeway-cli/internal/scalar"
 )
 
 func detectFormat(path string) fileFormat {
@@ -30,9 +32,9 @@ func requiredString(fields map[string]any, key string) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("missing field %q", key)
 	}
-	str, ok := value.(string)
-	if !ok || str == "" {
-		return "", fmt.Errorf("field %q must be a non-empty string", key)
+	str, ok := scalar.AsString(value)
+	if !ok {
+		return "", fmt.Errorf("field %q must be a non-empty string or number", key)
 	}
 	return str, nil
 }
@@ -45,11 +47,7 @@ func getString(m map[string]any, key string) (string, bool) {
 	if !ok {
 		return "", false
 	}
-	str, ok := value.(string)
-	if !ok {
-		return "", false
-	}
-	return str, true
+	return scalar.AsString(value)
 }
 
 func toSliceMap(value any) ([]map[string]any, error) {

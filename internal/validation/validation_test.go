@@ -114,6 +114,20 @@ func TestValidatePhaseSelection(t *testing.T) {
 	}
 }
 
+func TestValidateAllowsNumericIdentifiers(t *testing.T) {
+	root := fixturePath(t, "numeric_identifier")
+	cfg := loadConfig(t, root)
+
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+
+	if len(res.Errors) != 0 {
+		t.Fatalf("expected no errors, got %v", res.Errors)
+	}
+}
+
 func fixturePath(t *testing.T, name string) string {
 	t.Helper()
 	path := filepath.Join("testdata", name)

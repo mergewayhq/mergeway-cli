@@ -74,8 +74,7 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 		return nil, err
 	}
 
-	idField := typeDef.Identifier.Field
-	idValue, err := requiredString(fields, idField)
+	idValue, normalizedID, err := extractIdentifierValue(typeDef, fields)
 	if err != nil {
 		return nil, fmt.Errorf("data: %s create: %w", typeName, err)
 	}
@@ -95,7 +94,8 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 	}
 
 	normalized := cleanFields(fields)
-	normalized[idField] = idValue
+	idField := typeDef.Identifier.Field
+	normalized[idField] = normalizedID
 
 	if target.Multi {
 		fi := doc
@@ -141,15 +141,24 @@ func (s *Store) Update(typeName, id string, fields map[string]any, merge bool) (
 		return nil, fmt.Errorf("data: %s %q not found", typeName, id)
 	}
 
-	idField := typeDef.Identifier.Field
-
 	updated := cloneMap(loc.Object)
 	if merge {
 		mergeMaps(updated, fields)
 	} else {
 		updated = cleanFields(fields)
 	}
-	updated[idField] = id
+
+	idField := typeDef.Identifier.Field
+	idFieldDef := typeDef.Fields[idField]
+	var normalizedID any = id
+	if idFieldDef != nil {
+		converted, err := coerceIdentifierValue(idFieldDef.Type, idField, id)
+		if err != nil {
+			return nil, fmt.Errorf("data: %s update: %w", typeName, err)
+		}
+		normalizedID = converted
+	}
+	updated[idField] = normalizedID
 	removeTypeKeys(updated)
 
 	if loc.Multi {

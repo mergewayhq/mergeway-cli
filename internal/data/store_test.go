@@ -137,6 +137,59 @@ func TestStoreWithInlineConfig(t *testing.T) {
 	}
 }
 
+func TestStoreNumericIdentifiers(t *testing.T) {
+	store, repo := setupStore(t, "numeric")
+
+	ids, err := store.List("Person")
+	if err != nil {
+		t.Fatalf("List returned error: %v", err)
+	}
+
+	expected := []string{"1"}
+	if !reflect.DeepEqual(ids, expected) {
+		t.Fatalf("expected IDs %v, got %v", expected, ids)
+	}
+
+	obj, err := store.Get("Person", "1")
+	if err != nil {
+		t.Fatalf("Get returned error: %v", err)
+	}
+
+	if _, ok := obj.Fields["id"].(int); !ok {
+		t.Fatalf("expected stored id to be an integer, got %T", obj.Fields["id"])
+	}
+
+	created, err := store.Create("Person", map[string]any{
+		"id":   "2",
+		"name": "Babbage",
+	})
+	if err != nil {
+		t.Fatalf("Create returned error: %v", err)
+	}
+
+	if created.ID != "2" {
+		t.Fatalf("expected created ID '2', got %q", created.ID)
+	}
+
+	if _, ok := created.Fields["id"].(int64); !ok {
+		t.Fatalf("expected stored id to coerce to int64, got %T", created.Fields["id"])
+	}
+
+	path := filepath.Join(repo, "data", "user-2.yaml")
+	contents, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("reading generated file: %v", err)
+	}
+
+	if string(contents) == "" || !strings.Contains(string(contents), "id: 2") {
+		t.Fatalf("expected file contents to include 'id: 2', got %q", string(contents))
+	}
+
+	if _, err := store.Get("Person", "2"); err != nil {
+		t.Fatalf("expected to retrieve newly created Person: %v", err)
+	}
+}
+
 func setupStore(t *testing.T, fixture string) (*Store, string) {
 	t.Helper()
 	repo := copyRepo(t, fixture)

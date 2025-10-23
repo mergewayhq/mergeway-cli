@@ -1,0 +1,15 @@
+version: 1
+types:
+  Person:
+    definition:
+      id:
+        field: id
+      file_patterns:
+        - data/user-*.yaml
+      fields:
+        id:
+          type: integer
+          required: true
+        name:
+          type: string
+          required: true
