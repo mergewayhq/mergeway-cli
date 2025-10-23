@@ -100,6 +100,6 @@ func printUsage(w io.Writer) {
 	_, _ = fmt.Fprintln(w, "  delete                    Delete an object")
 	_, _ = fmt.Fprintln(w, "  validate                  Validate repository contents")
 	_, _ = fmt.Fprintln(w, "  config lint               Validate configuration files")
-	_, _ = fmt.Fprintln(w, "  config export             Export type definition as JSON Schema")
+	_, _ = fmt.Fprintln(w, "  config export             Export entity spec as JSON Schema")
 	_, _ = fmt.Fprintln(w, "  version                   Display CLI build information")
 }

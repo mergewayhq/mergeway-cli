@@ -1,11 +1,9 @@
 version: 1
 entities:
   Item:
-    definition:
-      id:
-        field: id
+    spec:
       file_patterns:
-        - data/items/*.yaml
+      - data/items/*.yaml
       fields:
         id:
           type: string
@@ -14,3 +12,4 @@ entities:
           type: string
           repeated: true
           unique: true
+      identifier: id

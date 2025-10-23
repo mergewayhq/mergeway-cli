@@ -1,11 +1,9 @@
 entities:
   User:
-    definition:
-      id:
-        field: id
+    spec:
       file_patterns:
-        - data/users/*.yaml
-        - data/users/*.json
+      - data/users/*.yaml
+      - data/users/*.json
       fields:
         id:
           type: string
@@ -19,3 +17,4 @@ entities:
         roles:
           type: string
           repeated: true
+      identifier: id

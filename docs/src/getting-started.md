@@ -40,9 +40,8 @@ Create `types/Post.yaml`:
 ```yaml
 entities:
   Post:
-    definition:
-      id:
-        field: id
+    spec:
+      identifier: id
       file_patterns:
         - data/posts/*.yaml
       fields:
@@ -126,9 +125,8 @@ Add a user schema (`types/User.yaml`):
 ```yaml
 entities:
   User:
-    definition:
-      id:
-        field: id
+    spec:
+      identifier: id
       file_patterns:
         - data/users/*.yaml
       fields:
@@ -145,9 +143,8 @@ Update `types/Post.yaml` so each post points to a user:
 ```yaml
 entities:
   Post:
-    definition:
-      id:
-        field: id
+    spec:
+      identifier: id
       file_patterns:
         - data/posts/*.yaml
       fields:

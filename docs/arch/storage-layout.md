@@ -21,7 +21,7 @@ repo-root/
   examples/
 ```
 
-- `mergeway.yaml`: root configuration entry file that wires together type definitions via includes.
+- `mergeway.yaml`: root configuration entry file that wires together entity specs via includes.
 - `types/`: YAML files that define types and field metadata.
 - `data/`: Object files stored in JSON or YAML; folders are a convenience, not a requirement.
 - `docs/`: Specification documents (this folder).

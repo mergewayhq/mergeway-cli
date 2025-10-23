@@ -1,11 +1,9 @@
 version: 1
 entities:
   Post:
-    definition:
-      id:
-        field: id
+    spec:
       file_patterns:
-        - data/posts/*.badyaml
+      - data/posts/*.badyaml
       fields:
         id:
           type: string
@@ -13,3 +11,4 @@ entities:
         title:
           type: string
           required: true
+      identifier: id

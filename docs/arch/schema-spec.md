@@ -26,21 +26,21 @@ Every configuration document must conform to the following shape after include e
 version: <integer>
 entities:
   <TypeName>:
-    definition: <TypeDefinition>
+    spec: <TypeSpec>
 ```
 
 - `version`: configuration schema version (start with `1`).
 - `entities`: map keyed by type identifiers (must start with an uppercase letter and otherwise follow identifier constraints outlined in `database-requirements.md`).
 
-## Type Definition
+## Entity Spec
 
-Each `TypeDefinition` entry provides the authoritative schema for a single object type.
+Each `TypeSpec` entry provides the authoritative schema for a single object type.
 
 ```yaml
 entities:
   User:
-    definition:
-      id:
+    spec:
+      identifier:
         field: id
       file_patterns:
         - data/users/*.yaml
@@ -67,6 +67,8 @@ entities:
           type: Team
           repeated: true
 ```
+
+`identifier` accepts either a plain string (e.g., `identifier: id`) or a mapping with `field`, optional `generated`, and `pattern` keys when you need additional behavior.
 
 ### Field Specification
 

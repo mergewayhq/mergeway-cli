@@ -1,10 +1,8 @@
 entities:
   Tag:
-    definition:
-      id:
-        field: id
+    spec:
       file_patterns:
-        - data/tags/*.yaml
+      - data/tags/*.yaml
       fields:
         id:
           type: string
@@ -12,3 +10,4 @@ entities:
         label:
           type: string
           required: true
+      identifier: id
