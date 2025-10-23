@@ -1,11 +1,9 @@
 version: 1
 entities:
   User:
-    definition:
-      id:
-        field: id
+    spec:
       file_patterns:
-        - data/users/*.yaml
+      - data/users/*.yaml
       fields:
         id:
           type: string
@@ -16,12 +14,11 @@ entities:
         email:
           type: string
           required: true
+      identifier: id
   Post:
-    definition:
-      id:
-        field: id
+    spec:
       file_patterns:
-        - data/posts/*.yaml
+      - data/posts/*.yaml
       fields:
         id:
           type: string
@@ -35,12 +32,11 @@ entities:
         tags:
           type: Tag
           repeated: true
+      identifier: id
   Tag:
-    definition:
-      id:
-        field: id
+    spec:
       file_patterns:
-        - data/tags/*.yaml
+      - data/tags/*.yaml
       fields:
         id:
           type: string
@@ -48,3 +44,4 @@ entities:
         label:
           type: string
           required: true
+      identifier: id

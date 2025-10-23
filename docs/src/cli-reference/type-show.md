@@ -43,4 +43,4 @@ fields:
 ## Related Commands
 
 - [`mw type list`](type-list.md) — find available types.
-- [`mw config export`](config-export.md) — generate a JSON Schema from a type definition.
+- [`mw config export`](config-export.md) — generate a JSON Schema from an entity spec.

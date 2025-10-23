@@ -1,7 +1,7 @@
 entities:
   User:
-    definition:
-      id:
+    spec:
+      identifier:
         field: id
       file_patterns:
         - data/users/*.yaml

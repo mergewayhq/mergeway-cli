@@ -40,23 +40,23 @@ func normalizeAggregate(agg *aggregateConfig) (*Config, error) {
 }
 
 func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error) {
-	def := rawType.Definition
+	spec := rawType.Spec
 
-	if def.ID.Field == "" {
-		return nil, fmt.Errorf("config: type %q missing id.field in %s", rawType.Name, rawType.Source)
+	if !spec.Identifier.set || spec.Identifier.Field == "" {
+		return nil, fmt.Errorf("config: type %q missing identifier in %s", rawType.Name, rawType.Source)
 	}
 
-	if !isValidIdentifier(def.ID.Field) {
-		return nil, fmt.Errorf("config: type %q has invalid identifier field %q", rawType.Name, def.ID.Field)
+	if !isValidIdentifier(spec.Identifier.Field) {
+		return nil, fmt.Errorf("config: type %q has invalid identifier field %q", rawType.Name, spec.Identifier.Field)
 	}
 
-	if len(def.FilePatterns) == 0 {
+	if len(spec.FilePatterns) == 0 {
 		return nil, fmt.Errorf("config: type %q must declare at least one file_patterns entry", rawType.Name)
 	}
 
-	fields := make(map[string]*FieldDefinition, len(def.Fields))
+	fields := make(map[string]*FieldDefinition, len(spec.Fields))
 
-	for fieldName, rawField := range def.Fields {
+	for fieldName, rawField := range spec.Fields {
 		if fieldName == "" {
 			return nil, fmt.Errorf("config: type %q has unnamed field", rawType.Name)
 		}
@@ -77,11 +77,11 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		Name:   rawType.Name,
 		Source: rawType.Source,
 		Identifier: IdentifierDefinition{
-			Field:     def.ID.Field,
-			Generated: def.ID.Generated,
-			Pattern:   def.ID.Pattern,
+			Field:     spec.Identifier.Field,
+			Generated: spec.Identifier.Generated,
+			Pattern:   spec.Identifier.Pattern,
 		},
-		FilePatterns: deduplicateStrings(def.FilePatterns),
+		FilePatterns: deduplicateStrings(spec.FilePatterns),
 		Fields:       fields,
 	}, nil
 }

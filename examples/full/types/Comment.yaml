@@ -1,10 +1,8 @@
 entities:
   Comment:
-    definition:
-      id:
-        field: id
+    spec:
       file_patterns:
-        - data/comments/*.json
+      - data/comments/*.json
       fields:
         id:
           type: string
@@ -21,3 +19,4 @@ entities:
         created_at:
           type: string
           required: true
+      identifier: id

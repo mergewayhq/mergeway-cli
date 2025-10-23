@@ -1,11 +1,10 @@
 version: 1
 entities:
-  "bad type":
-    definition:
-      id:
-        field: bad id
+  bad type:
+    spec:
       file_patterns:
-        - data/items/*.yaml
+      - data/items/*.yaml
       fields:
         value:
           type: string
+      identifier: bad id

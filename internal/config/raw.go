@@ -1,5 +1,11 @@
 package config
 
+import (
+	"fmt"
+
+	"gopkg.in/yaml.v3"
+)
+
 type rawConfigDocument struct {
 	Version  *int                      `yaml:"version"`
 	Includes []string                  `yaml:"includes"`
@@ -7,19 +13,57 @@ type rawConfigDocument struct {
 }
 
 type rawTypeWrapper struct {
-	Definition rawTypeDefinition `yaml:"definition"`
+	Spec rawTypeSpec `yaml:"spec"`
 }
 
-type rawTypeDefinition struct {
-	ID           rawIdentifierDefinition       `yaml:"id"`
+type rawTypeSpec struct {
+	Identifier   rawIdentifierSpec             `yaml:"identifier"`
 	FilePatterns []string                      `yaml:"file_patterns"`
 	Fields       map[string]rawFieldDefinition `yaml:"fields"`
 }
 
-type rawIdentifierDefinition struct {
+type rawIdentifierSpec struct {
 	Field     string `yaml:"field"`
 	Generated bool   `yaml:"generated"`
 	Pattern   string `yaml:"pattern"`
+	set       bool
+}
+
+func (r *rawIdentifierSpec) UnmarshalYAML(node *yaml.Node) error {
+	if node == nil {
+		return nil
+	}
+
+	if node.Tag == "!!null" {
+		return nil
+	}
+
+	switch node.Kind {
+	case yaml.ScalarNode:
+		var field string
+		if err := node.Decode(&field); err != nil {
+			return err
+		}
+		if field == "" {
+			return fmt.Errorf("config: identifier must be a non-empty string")
+		}
+		r.Field = field
+		r.Generated = false
+		r.Pattern = ""
+		r.set = true
+		return nil
+	case yaml.MappingNode:
+		type alias rawIdentifierSpec
+		var tmp alias
+		if err := node.Decode(&tmp); err != nil {
+			return err
+		}
+		*r = rawIdentifierSpec(tmp)
+		r.set = true
+		return nil
+	default:
+		return fmt.Errorf("config: identifier must be a string or mapping, got %s", node.ShortTag())
+	}
 }
 
 type rawFieldDefinition struct {
@@ -42,9 +86,9 @@ type aggregateConfig struct {
 }
 
 type rawTypeWithSource struct {
-	Name       string
-	Definition rawTypeDefinition
-	Source     string
+	Name   string
+	Spec   rawTypeSpec
+	Source string
 }
 
 func newAggregateConfig() *aggregateConfig {

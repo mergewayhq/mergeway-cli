@@ -151,9 +151,9 @@ func (a *aggregateConfig) addDocument(doc *rawConfigDocument, source string) err
 		}
 
 		a.Entities[name] = rawTypeWithSource{
-			Name:       name,
-			Definition: wrapper.Definition,
-			Source:     source,
+			Name:   name,
+			Spec:   wrapper.Spec,
+			Source: source,
 		}
 	}
 

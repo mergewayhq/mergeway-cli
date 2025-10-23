@@ -19,14 +19,13 @@ includes:
 
 ## Schema Files (`types/*.yaml`)
 
-A schema file wraps one or more type definitions. The example below defines a `Post` type:
+A schema file wraps one or more entity specs. The example below defines a `Post` entity:
 
 ```yaml
 entities:
   Post:
-    definition:
-      id:
-        field: id
+    spec:
+      identifier: id
       file_patterns:
         - data/posts/*.yaml
       fields:
@@ -43,13 +42,21 @@ entities:
           required: true
 ```
 
+For advanced scenarios you can expand `identifier` into a mapping:
+
+```yaml
+identifier:
+  field: id
+  generated: true
+```
+
 ### Required Sections
 
 | Key | Description |
 | --- | --- |
-| `definition.id.field` | Name of the identifier field inside each record (must be unique per type). The field value can be a string, integer, or number. |
-| `definition.file_patterns` | Glob patterns pointing at the data files that belong to this type. |
-| `definition.fields` | Map of field definitions. |
+| `spec.identifier` | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. |
+| `spec.file_patterns` | Glob patterns pointing at the data files that belong to this entity. |
+| `spec.fields` | Map of field definitions. |
 
 ### Field Attributes
 
@@ -66,7 +73,7 @@ Keep schema files small and focused—one entity per file is the easiest to main
 
 ## Data Files (`data/...`)
 
-Each data file must declare a `type` and provide the fields required by its schema:
+Each data file must declare a `type` and provide the fields required by its spec:
 
 ```yaml
 type: Post

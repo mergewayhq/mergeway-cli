@@ -1,10 +1,8 @@
 entities:
   Post:
-    definition:
-      id:
-        field: id
+    spec:
       file_patterns:
-        - data/posts/*.yaml
+      - data/posts/*.yaml
       fields:
         id:
           type: string
@@ -18,3 +16,4 @@ entities:
         tags:
           type: Tag
           repeated: true
+      identifier: id

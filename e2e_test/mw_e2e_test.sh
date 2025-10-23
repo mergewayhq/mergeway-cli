@@ -29,9 +29,8 @@ cat > "$STATE_DIR/mergeway.yaml" <<'CONFIG'
 version: 1
 entities:
   User:
-    definition:
-      id:
-        field: id
+    spec:
+      identifier: id
       file_patterns:
         - data/users/*.yaml
       fields:

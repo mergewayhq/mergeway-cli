@@ -26,7 +26,7 @@ Capture the expected surface of the `mw` command-line tool used to manage the fi
 - `mw type list`
   - Lists type identifiers defined in the configuration.
 - `mw type show <type>`
-  - Prints the effective schema for a type, including identifier metadata, field definitions, and file patterns.
+  - Prints the effective schema for a type, including identifier metadata, field definitions, and file patterns pulled from the entity spec.
   - Accepts `--format` to output JSON or YAML.
 
 ### 3. Object CRUD
@@ -40,7 +40,7 @@ All object-focused commands require `--type <type>` unless the object payload em
 - `mw create --type <type> --file <path> [--id <id>]`
   - Creates a new object from a payload file or STDIN.
   - Validates format/schema before writing unless `--skip-validate` is provided.
-  - Generates an identifier when the type definition flags `generated: true` and `--id` is omitted.
+  - Generates an identifier when the type spec flags `identifier.generated: true` and `--id` is omitted.
 - `mw update --type <type> --id <id> --file <path>`
   - Replaces the stored document with the provided payload (use `--merge` for deep merges).
   - Supports partial updates with `--merge` to deep-merge fields instead of replacing wholesale.
