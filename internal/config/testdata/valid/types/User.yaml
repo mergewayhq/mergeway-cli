@@ -1,4 +1,4 @@
-types:
+entities:
   User:
     definition:
       id:

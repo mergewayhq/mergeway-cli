@@ -38,7 +38,7 @@ This tells Mergeway to load every schema stored under `types/`.
 Create `types/Post.yaml`:
 
 ```yaml
-types:
+entities:
   Post:
     definition:
       id:
@@ -72,7 +72,7 @@ body: |
 
 ## 4. Inspect what Mergeway sees
 
-List the known types:
+List the known entities:
 
 ```bash
 mw type list
@@ -124,7 +124,7 @@ validation succeeded
 Add a user schema (`types/User.yaml`):
 
 ```yaml
-types:
+entities:
   User:
     definition:
       id:
@@ -143,7 +143,7 @@ types:
 Update `types/Post.yaml` so each post points to a user:
 
 ```yaml
-types:
+entities:
   Post:
     definition:
       id:

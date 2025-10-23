@@ -22,7 +22,7 @@ includes:
 A schema file wraps one or more type definitions. The example below defines a `Post` type:
 
 ```yaml
-types:
+entities:
   Post:
     definition:
       id:

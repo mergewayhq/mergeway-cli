@@ -1,4 +1,4 @@
-types:
+entities:
   Post:
     definition:
       id:

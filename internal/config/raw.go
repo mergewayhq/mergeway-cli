@@ -3,7 +3,7 @@ package config
 type rawConfigDocument struct {
 	Version  *int                      `yaml:"version"`
 	Includes []string                  `yaml:"includes"`
-	Types    map[string]rawTypeWrapper `yaml:"types"`
+	Entities map[string]rawTypeWrapper `yaml:"entities"`
 }
 
 type rawTypeWrapper struct {
@@ -38,7 +38,7 @@ type rawFieldDefinition struct {
 type aggregateConfig struct {
 	Version    int
 	VersionSet bool
-	Types      map[string]rawTypeWithSource
+	Entities   map[string]rawTypeWithSource
 }
 
 type rawTypeWithSource struct {
@@ -49,6 +49,6 @@ type rawTypeWithSource struct {
 
 func newAggregateConfig() *aggregateConfig {
 	return &aggregateConfig{
-		Types: make(map[string]rawTypeWithSource),
+		Entities: make(map[string]rawTypeWithSource),
 	}
 }
