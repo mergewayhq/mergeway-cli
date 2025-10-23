@@ -19,7 +19,7 @@ func normalizeAggregate(agg *aggregateConfig) (*Config, error) {
 		Types:   make(map[string]*TypeDefinition),
 	}
 
-	for name, rawType := range agg.Types {
+	for name, rawType := range agg.Entities {
 		if !isValidTypeName(name) {
 			return nil, fmt.Errorf("config: invalid type identifier %q in %s", name, rawType.Source)
 		}

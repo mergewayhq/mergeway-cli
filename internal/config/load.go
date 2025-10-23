@@ -115,11 +115,11 @@ func (a *aggregateConfig) merge(other *aggregateConfig) error {
 		}
 	}
 
-	for name, t := range other.Types {
-		if existing, ok := a.Types[name]; ok {
-			return fmt.Errorf("config: type %q defined in both %s and %s", name, existing.Source, t.Source)
+	for name, t := range other.Entities {
+		if existing, ok := a.Entities[name]; ok {
+			return fmt.Errorf("config: entity %q defined in both %s and %s", name, existing.Source, t.Source)
 		}
-		a.Types[name] = t
+		a.Entities[name] = t
 	}
 
 	return nil
@@ -141,16 +141,16 @@ func (a *aggregateConfig) addDocument(doc *rawConfigDocument, source string) err
 		}
 	}
 
-	for name, wrapper := range doc.Types {
+	for name, wrapper := range doc.Entities {
 		if name == "" {
-			return fmt.Errorf("config: unnamed type in %s", source)
+			return fmt.Errorf("config: unnamed entity in %s", source)
 		}
 
-		if existing, ok := a.Types[name]; ok {
-			return fmt.Errorf("config: type %q defined in both %s and %s", name, existing.Source, source)
+		if existing, ok := a.Entities[name]; ok {
+			return fmt.Errorf("config: entity %q defined in both %s and %s", name, existing.Source, source)
 		}
 
-		a.Types[name] = rawTypeWithSource{
+		a.Entities[name] = rawTypeWithSource{
 			Name:       name,
 			Definition: wrapper.Definition,
 			Source:     source,

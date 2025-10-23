@@ -24,20 +24,20 @@ Every configuration document must conform to the following shape after include e
 
 ```yaml
 version: <integer>
-types:
+entities:
   <TypeName>:
     definition: <TypeDefinition>
 ```
 
 - `version`: configuration schema version (start with `1`).
-- `types`: map keyed by type identifiers (must start with an uppercase letter and otherwise follow identifier constraints outlined in `database-requirements.md`).
+- `entities`: map keyed by type identifiers (must start with an uppercase letter and otherwise follow identifier constraints outlined in `database-requirements.md`).
 
 ## Type Definition
 
 Each `TypeDefinition` entry provides the authoritative schema for a single object type.
 
 ```yaml
-types:
+entities:
   User:
     definition:
       id:

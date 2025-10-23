@@ -32,7 +32,7 @@ The default configuration contains:
 ```yaml
 # mw configuration
 version: 1
-types: {}
+entities: {}
 ```
 
 ## Related Commands

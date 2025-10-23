@@ -27,7 +27,7 @@ echo "Initializing repository..."
 
 cat > "$STATE_DIR/mergeway.yaml" <<'CONFIG'
 version: 1
-types:
+entities:
   User:
     definition:
       id:

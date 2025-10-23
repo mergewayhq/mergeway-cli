@@ -50,5 +50,5 @@ func ensureFile(path, content string) error {
 }
 
 func defaultConfigTemplate() string {
-	return "# mw configuration\nversion: 1\ntypes: {}\n"
+	return "# mw configuration\nversion: 1\nentities: {}\n"
 }
