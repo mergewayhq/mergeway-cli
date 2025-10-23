@@ -3,6 +3,8 @@ package validation
 import (
 	"fmt"
 	"path/filepath"
+
+	"github.com/mergewayhq/mergeway-cli/internal/scalar"
 )
 
 func appendFiltered(dst []Error, errs []Error, phases map[Phase]bool, p Phase) []Error {
@@ -44,11 +46,7 @@ func getString(m map[string]any, key string) (string, bool) {
 	if !ok {
 		return "", false
 	}
-	str, ok := value.(string)
-	if !ok || str == "" {
-		return "", false
-	}
-	return str, true
+	return scalar.AsString(value)
 }
 
 func toSliceMap(value any) ([]map[string]any, error) {

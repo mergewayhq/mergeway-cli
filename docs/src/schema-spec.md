@@ -47,7 +47,7 @@ types:
 
 | Key | Description |
 | --- | --- |
-| `definition.id.field` | Name of the identifier field inside each record (must be unique per type). |
+| `definition.id.field` | Name of the identifier field inside each record (must be unique per type). The field value can be a string, integer, or number. |
 | `definition.file_patterns` | Glob patterns pointing at the data files that belong to this type. |
 | `definition.fields` | Map of field definitions. |
 
@@ -78,6 +78,14 @@ body: |
 ```
 
 You can store one object per file (as above) or provide an `items:` array to keep several objects together. Adding the `type` key is optional when the file already matches the schema’s `file_patterns`, but keeping it makes each file self-describing.
+
+Identifier fields accept numeric payloads as well. For example, the following record is valid when the schema marks `id` as an `integer`:
+
+```yaml
+type: Person
+id: 42
+name: Numeric Identifier
+```
 
 ## Good Practices
 

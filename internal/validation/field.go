@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
+	"github.com/mergewayhq/mergeway-cli/internal/scalar"
 )
 
 func validateFieldValue(field *config.FieldDefinition, value any, obj *rawObject, fieldName string) *Error {
@@ -63,8 +64,8 @@ func validateFieldValue(field *config.FieldDefinition, value any, obj *rawObject
 			}
 		}
 	default:
-		if _, ok := value.(string); !ok {
-			return typeError(obj, fieldName, "string")
+		if _, ok := scalar.AsString(value); !ok {
+			return typeError(obj, fieldName, "string or number")
 		}
 	}
 
@@ -94,14 +95,14 @@ func collectReferenceValues(value any, repeated bool) []string {
 
 		var values []string
 		for _, item := range slice {
-			if str, ok := item.(string); ok && str != "" {
+			if str, ok := scalar.AsString(item); ok {
 				values = append(values, str)
 			}
 		}
 		return values
 	}
 
-	if str, ok := value.(string); ok && str != "" {
+	if str, ok := scalar.AsString(value); ok {
 		return []string{str}
 	}
 

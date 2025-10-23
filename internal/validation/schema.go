@@ -52,7 +52,7 @@ func validateTypeSchema(objects []*rawObject, typeDef *config.TypeDefinition, in
 				Phase:   PhaseSchema,
 				Type:    typeDef.Name,
 				File:    objectLocation(obj),
-				Message: fmt.Sprintf("identifier field %q must be a non-empty string", idField),
+				Message: fmt.Sprintf("identifier field %q must be a non-empty string or number", idField),
 			})
 			hadError = true
 			continue
