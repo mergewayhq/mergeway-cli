@@ -1,18 +1,19 @@
 entities:
-  Post:
+  User:
     file_patterns:
-      - data/posts/*.yaml
+      - data/users/*.yaml
+      - data/users/*.json
     fields:
       id:
         type: string
         required: true
-      title:
+      name:
         type: string
         required: true
-      author:
-        type: User
+      email:
+        type: string
         required: true
-      tags:
-        type: Tag
+      roles:
+        type: string
         repeated: true
     identifier: id

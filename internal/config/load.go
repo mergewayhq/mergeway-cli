@@ -141,7 +141,7 @@ func (a *aggregateConfig) addDocument(doc *rawConfigDocument, source string) err
 		}
 	}
 
-	for name, wrapper := range doc.Entities {
+	for name, spec := range doc.Entities {
 		if name == "" {
 			return fmt.Errorf("config: unnamed entity in %s", source)
 		}
@@ -152,7 +152,7 @@ func (a *aggregateConfig) addDocument(doc *rawConfigDocument, source string) err
 
 		a.Entities[name] = rawTypeWithSource{
 			Name:   name,
-			Spec:   wrapper.Spec,
+			Spec:   spec,
 			Source: source,
 		}
 	}

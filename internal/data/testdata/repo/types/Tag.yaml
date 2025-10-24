@@ -1,13 +1,12 @@
 entities:
   Tag:
-    spec:
-      file_patterns:
+    file_patterns:
       - data/tags/*.yaml
-      fields:
-        id:
-          type: string
-          required: true
-        label:
-          type: string
-          required: true
-      identifier: id
+    fields:
+      id:
+        type: string
+        required: true
+      label:
+        type: string
+        required: true
+    identifier: id

@@ -1,15 +1,14 @@
 version: 1
 entities:
   Item:
-    spec:
-      file_patterns:
+    file_patterns:
       - data/items/*.yaml
-      fields:
-        id:
-          type: string
-          required: true
-        tags:
-          type: string
-          repeated: true
-          unique: true
-      identifier: id
+    fields:
+      id:
+        type: string
+        required: true
+      tags:
+        type: string
+        repeated: true
+        unique: true
+    identifier: id

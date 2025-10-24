@@ -29,19 +29,18 @@ cat > "$STATE_DIR/mergeway.yaml" <<'CONFIG'
 version: 1
 entities:
   User:
-    spec:
-      identifier: id
-      file_patterns:
-        - data/users/*.yaml
-      fields:
-        id:
-          type: string
-          required: true
-        name:
-          type: string
-          required: true
-        email:
-          type: string
+    identifier: id
+    file_patterns:
+      - data/users/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true
+      email:
+        type: string
 CONFIG
 
 echo "Listing types..."

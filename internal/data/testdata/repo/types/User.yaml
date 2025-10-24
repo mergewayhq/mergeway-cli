@@ -1,19 +1,18 @@
 entities:
   User:
-    spec:
-      identifier:
-        field: id
-      file_patterns:
-        - data/users/*.yaml
-      fields:
-        id:
-          type: string
-          required: true
-        name:
-          type: string
-          required: true
-        email:
-          type: string
-          required: true
-        role:
-          type: string
+    identifier:
+      field: id
+    file_patterns:
+      - data/users/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true
+      email:
+        type: string
+        required: true
+      role:
+        type: string

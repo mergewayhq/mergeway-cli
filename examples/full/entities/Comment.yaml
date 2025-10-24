@@ -1,18 +1,21 @@
 entities:
-  Post:
+  Comment:
     file_patterns:
-      - data/posts/*.yaml
+      - data/comments/*.json
     fields:
       id:
         type: string
         required: true
-      title:
-        type: string
+      post:
+        type: Post
         required: true
       author:
         type: User
         required: true
-      tags:
-        type: Tag
-        repeated: true
+      content:
+        type: string
+        required: true
+      created_at:
+        type: string
+        required: true
     identifier: id

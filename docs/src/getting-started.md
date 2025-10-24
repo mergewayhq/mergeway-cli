@@ -40,19 +40,18 @@ Create `types/Post.yaml`:
 ```yaml
 entities:
   Post:
-    spec:
-      identifier: id
-      file_patterns:
-        - data/posts/*.yaml
-      fields:
-        id:
-          type: string
-          required: true
-        title:
-          type: string
-          required: true
-        body:
-          type: string
+    identifier: id
+    file_patterns:
+      - data/posts/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      title:
+        type: string
+        required: true
+      body:
+        type: string
 ```
 
 This schema maps every YAML file in `data/posts/` to a `Post`. The `id` field acts as the primary key.
@@ -125,17 +124,16 @@ Add a user schema (`types/User.yaml`):
 ```yaml
 entities:
   User:
-    spec:
-      identifier: id
-      file_patterns:
-        - data/users/*.yaml
-      fields:
-        id:
-          type: string
-          required: true
-        name:
-          type: string
-          required: true
+    identifier: id
+    file_patterns:
+      - data/users/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true
 ```
 
 Update `types/Post.yaml` so each post points to a user:
@@ -143,22 +141,21 @@ Update `types/Post.yaml` so each post points to a user:
 ```yaml
 entities:
   Post:
-    spec:
-      identifier: id
-      file_patterns:
-        - data/posts/*.yaml
-      fields:
-        id:
-          type: string
-          required: true
-        title:
-          type: string
-          required: true
-        body:
-          type: string
-        author:
-          type: User
-          required: true
+    identifier: id
+    file_patterns:
+      - data/posts/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      title:
+        type: string
+        required: true
+      body:
+        type: string
+      author:
+        type: User
+        required: true
 ```
 
 Run validation again:

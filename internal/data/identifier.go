@@ -12,7 +12,7 @@ import (
 
 func extractIdentifierValue(typeDef *config.TypeDefinition, fields map[string]any) (string, any, error) {
 	if typeDef == nil {
-		return "", nil, fmt.Errorf("data: type spec is required")
+		return "", nil, fmt.Errorf("data: type definition is required")
 	}
 	idField := typeDef.Identifier.Field
 	if idField == "" {
