@@ -84,7 +84,7 @@ All object-focused commands require `--type <type>` unless the object payload em
 ## Validation Workflow
 
 1. CLI loads configuration (resolving includes/globs).
-2. For each type, the CLI locates object files using `file_patterns`.
+2. For each type, the CLI locates object files using `include`.
 3. Validation phases execute sequentially: format → schema → references.
 4. Errors collated unless `--fail-fast` is set.
 

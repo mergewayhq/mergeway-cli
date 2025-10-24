@@ -112,7 +112,7 @@ func (s *Store) matchTypeFiles(typeDef *config.TypeDefinition) ([]string, error)
 	seen := make(map[string]struct{})
 	var files []string
 
-	for _, pattern := range typeDef.FilePatterns {
+	for _, pattern := range typeDef.Include {
 		absPattern := pattern
 		if !filepath.IsAbs(absPattern) {
 			absPattern = filepath.Join(s.root, filepath.Clean(pattern))

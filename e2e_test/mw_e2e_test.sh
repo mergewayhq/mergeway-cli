@@ -30,7 +30,7 @@ version: 1
 entities:
   User:
     identifier: id
-    file_patterns:
+    include:
       - data/users/*.yaml
     fields:
       id:

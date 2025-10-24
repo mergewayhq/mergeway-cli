@@ -50,8 +50,8 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		return nil, fmt.Errorf("config: type %q has invalid identifier field %q", rawType.Name, spec.Identifier.Field)
 	}
 
-	if len(spec.FilePatterns) == 0 {
-		return nil, fmt.Errorf("config: type %q must declare at least one file_patterns entry", rawType.Name)
+	if len(spec.Include) == 0 {
+		return nil, fmt.Errorf("config: type %q must declare at least one include entry", rawType.Name)
 	}
 
 	fields := make(map[string]*FieldDefinition, len(spec.Fields))
@@ -81,8 +81,8 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 			Generated: spec.Identifier.Generated,
 			Pattern:   spec.Identifier.Pattern,
 		},
-		FilePatterns: deduplicateStrings(spec.FilePatterns),
-		Fields:       fields,
+		Include: deduplicateStrings(spec.Include),
+		Fields:  fields,
 	}, nil
 }
 

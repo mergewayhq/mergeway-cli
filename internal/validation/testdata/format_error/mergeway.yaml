@@ -1,7 +1,7 @@
 version: 1
 entities:
   Post:
-    file_patterns:
+    include:
       - data/posts/*.badyaml
     fields:
       id:

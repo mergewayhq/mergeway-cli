@@ -27,7 +27,7 @@ version: <integer>
 entities:
   <TypeName>:
     identifier: <IdentifierDefinition|string>
-    file_patterns:
+    include:
       - <glob>
     fields:
       <FieldName>: <FieldDefinition>
@@ -45,7 +45,7 @@ entities:
   User:
     identifier:
       field: id
-    file_patterns:
+    include:
       - data/users/*.yaml
     fields:
       id:
@@ -93,7 +93,7 @@ Extra validation knobs let future tooling derive JSON Schema while preserving ri
 
 ## File Association
 
-`file_patterns` bind a type to one or more data files. Patterns may select both YAML and JSON documents. When matching files, the CLI infers the type from the configuration; a top-level `type` field is optional and only used as an override/sanity check.
+`include` bind a type to one or more data files. Patterns may select both YAML and JSON documents. When matching files, the CLI infers the type from the configuration; a top-level `type` field is optional and only used as an override/sanity check.
 
 ```yaml
 # multi-object file example

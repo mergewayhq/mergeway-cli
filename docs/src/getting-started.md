@@ -41,7 +41,7 @@ Create `types/Post.yaml`:
 entities:
   Post:
     identifier: id
-    file_patterns:
+    include:
       - data/posts/*.yaml
     fields:
       id:
@@ -125,8 +125,6 @@ Add a user schema (`types/User.yaml`):
 entities:
   User:
     identifier: id
-    file_patterns:
-      - data/users/*.yaml
     fields:
       id:
         type: string
@@ -134,6 +132,8 @@ entities:
       name:
         type: string
         required: true
+    include:
+      - data/users/*.yaml
 ```
 
 Update `types/Post.yaml` so each post points to a user:
@@ -142,8 +142,6 @@ Update `types/Post.yaml` so each post points to a user:
 entities:
   Post:
     identifier: id
-    file_patterns:
-      - data/posts/*.yaml
     fields:
       id:
         type: string
@@ -156,6 +154,8 @@ entities:
       author:
         type: User
         required: true
+    include:
+      - data/posts/*.yaml
 ```
 
 Run validation again:

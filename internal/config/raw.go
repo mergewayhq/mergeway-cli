@@ -13,9 +13,9 @@ type rawConfigDocument struct {
 }
 
 type rawTypeSpec struct {
-	Identifier   rawIdentifierSpec             `yaml:"identifier"`
-	FilePatterns []string                      `yaml:"file_patterns"`
-	Fields       map[string]rawFieldDefinition `yaml:"fields"`
+	Identifier rawIdentifierSpec             `yaml:"identifier"`
+	Include    []string                      `yaml:"include"`
+	Fields     map[string]rawFieldDefinition `yaml:"fields"`
 }
 
 type rawIdentifierSpec struct {

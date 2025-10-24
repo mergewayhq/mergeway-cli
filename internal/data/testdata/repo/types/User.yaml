@@ -2,7 +2,7 @@ entities:
   User:
     identifier:
       field: id
-    file_patterns:
+    include:
       - data/users/*.yaml
     fields:
       id:
