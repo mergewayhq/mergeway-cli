@@ -1,0 +1,12 @@
+version: 1
+entities:
+  Person:
+    identifier: id
+    include:
+      - data/*.yaml
+    fields:
+      id: string
+      name:
+        type: string
+        required: true
+      age: integer

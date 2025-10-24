@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -74,6 +75,47 @@ type rawFieldDefinition struct {
 	Unique     *bool                         `yaml:"unique"`
 	Computed   bool                          `yaml:"computed"`
 	Pattern    string                        `yaml:"pattern"`
+}
+
+func (r *rawFieldDefinition) UnmarshalYAML(node *yaml.Node) error {
+	if node == nil {
+		return nil
+	}
+
+	switch node.Kind {
+	case yaml.ScalarNode:
+		var typeName string
+		if err := node.Decode(&typeName); err != nil {
+			return err
+		}
+		typeName = strings.TrimSpace(typeName)
+		if typeName == "" {
+			return fmt.Errorf("config: field type must be a non-empty string")
+		}
+		r.Type = typeName
+		r.Required = false
+		r.Repeated = false
+		r.Format = ""
+		r.Enum = nil
+		r.Default = nil
+		r.Properties = nil
+		r.Unique = nil
+		r.Computed = false
+		r.Pattern = ""
+		return nil
+	case yaml.MappingNode:
+		type alias rawFieldDefinition
+		var tmp alias
+		if err := node.Decode(&tmp); err != nil {
+			return err
+		}
+		*r = rawFieldDefinition(tmp)
+		return nil
+	case yaml.AliasNode:
+		return node.Decode(r)
+	default:
+		return fmt.Errorf("config: field definition must be a string or mapping, got %s", node.ShortTag())
+	}
 }
 
 type aggregateConfig struct {

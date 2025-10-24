@@ -50,11 +50,10 @@ entities:
       title:
         type: string
         required: true
-      body:
-        type: string
+      body: string
 ```
 
-This schema maps every YAML file in `data/posts/` to a `Post`. The `id` field acts as the primary key.
+This schema maps every YAML file in `data/posts/` to a `Post`. The `id` field acts as the primary key. The `body` field uses the shorthand `body: string`, which is equivalent to the longer mapping with `required: false`.
 
 ## 3. Add the first record
 

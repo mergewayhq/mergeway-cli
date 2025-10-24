@@ -102,3 +102,46 @@ func TestLoadUnknownReference(t *testing.T) {
 		t.Fatalf("expected unknown type error, got %q", got)
 	}
 }
+
+func TestLoadShorthandFieldDefinitions(t *testing.T) {
+	path := filepath.Join("testdata", "shorthand", "mergeway.yaml")
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load returned error: %v", err)
+	}
+
+	person, ok := cfg.Types["Person"]
+	if !ok {
+		t.Fatalf("expected type 'Person' to be present")
+	}
+
+	idField, ok := person.Fields["id"]
+	if !ok {
+		t.Fatalf("expected field 'id'")
+	}
+	if idField.Type != "string" {
+		t.Fatalf("expected id field type 'string', got %q", idField.Type)
+	}
+	if idField.Required {
+		t.Fatalf("expected shorthand id field to default to optional")
+	}
+
+	ageField, ok := person.Fields["age"]
+	if !ok {
+		t.Fatalf("expected field 'age'")
+	}
+	if ageField.Type != "integer" {
+		t.Fatalf("expected age field type 'integer', got %q", ageField.Type)
+	}
+	if ageField.Required {
+		t.Fatalf("expected shorthand age field to default to optional")
+	}
+
+	nameField, ok := person.Fields["name"]
+	if !ok {
+		t.Fatalf("expected field 'name'")
+	}
+	if !nameField.Required {
+		t.Fatalf("expected explicit mapping to preserve required=true")
+	}
+}
