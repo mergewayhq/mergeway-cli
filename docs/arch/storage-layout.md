@@ -35,7 +35,7 @@ repo-root/
 ```yaml
 # mergeway.yaml
 version: 1
-includes:
+include:
   - types/*.yaml
 ```
 

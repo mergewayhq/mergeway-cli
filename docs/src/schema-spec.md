@@ -10,12 +10,12 @@ The workspace entry file declares the schema version and the files to load:
 
 ```yaml
 version: 1
-includes:
+include:
   - types/*.yaml
 ```
 
 - `version` tracks breaking changes in the configuration format (keep it at `1`).
-- `includes` is a list of glob patterns. Each matching file is merged into the configuration. Patterns must resolve to at least one file; otherwise Mergeway reports an error.
+- `include` is a list of glob patterns. Each matching file is merged into the configuration. Patterns must resolve to at least one file; otherwise Mergeway reports an error.
 
 ## Schema Files (`types/*.yaml`)
 
@@ -57,22 +57,22 @@ entities:
 
 ### Required Sections
 
-| Key | Description |
-| --- | --- |
-| `identifier` | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. |
-| `file_patterns` | Glob patterns pointing at the data files that belong to this entity. |
-| `fields` | Map of field definitions. |
+| Key             | Description                                                                                                                                                                                                                                            |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `identifier`    | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. |
+| `file_patterns` | Glob patterns pointing at the data files that belong to this entity.                                                                                                                                                                                   |
+| `fields`        | Map of field definitions.                                                                                                                                                                                                                              |
 
 ### Field Attributes
 
-| Attribute | Example | Notes |
-| --- | --- | --- |
-| `type` | `string`, `number`, `boolean`, `list[string]`, `User` | Lists are written as `list[type]`. A plain string (e.g., `User`) references another type. |
-| `required` | `true` / `false` | Required fields must appear in every record. |
-| `repeated` | `true` / `false` | Indicates an array field. |
-| `description` | `Service owner team` | Optional but recommended. |
-| `enum` | `[draft, active, retired]` | Allowed values. |
-| `default` | Any scalar | Value injected when the field is missing. |
+| Attribute     | Example                                               | Notes                                                                                     |
+| ------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `type`        | `string`, `number`, `boolean`, `list[string]`, `User` | Lists are written as `list[type]`. A plain string (e.g., `User`) references another type. |
+| `required`    | `true` / `false`                                      | Required fields must appear in every record.                                              |
+| `repeated`    | `true` / `false`                                      | Indicates an array field.                                                                 |
+| `description` | `Service owner team`                                  | Optional but recommended.                                                                 |
+| `enum`        | `[draft, active, retired]`                            | Allowed values.                                                                           |
+| `default`     | Any scalar                                            | Value injected when the field is missing.                                                 |
 
 Keep schema files small and focused—one entity per file is the easiest to maintain.
 
