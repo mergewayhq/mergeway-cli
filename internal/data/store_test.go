@@ -105,6 +105,46 @@ func TestStoreCreateUpdateDelete(t *testing.T) {
 	}
 }
 
+func TestStoreJSONPathIncludes(t *testing.T) {
+	store, repo := setupStore(t, "jsonpath")
+
+	ids, err := store.List("User")
+	if err != nil {
+		t.Fatalf("List returned error: %v", err)
+	}
+
+	expectedIDs := []string{"User-A", "User-B"}
+	if !reflect.DeepEqual(ids, expectedIDs) {
+		t.Fatalf("expected IDs %v, got %v", expectedIDs, ids)
+	}
+
+	obj, err := store.Get("User", "User-B")
+	if err != nil {
+		t.Fatalf("Get returned error: %v", err)
+	}
+
+	if obj.Fields["name"] != "Bob" {
+		t.Fatalf("expected name 'Bob', got %v", obj.Fields["name"])
+	}
+
+	jsonPathFile := filepath.Join(repo, "data", "users.json")
+	if obj.File != jsonPathFile {
+		t.Fatalf("expected file %s, got %s", jsonPathFile, obj.File)
+	}
+
+	if _, err := store.Update("User", "User-A", map[string]any{"name": "Updated"}, true); err == nil || !strings.Contains(err.Error(), "selector include") {
+		t.Fatalf("expected update to fail for selector include, got %v", err)
+	}
+
+	if _, err := store.Create("User", map[string]any{"id": "User-C", "name": "Carol"}); err == nil || !strings.Contains(err.Error(), "selector") {
+		t.Fatalf("expected create to fail for selector include, got %v", err)
+	}
+
+	if err := store.Delete("User", "User-A"); err == nil || !strings.Contains(err.Error(), "selector include") {
+		t.Fatalf("expected delete to fail for selector include, got %v", err)
+	}
+}
+
 func TestStoreWithInlineConfig(t *testing.T) {
 	store, _ := setupStore(t, "inline")
 

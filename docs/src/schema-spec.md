@@ -57,14 +57,29 @@ entities:
       # ...
 ```
 
+When several objects live in one file, provide a JSONPath selector to extract them:
+
+```yaml
+entities:
+  User:
+    identifier: id
+    include:
+      - path: data/users.json
+        selector: "$.users[*]"
+    fields:
+      # ...
+```
+
+Strings remain a shorthand for `path` with no `selector`; Mergeway then reads the entire file as a single object (or uses the `items:` array if present).
+
 ### Required Sections
 
-| Key          | Description                                                                                                                                                                                                                                            |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `identifier` | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. |
-| `include`    | Glob patterns pointing at the data files that belong to this entity. Omit only when you rely exclusively on inline `data`.                                                                                                                             |
-| `fields`     | Map of field definitions. Use either the shorthand `field: type` (defaults to optional) or the expanded mapping for advanced options.                                                                                                                  |
-| `data`       | Optional array of inline records. Each entry must contain the identifier field and follows the same schema rules as external data files.                                                                                                              |
+| Key          | Description                                                                                                                                                                                                                                               |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `identifier` | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number.    |
+| `include`    | List of data sources. Each entry can be a glob string (shorthand) or a mapping with `path` and optional `selector` property. Omit only when you rely exclusively on inline `data`. Without a selector, Mergeway treats the whole file as a single object. |
+| `fields`     | Map of field definitions. Use either the shorthand `field: type` (defaults to optional) or the expanded mapping for advanced options.                                                                                                                     |
+| `data`       | Optional array of inline records. Each entry must contain the identifier field and follows the same schema rules as external data files.                                                                                                                  |
 
 ### Inline Data
 
@@ -124,6 +139,8 @@ body: |
 ```
 
 You can store one object per file (as above) or provide an `items:` array to keep several objects together. Adding the `type` key is optional when the file already matches the schema’s `include`, but keeping it makes each file self-describing.
+
+JSONPath selectors let you extract objects from nested structures—handy when you need to read a subset of a larger document. For example, `selector: "$.users[*]"` walks through the `users` array in a JSON file and emits one record per element. Mergeway validates that the selector returns objects; any other shape triggers a format error.
 
 Identifier fields accept numeric payloads as well. For example, the following record is valid when the schema marks `id` as an `integer`:
 

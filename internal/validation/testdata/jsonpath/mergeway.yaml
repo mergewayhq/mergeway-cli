@@ -1,0 +1,3 @@
+version: 1
+include:
+  - types/*.yaml

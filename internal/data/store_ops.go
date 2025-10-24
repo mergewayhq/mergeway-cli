@@ -88,7 +88,7 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 		return nil, err
 	}
 
-	doc, err := s.loadFile(target.Path, typeDef.Name)
+	doc, err := s.loadFile(target.Path, typeDef.Name, "")
 	if err != nil && !errors.Is(err, errFileNotFound) {
 		return nil, err
 	}
@@ -143,6 +143,9 @@ func (s *Store) Update(typeName, id string, fields map[string]any, merge bool) (
 	if loc.Inline {
 		return nil, fmt.Errorf("data: %s %q is defined inline and cannot be modified", typeName, id)
 	}
+	if loc.ReadOnly {
+		return nil, fmt.Errorf("data: %s %q is sourced via selector include and cannot be modified", typeName, id)
+	}
 
 	updated := cloneMap(loc.Object)
 	if merge {
@@ -195,6 +198,9 @@ func (s *Store) Delete(typeName, id string) error {
 	}
 	if loc.Inline {
 		return fmt.Errorf("data: %s %q is defined inline and cannot be modified", typeName, id)
+	}
+	if loc.ReadOnly {
+		return fmt.Errorf("data: %s %q is sourced via selector include and cannot be modified", typeName, id)
 	}
 
 	if loc.Multi {

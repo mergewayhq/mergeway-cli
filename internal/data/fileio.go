@@ -7,53 +7,120 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/theory/jsonpath"
 	"gopkg.in/yaml.v3"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
 )
 
-func (s *Store) loadFile(path string, expectedType string) (*fileContent, error) {
+func (s *Store) loadFile(path string, expectedType string, selector string) (*fileContent, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	var doc map[string]any
-	if err := yaml.Unmarshal(data, &doc); err != nil {
-		return nil, fmt.Errorf("data: parse %s: %w", path, err)
-	}
+	format := detectFormat(path)
 
-	typeName, hasType := getString(doc, "type")
-	if hasType {
-		delete(doc, "type")
-	}
-
-	if typeName == "" {
-		typeName = expectedType
-	}
-	if expectedType != "" && typeName != "" && typeName != expectedType {
-		return nil, fmt.Errorf("data: file %s declares type %s; expected %s", path, typeName, expectedType)
-	}
-
-	itemsRaw, hasItems := doc["items"]
-
-	fc := &fileContent{
-		Path:     path,
-		TypeName: typeName,
-		Format:   detectFormat(path),
-	}
-
-	if hasItems {
-		slice, err := toSliceMap(itemsRaw)
-		if err != nil {
-			return nil, fmt.Errorf("data: file %s items: %w", path, err)
+	if selector == "" {
+		var doc map[string]any
+		if err := yaml.Unmarshal(data, &doc); err != nil {
+			return nil, fmt.Errorf("data: parse %s: %w", path, err)
 		}
-		fc.Multi = true
-		fc.Items = slice
+
+		typeName, hasType := getString(doc, "type")
+		if hasType {
+			delete(doc, "type")
+		}
+
+		if typeName == "" {
+			typeName = expectedType
+		}
+		if expectedType != "" && typeName != "" && typeName != expectedType {
+			return nil, fmt.Errorf("data: file %s declares type %s; expected %s", path, typeName, expectedType)
+		}
+
+		itemsRaw, hasItems := doc["items"]
+
+		fc := &fileContent{
+			Path:     path,
+			TypeName: typeName,
+			Format:   format,
+		}
+
+		if hasItems {
+			slice, err := toSliceMap(itemsRaw)
+			if err != nil {
+				return nil, fmt.Errorf("data: file %s items: %w", path, err)
+			}
+			fc.Multi = true
+			fc.Items = slice
+			return fc, nil
+		}
+
+		fc.Single = doc
 		return fc, nil
 	}
 
-	fc.Single = doc
+	var root any
+	if err := yaml.Unmarshal(data, &root); err != nil {
+		return nil, fmt.Errorf("data: parse %s: %w", path, err)
+	}
+
+	normalizedRoot, err := normalizeYAMLValue(root)
+	if err != nil {
+		return nil, fmt.Errorf("data: normalize %s: %w", path, err)
+	}
+
+	compiled, err := jsonpath.Parse(selector)
+	if err != nil {
+		return nil, fmt.Errorf("data: parse selector %q in %s: %w", selector, path, err)
+	}
+
+	located := compiled.SelectLocated(normalizedRoot)
+	if len(located) == 0 {
+		return nil, fmt.Errorf("data: selector %q in %s matched no values", selector, path)
+	}
+
+	items := make([]map[string]any, 0, len(located))
+	for _, node := range located {
+		obj, err := normalizeObject(node.Node)
+		if err != nil {
+			return nil, fmt.Errorf("data: selector %q in %s at %s: %w", selector, path, node.Path.String(), err)
+		}
+
+		if expectedType != "" {
+			if typeName, ok := getString(obj, "type"); ok && typeName != "" {
+				if typeName != expectedType {
+					return nil, fmt.Errorf("data: selector %q in %s at %s declares type %s; expected %s", selector, path, node.Path.String(), typeName, expectedType)
+				}
+			}
+			if typeName, ok := getString(obj, "Type"); ok && typeName != "" {
+				if typeName != expectedType {
+					return nil, fmt.Errorf("data: selector %q in %s at %s declares type %s; expected %s", selector, path, node.Path.String(), typeName, expectedType)
+				}
+			}
+		}
+
+		removeTypeKeys(obj)
+		items = append(items, obj)
+	}
+
+	fc := &fileContent{
+		Path:     path,
+		TypeName: expectedType,
+		Format:   format,
+		Multi:    len(items) > 1,
+		Selector: selector,
+		ReadOnly: true,
+	}
+
+	if len(items) == 1 {
+		fc.Single = items[0]
+		fc.Multi = false
+	} else {
+		fc.Items = items
+	}
+
 	return fc, nil
 }
 
@@ -123,8 +190,17 @@ func (s *Store) removeFile(path string) error {
 
 func (s *Store) chooseCreateTarget(typeDef *config.TypeDefinition, id string) (*createTarget, error) {
 	var multiTarget *createTarget
+	var foundWritable bool
 
-	for _, pattern := range typeDef.Include {
+	for _, include := range typeDef.Include {
+		if include.Selector != "" {
+			continue
+		}
+		foundWritable = true
+		pattern := include.Path
+		if pattern == "" {
+			continue
+		}
 		absPattern := pattern
 		if !filepath.IsAbs(absPattern) {
 			absPattern = filepath.Join(s.root, filepath.Clean(pattern))
@@ -142,6 +218,10 @@ func (s *Store) chooseCreateTarget(typeDef *config.TypeDefinition, id string) (*
 
 	if multiTarget != nil {
 		return multiTarget, nil
+	}
+
+	if !foundWritable {
+		return nil, fmt.Errorf("data: unable to resolve create target for type %s; includes use selector expressions", typeDef.Name)
 	}
 
 	return nil, fmt.Errorf("data: unable to resolve create target for type %s", typeDef.Name)

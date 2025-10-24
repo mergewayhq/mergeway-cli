@@ -145,3 +145,29 @@ func TestLoadShorthandFieldDefinitions(t *testing.T) {
 		t.Fatalf("expected explicit mapping to preserve required=true")
 	}
 }
+
+func TestLoadIncludeWithJSONPath(t *testing.T) {
+	path := filepath.Join("testdata", "jsonpath", "mergeway.yaml")
+
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load returned error: %v", err)
+	}
+
+	item, ok := cfg.Types["Item"]
+	if !ok {
+		t.Fatalf("expected type 'Item' to be present")
+	}
+
+	if len(item.Include) != 1 {
+		t.Fatalf("expected one include, got %d", len(item.Include))
+	}
+
+	include := item.Include[0]
+	if include.Path != "data/items.json" {
+		t.Fatalf("expected include path 'data/items.json', got %q", include.Path)
+	}
+	if include.Selector != "$.items[*]" {
+		t.Fatalf("expected selector '$.items[*]', got %q", include.Selector)
+	}
+}

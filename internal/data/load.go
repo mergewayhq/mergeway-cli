@@ -10,8 +10,13 @@ import (
 	"github.com/mergewayhq/mergeway-cli/internal/config"
 )
 
+type includeMatch struct {
+	include config.IncludeDefinition
+	path    string
+}
+
 func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
-	files, err := s.matchTypeFiles(typeDef)
+	matches, err := s.resolveIncludeMatches(typeDef)
 	if err != nil {
 		return nil, err
 	}
@@ -19,13 +24,13 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 	seenIDs := make(map[string]struct{})
 	idField := typeDef.Identifier.Field
 	var objects []*Object
-	for _, file := range files {
-		fc, err := s.loadFile(file, typeDef.Name)
+	for _, match := range matches {
+		fc, err := s.loadFile(match.path, typeDef.Name, match.include.Selector)
 		if err != nil {
 			return nil, err
 		}
 
-		if fc.TypeName != typeDef.Name {
+		if fc.TypeName != "" && fc.TypeName != typeDef.Name {
 			return nil, fmt.Errorf("data: file %s declares type %s; expected %s", fc.Path, fc.TypeName, typeDef.Name)
 		}
 
@@ -66,15 +71,15 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 }
 
 func (s *Store) findObject(typeDef *config.TypeDefinition, id string) (*objectLocation, error) {
-	files, err := s.matchTypeFiles(typeDef)
+	matches, err := s.resolveIncludeMatches(typeDef)
 	if err != nil {
 		return nil, err
 	}
 
 	idField := typeDef.Identifier.Field
 
-	for _, file := range files {
-		fc, err := s.loadFile(file, typeDef.Name)
+	for _, match := range matches {
+		fc, err := s.loadFile(match.path, typeDef.Name, match.include.Selector)
 		if err != nil {
 			if errors.Is(err, errFileNotFound) {
 				continue
@@ -82,7 +87,7 @@ func (s *Store) findObject(typeDef *config.TypeDefinition, id string) (*objectLo
 			return nil, err
 		}
 
-		if fc.TypeName != typeDef.Name {
+		if fc.TypeName != "" && fc.TypeName != typeDef.Name {
 			return nil, fmt.Errorf("data: file %s declares type %s; expected %s", fc.Path, fc.TypeName, typeDef.Name)
 		}
 
@@ -91,7 +96,7 @@ func (s *Store) findObject(typeDef *config.TypeDefinition, id string) (*objectLo
 				val, _ := getString(item, idField)
 				if val == id {
 					return &objectLocation{
-						FilePath: file,
+						FilePath: match.path,
 						Format:   fc.Format,
 						Multi:    true,
 						Index:    idx,
@@ -99,6 +104,7 @@ func (s *Store) findObject(typeDef *config.TypeDefinition, id string) (*objectLo
 						File:     fc,
 						TypeName: typeDef.Name,
 						IDField:  idField,
+						ReadOnly: fc.ReadOnly,
 					}, nil
 				}
 			}
@@ -108,13 +114,14 @@ func (s *Store) findObject(typeDef *config.TypeDefinition, id string) (*objectLo
 		val, _ := getString(fc.Single, idField)
 		if val == id {
 			return &objectLocation{
-				FilePath: file,
+				FilePath: match.path,
 				Format:   fc.Format,
 				Multi:    false,
 				Object:   cloneMap(fc.Single),
 				File:     fc,
 				TypeName: typeDef.Name,
 				IDField:  idField,
+				ReadOnly: fc.ReadOnly,
 			}, nil
 		}
 	}
@@ -142,22 +149,29 @@ func (s *Store) findObject(typeDef *config.TypeDefinition, id string) (*objectLo
 	return nil, nil
 }
 
-func (s *Store) matchTypeFiles(typeDef *config.TypeDefinition) ([]string, error) {
+func (s *Store) resolveIncludeMatches(typeDef *config.TypeDefinition) ([]includeMatch, error) {
 	seen := make(map[string]struct{})
-	var files []string
+	var matches []includeMatch
 
-	for _, pattern := range typeDef.Include {
+	for _, include := range typeDef.Include {
+		pattern := include.Path
+		if pattern == "" {
+			continue
+		}
+
 		absPattern := pattern
 		if !filepath.IsAbs(absPattern) {
 			absPattern = filepath.Join(s.root, filepath.Clean(pattern))
 		}
 
-		matches, err := filepath.Glob(absPattern)
+		globbed, err := filepath.Glob(absPattern)
 		if err != nil {
 			return nil, fmt.Errorf("data: glob %s: %w", pattern, err)
 		}
 
-		for _, match := range matches {
+		sort.Strings(globbed)
+
+		for _, match := range globbed {
 			info, err := os.Stat(match)
 			if err != nil {
 				if errors.Is(err, errFileNotFound) {
@@ -168,14 +182,16 @@ func (s *Store) matchTypeFiles(typeDef *config.TypeDefinition) ([]string, error)
 			if info.IsDir() {
 				continue
 			}
-			if _, ok := seen[match]; ok {
+
+			key := include.Path + "\x00" + include.Selector + "\x00" + match
+			if _, ok := seen[key]; ok {
 				continue
 			}
-			seen[match] = struct{}{}
-			files = append(files, match)
+			seen[key] = struct{}{}
+
+			matches = append(matches, includeMatch{include: include, path: match})
 		}
 	}
 
-	sort.Strings(files)
-	return files, nil
+	return matches, nil
 }

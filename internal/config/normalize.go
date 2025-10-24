@@ -83,7 +83,7 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 			Generated: spec.Identifier.Generated,
 			Pattern:   spec.Identifier.Pattern,
 		},
-		Include:    deduplicateStrings(spec.Include),
+		Include:    normalizeIncludeDirectives(spec.Include),
 		Fields:     fields,
 		InlineData: inlineData,
 	}, nil
@@ -219,19 +219,28 @@ func cloneInlineValue(value any) any {
 	}
 }
 
-func deduplicateStrings(values []string) []string {
-	seen := make(map[string]struct{}, len(values))
-	result := make([]string, 0, len(values))
-	for _, v := range values {
-		if v == "" {
-			continue
-		}
-		if _, ok := seen[v]; ok {
-			continue
-		}
-		seen[v] = struct{}{}
-		result = append(result, v)
+func normalizeIncludeDirectives(entries []rawIncludeDirective) []IncludeDefinition {
+	if len(entries) == 0 {
+		return nil
 	}
+
+	seen := make(map[string]struct{}, len(entries))
+	result := make([]IncludeDefinition, 0, len(entries))
+	for _, entry := range entries {
+		if entry.Path == "" {
+			continue
+		}
+		key := entry.Path + "\x00" + entry.Selector
+		if _, ok := seen[key]; ok {
+			continue
+		}
+		seen[key] = struct{}{}
+		result = append(result, IncludeDefinition{
+			Path:     entry.Path,
+			Selector: entry.Selector,
+		})
+	}
+
 	return result
 }
 
