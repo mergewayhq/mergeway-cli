@@ -1,0 +1,10 @@
+version: 1
+entities:
+  User:
+    identifier: id
+    fields:
+      id: string
+      name: string
+    include:
+      - path: data/users.json
+        selector: "$.users[*]"

@@ -66,6 +66,68 @@ func toSliceMap(value any) ([]map[string]any, error) {
 	return result, nil
 }
 
+func normalizeYAMLValue(value any) (any, error) {
+	switch v := value.(type) {
+	case map[string]any:
+		result := make(map[string]any, len(v))
+		for key, child := range v {
+			normalized, err := normalizeYAMLValue(child)
+			if err != nil {
+				return nil, err
+			}
+			result[key] = normalized
+		}
+		return result, nil
+	case map[any]any:
+		result := make(map[string]any, len(v))
+		for key, child := range v {
+			strKey, ok := key.(string)
+			if !ok {
+				return nil, fmt.Errorf("expected string map key, got %T", key)
+			}
+			normalized, err := normalizeYAMLValue(child)
+			if err != nil {
+				return nil, err
+			}
+			result[strKey] = normalized
+		}
+		return result, nil
+	case []any:
+		result := make([]any, len(v))
+		for i, item := range v {
+			normalized, err := normalizeYAMLValue(item)
+			if err != nil {
+				return nil, err
+			}
+			result[i] = normalized
+		}
+		return result, nil
+	default:
+		return v, nil
+	}
+}
+
+func normalizeObject(value any) (map[string]any, error) {
+	normalized, err := normalizeYAMLValue(value)
+	if err != nil {
+		return nil, err
+	}
+
+	obj, ok := normalized.(map[string]any)
+	if !ok {
+		return nil, fmt.Errorf("expected object, got %T", normalized)
+	}
+	return obj, nil
+}
+
+func removeTypeKeys(m map[string]any) {
+	if m == nil {
+		return
+	}
+	delete(m, "type")
+	delete(m, "Type")
+}
+
 func cloneMap(m map[string]any) map[string]any {
 	if m == nil {
 		return nil

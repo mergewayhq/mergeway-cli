@@ -21,6 +21,20 @@ func TestValidateAllPhasesSuccess(t *testing.T) {
 	}
 }
 
+func TestValidateJSONPathIncludes(t *testing.T) {
+	root := fixturePath(t, "jsonpath")
+	cfg := loadConfig(t, root)
+
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+
+	if len(res.Errors) != 0 {
+		t.Fatalf("expected no errors, got %v", res.Errors)
+	}
+}
+
 func TestValidateFormatError(t *testing.T) {
 	root := fixturePath(t, "format_error")
 	cfg := loadConfig(t, root)

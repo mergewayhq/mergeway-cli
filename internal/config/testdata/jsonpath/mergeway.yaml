@@ -1,0 +1,9 @@
+version: 1
+entities:
+  Item:
+    identifier: id
+    fields:
+      id: string
+    include:
+      - path: data/items.json
+        selector: "$.items[*]"

@@ -15,9 +15,52 @@ type rawConfigDocument struct {
 
 type rawTypeSpec struct {
 	Identifier rawIdentifierSpec             `yaml:"identifier"`
-	Include    []string                      `yaml:"include"`
+	Include    []rawIncludeDirective         `yaml:"include"`
 	Fields     map[string]rawFieldDefinition `yaml:"fields"`
 	Data       []map[string]any              `yaml:"data"`
+}
+
+type rawIncludeDirective struct {
+	Path     string `yaml:"path"`
+	Selector string `yaml:"selector"`
+}
+
+func (r *rawIncludeDirective) UnmarshalYAML(node *yaml.Node) error {
+	if node == nil {
+		return nil
+	}
+
+	switch node.Kind {
+	case yaml.ScalarNode:
+		var path string
+		if err := node.Decode(&path); err != nil {
+			return err
+		}
+		path = strings.TrimSpace(path)
+		if path == "" {
+			return fmt.Errorf("config: include path must be a non-empty string")
+		}
+		r.Path = path
+		r.Selector = ""
+		return nil
+	case yaml.MappingNode:
+		type alias rawIncludeDirective
+		var tmp alias
+		if err := node.Decode(&tmp); err != nil {
+			return err
+		}
+		tmp.Path = strings.TrimSpace(tmp.Path)
+		tmp.Selector = strings.TrimSpace(tmp.Selector)
+		if tmp.Path == "" {
+			return fmt.Errorf("config: include path must be a non-empty string")
+		}
+		*r = rawIncludeDirective(tmp)
+		return nil
+	case yaml.AliasNode:
+		return node.Decode(r)
+	default:
+		return fmt.Errorf("config: include entry must be a string or mapping, got %s", node.ShortTag())
+	}
 }
 
 type rawIdentifierSpec struct {

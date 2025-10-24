@@ -16,9 +16,15 @@ type TypeDefinition struct {
 	Name       string
 	Source     string
 	Identifier IdentifierDefinition
-	Include    []string
+	Include    []IncludeDefinition
 	Fields     map[string]*FieldDefinition
 	InlineData []map[string]any
+}
+
+// IncludeDefinition links a type to data files and selectors.
+type IncludeDefinition struct {
+	Path     string
+	Selector string
 }
 
 // IdentifierDefinition specifies the identifier field metadata.

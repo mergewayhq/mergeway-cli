@@ -51,6 +51,7 @@ type objectLocation struct {
 	TypeName string
 	IDField  string
 	Inline   bool
+	ReadOnly bool
 }
 
 func (loc *objectLocation) cloneObject() *Object {
@@ -84,6 +85,8 @@ type fileContent struct {
 	Multi    bool
 	Single   map[string]any
 	Items    []map[string]any
+	Selector string
+	ReadOnly bool
 }
 
 type createTarget struct {
