@@ -26,46 +26,49 @@ Every configuration document must conform to the following shape after include e
 version: <integer>
 entities:
   <TypeName>:
-    spec: <TypeSpec>
+    identifier: <IdentifierDefinition|string>
+    file_patterns:
+      - <glob>
+    fields:
+      <FieldName>: <FieldDefinition>
 ```
 
 - `version`: configuration schema version (start with `1`).
 - `entities`: map keyed by type identifiers (must start with an uppercase letter and otherwise follow identifier constraints outlined in `database-requirements.md`).
 
-## Entity Spec
+## Entity Definition
 
-Each `TypeSpec` entry provides the authoritative schema for a single object type.
+Each `<EntityDefinition>` entry provides the authoritative schema for a single object type.
 
 ```yaml
 entities:
   User:
-    spec:
-      identifier:
-        field: id
-      file_patterns:
-        - data/users/*.yaml
-      fields:
-        id:
-          type: string
-          required: true
-        name:
-          type: string
-          required: true
-        email:
-          type: string
-          format: email
-          required: true
-        profile:
-          type: object
-          properties:
-            bio:
-              type: string
-            website:
-              type: string
-              format: uri
-        teams:
-          type: Team
-          repeated: true
+    identifier:
+      field: id
+    file_patterns:
+      - data/users/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true
+      email:
+        type: string
+        format: email
+        required: true
+      profile:
+        type: object
+        properties:
+          bio:
+            type: string
+          website:
+            type: string
+            format: uri
+      teams:
+        type: Team
+        repeated: true
 ```
 
 `identifier` accepts either a plain string (e.g., `identifier: id`) or a mapping with `field`, optional `generated`, and `pattern` keys when you need additional behavior.

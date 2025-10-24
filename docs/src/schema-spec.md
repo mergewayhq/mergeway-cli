@@ -19,44 +19,49 @@ includes:
 
 ## Schema Files (`types/*.yaml`)
 
-A schema file wraps one or more entity specs. The example below defines a `Post` entity:
+A schema file declares one or more entity definitions. The example below defines a `Post` entity:
 
 ```yaml
 entities:
   Post:
-    spec:
-      identifier: id
-      file_patterns:
-        - data/posts/*.yaml
-      fields:
-        id:
-          type: string
-          required: true
-        title:
-          type: string
-          required: true
-        body:
-          type: string
-        author:
-          type: User
-          required: true
+    identifier: id
+    file_patterns:
+      - data/posts/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      title:
+        type: string
+        required: true
+      body:
+        type: string
+      author:
+        type: User
+        required: true
 ```
 
 For advanced scenarios you can expand `identifier` into a mapping:
 
 ```yaml
-identifier:
-  field: id
-  generated: true
+entities:
+  Post:
+    identifier:
+      field: id
+      generated: true
+    file_patterns:
+      - data/posts/*.yaml
+    fields:
+      # ...
 ```
 
 ### Required Sections
 
 | Key | Description |
 | --- | --- |
-| `spec.identifier` | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. |
-| `spec.file_patterns` | Glob patterns pointing at the data files that belong to this entity. |
-| `spec.fields` | Map of field definitions. |
+| `identifier` | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. |
+| `file_patterns` | Glob patterns pointing at the data files that belong to this entity. |
+| `fields` | Map of field definitions. |
 
 ### Field Attributes
 
@@ -73,7 +78,7 @@ Keep schema files small and focused—one entity per file is the easiest to main
 
 ## Data Files (`data/...`)
 
-Each data file must declare a `type` and provide the fields required by its spec:
+Each data file must declare a `type` and provide the fields required by its entity definition:
 
 ```yaml
 type: Post

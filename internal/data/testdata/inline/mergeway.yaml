@@ -1,47 +1,44 @@
 version: 1
 entities:
   User:
-    spec:
-      file_patterns:
+    file_patterns:
       - data/users/*.yaml
-      fields:
-        id:
-          type: string
-          required: true
-        name:
-          type: string
-          required: true
-        email:
-          type: string
-          required: true
-      identifier: id
+    fields:
+      id:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true
+      email:
+        type: string
+        required: true
+    identifier: id
   Post:
-    spec:
-      file_patterns:
+    file_patterns:
       - data/posts/*.yaml
-      fields:
-        id:
-          type: string
-          required: true
-        title:
-          type: string
-          required: true
-        author:
-          type: User
-          required: true
-        tags:
-          type: Tag
-          repeated: true
-      identifier: id
+    fields:
+      id:
+        type: string
+        required: true
+      title:
+        type: string
+        required: true
+      author:
+        type: User
+        required: true
+      tags:
+        type: Tag
+        repeated: true
+    identifier: id
   Tag:
-    spec:
-      file_patterns:
+    file_patterns:
       - data/tags/*.yaml
-      fields:
-        id:
-          type: string
-          required: true
-        label:
-          type: string
-          required: true
-      identifier: id
+    fields:
+      id:
+        type: string
+        required: true
+      label:
+        type: string
+        required: true
+    identifier: id

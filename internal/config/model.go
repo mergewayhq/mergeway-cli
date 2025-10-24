@@ -50,7 +50,7 @@ func (c *Config) String() string {
 	return fmt.Sprintf("Config{version:%d, types:%d}", c.Version, len(c.Types))
 }
 
-// Sources returns a sorted list of files that contributed entity specs.
+// Sources returns a sorted list of files that contributed entity definitions.
 func (c *Config) Sources() []string {
 	if c == nil {
 		return nil

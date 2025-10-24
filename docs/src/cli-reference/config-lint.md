@@ -28,7 +28,7 @@ configuration valid
 
 If the command encounters a problem (for example, an include pattern that matches no files), it prints the error and exits with status `1`.
 
-Run this command whenever you edit `mergeway.yaml` or add new entity specs to catch syntax mistakes early.
+Run this command whenever you edit `mergeway.yaml` or add new entity definitions to catch syntax mistakes early.
 
 ## Related Commands
 

@@ -7,13 +7,9 @@ import (
 )
 
 type rawConfigDocument struct {
-	Version  *int                      `yaml:"version"`
-	Includes []string                  `yaml:"includes"`
-	Entities map[string]rawTypeWrapper `yaml:"entities"`
-}
-
-type rawTypeWrapper struct {
-	Spec rawTypeSpec `yaml:"spec"`
+	Version  *int                   `yaml:"version"`
+	Includes []string               `yaml:"includes"`
+	Entities map[string]rawTypeSpec `yaml:"entities"`
 }
 
 type rawTypeSpec struct {

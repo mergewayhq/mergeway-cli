@@ -1,14 +1,13 @@
 version: 1
 entities:
   Person:
-    spec:
-      file_patterns:
+    file_patterns:
       - data/*.yaml
-      fields:
-        id:
-          type: integer
-          required: true
-        name:
-          type: string
-          required: true
-      identifier: id
+    fields:
+      id:
+        type: integer
+        required: true
+      name:
+        type: string
+        required: true
+    identifier: id

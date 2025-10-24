@@ -1,12 +1,11 @@
 version: 1
 entities:
   Post:
-    spec:
-      file_patterns:
+    file_patterns:
       - data/posts/*.yaml
-      fields:
-        id:
-          type: string
-        author:
-          type: User
-      identifier: id
+    fields:
+      id:
+        type: string
+      author:
+        type: User
+    identifier: id
