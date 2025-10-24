@@ -28,14 +28,11 @@ entities:
     include:
       - data/posts/*.yaml
     fields:
-      id:
-        type: string
-        required: true
+      id: string
       title:
         type: string
         required: true
-      body:
-        type: string
+      body: string
       author:
         type: User
         required: true
@@ -66,7 +63,7 @@ entities:
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `identifier` | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. |
 | `include`    | Glob patterns pointing at the data files that belong to this entity. Omit only when you rely exclusively on inline `data`.                                                                                                                             |
-| `fields`     | Map of field definitions.                                                                                                                                                                                                                              |
+| `fields`     | Map of field definitions. Use either the shorthand `field: type` (defaults to optional) or the expanded mapping for advanced options.                                                                                                                  |
 | `data`       | Optional array of inline records. Each entry must contain the identifier field and follows the same schema rules as external data files.                                                                                                              |
 
 ### Inline Data
@@ -80,14 +77,11 @@ entities:
     include:
       - data/people/*.yaml
     fields:
-      id:
-        type: string
-        required: true
+      id: string
       name:
         type: string
         required: true
-      age:
-        type: integer
+      age: integer
     data:
       - id: person-1
         name: Alice
@@ -98,6 +92,10 @@ entities:
 ```
 
 Inline records are loaded alongside file-based data. If a record with the same identifier exists both inline and on disk, the file wins. Inline records are read-only at runtime—`mw data update` and `mw data delete` target files only.
+
+### Field Shorthand
+
+When a field only needs a type, map entries can use the compact `field: type` syntax. These fields default to `required: false` and behave identically to the expanded form otherwise. Switch to the full mapping whenever you need attributes like `required`, `repeated`, or `format`.
 
 ### Field Attributes
 

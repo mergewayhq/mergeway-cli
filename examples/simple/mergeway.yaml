@@ -1,16 +1,15 @@
 version: 1
 entities:
+
   Person:
-    identifier: id
+
     fields:
-      id:
-        type: integer
-        required: true
-      name:
-        type: string
-        required: true
-      age:
-        type: integer
+      id: integer
+      name: string
+      age: integer
+
+    identifier: id
+
     data:
       - id: 1
         name: Alice Example
