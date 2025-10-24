@@ -9,6 +9,3 @@ src = "src"
 [output.html]
 default-theme = "light"
 site-url = "/"
-
-[output.html.fold]
-enable = true

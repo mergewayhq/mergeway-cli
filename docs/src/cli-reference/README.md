@@ -34,5 +34,6 @@ Every command shares a set of global flags:
 - [`mw create`](cli/create.md)
 - [`mw update`](cli/update.md)
 - [`mw delete`](cli/delete.md)
+- [`mw export`](cli/export.md)
 
 Need a refresher on terminology? See the [Concepts](../concepts/README.md) chapter.
