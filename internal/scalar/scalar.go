@@ -11,18 +11,18 @@ import (
 // strings, numbers, and json.Number values produced by the JSON decoder.
 func AsString(value any) (string, bool) {
 	switch v := value.(type) {
+	case json.Number:
+		str := v.String()
+		if str == "" {
+			return "", false
+		}
+		return str, true
 	case string:
 		if v == "" {
 			return "", false
 		}
 		return v, true
 	case fmt.Stringer:
-		str := v.String()
-		if str == "" {
-			return "", false
-		}
-		return str, true
-	case json.Number:
 		str := v.String()
 		if str == "" {
 			return "", false

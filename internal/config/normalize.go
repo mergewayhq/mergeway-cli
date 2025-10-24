@@ -235,10 +235,7 @@ func normalizeIncludeDirectives(entries []rawIncludeDirective) []IncludeDefiniti
 			continue
 		}
 		seen[key] = struct{}{}
-		result = append(result, IncludeDefinition{
-			Path:     entry.Path,
-			Selector: entry.Selector,
-		})
+		result = append(result, IncludeDefinition(entry))
 	}
 
 	return result
