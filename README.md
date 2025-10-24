@@ -49,6 +49,9 @@ mw list --type User
 
 # 4. Validate structure and relations before merging
 mw validate --summary
+
+# 5. Export your dataset as a single snapshot
+mw export --format json --output snapshot.json
 ```
 
 ## Explore the Examples

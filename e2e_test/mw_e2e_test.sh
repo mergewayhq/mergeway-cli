@@ -80,6 +80,12 @@ echo
 "$MW_BIN" --root "$STATE_DIR" list --type User
 echo
 
+echo "Exporting repository snapshot..."
+EXPORT_PATH="$INPUT_DIR/export.json"
+"$MW_BIN" --root "$STATE_DIR" --format json export --output "$EXPORT_PATH"
+cat "$EXPORT_PATH"
+echo
+
 
 echo "Validating example dataset..."
 "$MW_BIN" --root "$ROOT_DIR/examples/full" validate

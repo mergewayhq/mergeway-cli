@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -96,6 +97,65 @@ func TestConfigExport(t *testing.T) {
 
 	if !strings.Contains(stdout.String(), "\"properties\"") {
 		t.Fatalf("unexpected output: %s", stdout.String())
+	}
+}
+
+func TestExportToStdout(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "export"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("export exit %d stderr %s", code, stderr.String())
+	}
+
+	data := make(map[string]any)
+	if err := yaml.Unmarshal(stdout.Bytes(), &data); err != nil {
+		t.Fatalf("unexpected yaml output: %v (body=%s)", err, stdout.String())
+	}
+
+	users, ok := data["User"].([]any)
+	if !ok || len(users) == 0 {
+		t.Fatalf("expected user records, got %v", data["User"])
+	}
+
+	if _, ok := data["Post"].([]any); !ok {
+		t.Fatalf("expected post records, got %v", data["Post"])
+	}
+}
+
+func TestExportWithOutputAndFilters(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	outputPath := filepath.Join(t.TempDir(), "export.json")
+
+	code := Run([]string{"--root", repo, "--format", "json", "export", "--output", outputPath, "Post"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("export exit %d stderr %s", code, stderr.String())
+	}
+
+	if stdout.Len() != 0 {
+		t.Fatalf("expected no stdout, got %s", stdout.String())
+	}
+
+	body, err := os.ReadFile(outputPath)
+	if err != nil {
+		t.Fatalf("read export file: %v", err)
+	}
+
+	var payload map[string]any
+	if err := json.Unmarshal(body, &payload); err != nil {
+		t.Fatalf("unexpected json output: %v (body=%s)", err, string(body))
+	}
+
+	if len(payload) != 1 {
+		t.Fatalf("expected only one entity, got %v", payload)
+	}
+	posts, ok := payload["Post"].([]any)
+	if !ok || len(posts) == 0 {
+		t.Fatalf("expected post records, got %v", payload["Post"])
 	}
 }
 
