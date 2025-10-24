@@ -140,6 +140,9 @@ func (s *Store) Update(typeName, id string, fields map[string]any, merge bool) (
 	if loc == nil {
 		return nil, fmt.Errorf("data: %s %q not found", typeName, id)
 	}
+	if loc.Inline {
+		return nil, fmt.Errorf("data: %s %q is defined inline and cannot be modified", typeName, id)
+	}
 
 	updated := cloneMap(loc.Object)
 	if merge {
@@ -189,6 +192,9 @@ func (s *Store) Delete(typeName, id string) error {
 	}
 	if loc == nil {
 		return fmt.Errorf("data: %s %q not found", typeName, id)
+	}
+	if loc.Inline {
+		return fmt.Errorf("data: %s %q is defined inline and cannot be modified", typeName, id)
 	}
 
 	if loc.Multi {

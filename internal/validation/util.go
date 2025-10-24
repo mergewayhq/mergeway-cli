@@ -66,4 +66,30 @@ func toSliceMap(value any) ([]map[string]any, error) {
 	return result, nil
 }
 
+func cloneMap(m map[string]any) map[string]any {
+	if m == nil {
+		return nil
+	}
+	dup := make(map[string]any, len(m))
+	for k, v := range m {
+		dup[k] = cloneValue(v)
+	}
+	return dup
+}
+
+func cloneValue(v any) any {
+	switch val := v.(type) {
+	case map[string]any:
+		return cloneMap(val)
+	case []any:
+		res := make([]any, len(val))
+		for i, item := range val {
+			res[i] = cloneValue(item)
+		}
+		return res
+	default:
+		return val
+	}
+}
+
 // osReadFile is a test seam for injecting failures.

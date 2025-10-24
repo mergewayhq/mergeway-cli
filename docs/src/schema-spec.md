@@ -39,6 +39,11 @@ entities:
       author:
         type: User
         required: true
+    data:
+      - id: post-inline
+        title: Inline Example
+        author: user-alice
+        body: Inline data lives in the schema file.
 ```
 
 For advanced scenarios you can expand `identifier` into a mapping:
@@ -60,8 +65,39 @@ entities:
 | Key          | Description                                                                                                                                                                                                                                            |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `identifier` | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. |
-| `include`    | Glob patterns pointing at the data files that belong to this entity.                                                                                                                                                                                   |
+| `include`    | Glob patterns pointing at the data files that belong to this entity. Omit only when you rely exclusively on inline `data`.                                                                                                                             |
 | `fields`     | Map of field definitions.                                                                                                                                                                                                                              |
+| `data`       | Optional array of inline records. Each entry must contain the identifier field and follows the same schema rules as external data files.                                                                                                              |
+
+### Inline Data
+
+Inline data is helpful for tiny lookup tables or bootstrapping a demo without creating additional files. Define records directly inside the entity specification:
+
+```yaml
+entities:
+  Person:
+    identifier: id
+    include:
+      - data/people/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true
+      age:
+        type: integer
+    data:
+      - id: person-1
+        name: Alice
+        age: 30
+      - id: person-2
+        name: Bob
+        age: 42
+```
+
+Inline records are loaded alongside file-based data. If a record with the same identifier exists both inline and on disk, the file wins. Inline records are read-only at runtime—`mw data update` and `mw data delete` target files only.
 
 ### Field Attributes
 

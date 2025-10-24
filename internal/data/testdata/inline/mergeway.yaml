@@ -42,3 +42,6 @@ entities:
         type: string
         required: true
     identifier: id
+    data:
+      - id: Tag-Inline
+        label: Inline Tag

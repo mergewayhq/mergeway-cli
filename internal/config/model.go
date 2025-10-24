@@ -18,6 +18,7 @@ type TypeDefinition struct {
 	Identifier IdentifierDefinition
 	Include    []string
 	Fields     map[string]*FieldDefinition
+	InlineData []map[string]any
 }
 
 // IdentifierDefinition specifies the identifier field metadata.

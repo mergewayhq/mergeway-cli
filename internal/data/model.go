@@ -50,6 +50,7 @@ type objectLocation struct {
 	File     *fileContent
 	TypeName string
 	IDField  string
+	Inline   bool
 }
 
 func (loc *objectLocation) cloneObject() *Object {

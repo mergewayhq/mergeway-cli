@@ -135,6 +135,33 @@ func TestStoreWithInlineConfig(t *testing.T) {
 	if obj.Fields["title"] != "Inline Updated" {
 		t.Fatalf("expected updated title, got %v", obj.Fields["title"])
 	}
+
+	tagIDs, err := store.List("Tag")
+	if err != nil {
+		t.Fatalf("List tags returned error: %v", err)
+	}
+
+	expectedTagIDs := []string{"Tag-Docs", "Tag-Inline"}
+	if !reflect.DeepEqual(tagIDs, expectedTagIDs) {
+		t.Fatalf("expected tag IDs %v, got %v", expectedTagIDs, tagIDs)
+	}
+
+	inlineTag, err := store.Get("Tag", "Tag-Inline")
+	if err != nil {
+		t.Fatalf("Get inline tag returned error: %v", err)
+	}
+
+	if inlineTag.Fields["label"] != "Inline Tag" {
+		t.Fatalf("expected inline tag label 'Inline Tag', got %v", inlineTag.Fields["label"])
+	}
+
+	if _, err := store.Update("Tag", "Tag-Inline", map[string]any{"label": "New"}, false); err == nil || !strings.Contains(err.Error(), "inline") {
+		t.Fatalf("expected inline update to fail, got %v", err)
+	}
+
+	if err := store.Delete("Tag", "Tag-Inline"); err == nil || !strings.Contains(err.Error(), "inline") {
+		t.Fatalf("expected inline delete to fail, got %v", err)
+	}
 }
 
 func TestStoreNumericIdentifiers(t *testing.T) {

@@ -104,5 +104,20 @@ func loadTypeObjects(root string, typeDef *config.TypeDefinition) ([]*rawObject,
 		})
 	}
 
+	source := relPath(root, typeDef.Source)
+	for idx, item := range typeDef.InlineData {
+		label := source
+		if label == "" {
+			label = typeDef.Source
+		}
+		label = fmt.Sprintf("%s (inline %d)", label, idx+1)
+		records = append(records, &rawObject{
+			typeDef: typeDef,
+			file:    label,
+			index:   -1,
+			data:    cloneMap(item),
+		})
+	}
+
 	return records, errs
 }
