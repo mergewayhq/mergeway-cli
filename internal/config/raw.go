@@ -8,7 +8,7 @@ import (
 
 type rawConfigDocument struct {
 	Version  *int                   `yaml:"version"`
-	Includes []string               `yaml:"includes"`
+	Include  []string               `yaml:"include"`
 	Entities map[string]rawTypeSpec `yaml:"entities"`
 }
 

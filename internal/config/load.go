@@ -57,7 +57,7 @@ func loadRecursive(path string, cache map[string]*aggregateConfig, stack map[str
 	agg := newAggregateConfig()
 	baseDir := filepath.Dir(path)
 
-	for _, include := range doc.Includes {
+	for _, include := range doc.Include {
 		includePath := include
 		if !filepath.IsAbs(includePath) {
 			includePath = filepath.Join(baseDir, includePath)

@@ -27,7 +27,7 @@ Open `mergeway.yaml` and replace its contents with:
 
 ```yaml
 version: 1
-includes:
+include:
   - types/*.yaml
 ```
 

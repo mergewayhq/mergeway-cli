@@ -12,11 +12,11 @@ Define the configuration language that describes database structure, so the CLI 
 
 ```yaml
 version: 1
-includes:
+include:
   - types/**/*.yaml
 ```
 
-The CLI resolves `includes` relative to the parent file, expanding globs before merging the referenced documents.
+The CLI resolves `include` relative to the parent file, expanding globs before merging the referenced documents.
 
 ## Top-Level Structure
 
