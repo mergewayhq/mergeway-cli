@@ -50,8 +50,8 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		return nil, fmt.Errorf("config: type %q has invalid identifier field %q", rawType.Name, spec.Identifier.Field)
 	}
 
-	if len(spec.Include) == 0 {
-		return nil, fmt.Errorf("config: type %q must declare at least one include entry", rawType.Name)
+	if len(spec.Include) == 0 && len(spec.Data) == 0 {
+		return nil, fmt.Errorf("config: type %q must declare at least one include or provide inline data", rawType.Name)
 	}
 
 	fields := make(map[string]*FieldDefinition, len(spec.Fields))
@@ -73,6 +73,8 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		fields[fieldName] = fieldDef
 	}
 
+	inlineData := cloneInlineData(spec.Data)
+
 	return &TypeDefinition{
 		Name:   rawType.Name,
 		Source: rawType.Source,
@@ -81,8 +83,9 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 			Generated: spec.Identifier.Generated,
 			Pattern:   spec.Identifier.Pattern,
 		},
-		Include: deduplicateStrings(spec.Include),
-		Fields:  fields,
+		Include:    deduplicateStrings(spec.Include),
+		Fields:     fields,
+		InlineData: inlineData,
 	}, nil
 }
 
@@ -177,6 +180,43 @@ func validateFieldReference(typeName string, field *FieldDefinition, types map[s
 	}
 
 	return nil
+}
+
+func cloneInlineData(items []map[string]any) []map[string]any {
+	if len(items) == 0 {
+		return nil
+	}
+	result := make([]map[string]any, 0, len(items))
+	for _, item := range items {
+		result = append(result, cloneInlineMap(item))
+	}
+	return result
+}
+
+func cloneInlineMap(src map[string]any) map[string]any {
+	if src == nil {
+		return nil
+	}
+	dst := make(map[string]any, len(src))
+	for k, v := range src {
+		dst[k] = cloneInlineValue(v)
+	}
+	return dst
+}
+
+func cloneInlineValue(value any) any {
+	switch v := value.(type) {
+	case map[string]any:
+		return cloneInlineMap(v)
+	case []any:
+		res := make([]any, len(v))
+		for i, item := range v {
+			res[i] = cloneInlineValue(item)
+		}
+		return res
+	default:
+		return v
+	}
 }
 
 func deduplicateStrings(values []string) []string {

@@ -31,6 +31,8 @@ entities:
       - <glob>
     fields:
       <FieldName>: <FieldDefinition>
+    data:
+      - <InlineRecord>
 ```
 
 - `version`: configuration schema version (start with `1`).
@@ -69,9 +71,14 @@ entities:
       teams:
         type: Team
         repeated: true
+    data:
+      - id: team-tools
+        name: Tools Team
 ```
 
 `identifier` accepts either a plain string (e.g., `identifier: id`) or a mapping with `field`, optional `generated`, and `pattern` keys when you need additional behavior.
+
+Inline records declared under `data` are optional and most useful for tiny lookup sets or bootstrapping demos without creating separate files.
 
 ### Field Specification
 
@@ -94,6 +101,8 @@ Extra validation knobs let future tooling derive JSON Schema while preserving ri
 ## File Association
 
 `include` bind a type to one or more data files. Patterns may select both YAML and JSON documents. When matching files, the CLI infers the type from the configuration; a top-level `type` field is optional and only used as an override/sanity check.
+
+Inline data defined within the schema participates in validation and read operations just like file-backed records. When both inline and file data supply the same identifier, the file-sourced record wins. Inline data is intentionally immutable at runtime; mutating commands continue to operate on disk files only.
 
 ```yaml
 # multi-object file example

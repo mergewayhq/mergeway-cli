@@ -68,6 +68,33 @@ body: |
   We are excited to announce the product launch.
 ```
 
+### Optional: seed inline data
+
+If you only need a couple of seed rows, you can embed them alongside the schema by adding a `data` section:
+
+```yaml
+entities:
+  Post:
+    identifier: id
+    include:
+      - data/posts/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      title:
+        type: string
+        required: true
+      body:
+        type: string
+    data:
+      - id: post-inline
+        title: Inline Example
+        body: Inline data lives in the schema file.
+```
+
+Inline records load together with file-based data. They are intentionally read-only—commands such as `mw data update` and `mw data delete` only modify files on disk.
+
 ## 4. Inspect what Mergeway sees
 
 List the known entities:

@@ -25,6 +25,9 @@ entities:
         type: string
         required: true
     identifier: id
+    data:
+      - id: Tag-Inline
+        label: Inline Tag
   Post:
     include:
       - data/posts/*.yaml

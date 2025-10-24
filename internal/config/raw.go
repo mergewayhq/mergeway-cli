@@ -16,6 +16,7 @@ type rawTypeSpec struct {
 	Identifier rawIdentifierSpec             `yaml:"identifier"`
 	Include    []string                      `yaml:"include"`
 	Fields     map[string]rawFieldDefinition `yaml:"fields"`
+	Data       []map[string]any              `yaml:"data"`
 }
 
 type rawIdentifierSpec struct {

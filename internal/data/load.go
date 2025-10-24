@@ -16,6 +16,8 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 		return nil, err
 	}
 
+	seenIDs := make(map[string]struct{})
+	idField := typeDef.Identifier.Field
 	var objects []*Object
 	for _, file := range files {
 		fc, err := s.loadFile(file, typeDef.Name)
@@ -29,23 +31,35 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 
 		if fc.Multi {
 			for _, item := range fc.Items {
-				idField := typeDef.Identifier.Field
 				idVal, err := requiredString(item, idField)
 				if err != nil {
 					return nil, fmt.Errorf("data: %s in %s: %w", typeDef.Name, fc.Path, err)
 				}
 				objects = append(objects, &Object{Type: typeDef.Name, ID: idVal, Fields: cloneMap(item), File: fc.Path})
+				seenIDs[idVal] = struct{}{}
 			}
 			continue
 		}
 
-		idField := typeDef.Identifier.Field
 		idVal, err := requiredString(fc.Single, idField)
 		if err != nil {
 			return nil, fmt.Errorf("data: %s in %s: %w", typeDef.Name, fc.Path, err)
 		}
 
 		objects = append(objects, &Object{Type: typeDef.Name, ID: idVal, Fields: cloneMap(fc.Single), File: fc.Path})
+		seenIDs[idVal] = struct{}{}
+	}
+
+	for idx, item := range typeDef.InlineData {
+		idVal, err := requiredString(item, idField)
+		if err != nil {
+			return nil, fmt.Errorf("data: %s inline item %d: %w", typeDef.Name, idx+1, err)
+		}
+		if _, exists := seenIDs[idVal]; exists {
+			continue
+		}
+		objects = append(objects, &Object{Type: typeDef.Name, ID: idVal, Fields: cloneMap(item)})
+		seenIDs[idVal] = struct{}{}
 	}
 
 	return objects, nil
@@ -101,6 +115,26 @@ func (s *Store) findObject(typeDef *config.TypeDefinition, id string) (*objectLo
 				File:     fc,
 				TypeName: typeDef.Name,
 				IDField:  idField,
+			}, nil
+		}
+	}
+
+	for idx, item := range typeDef.InlineData {
+		val, err := requiredString(item, idField)
+		if err != nil {
+			return nil, fmt.Errorf("data: %s inline item %d: %w", typeDef.Name, idx+1, err)
+		}
+		if val == id {
+			return &objectLocation{
+				FilePath: "",
+				Format:   formatYAML,
+				Multi:    false,
+				Index:    -1,
+				Object:   cloneMap(item),
+				File:     nil,
+				TypeName: typeDef.Name,
+				IDField:  idField,
+				Inline:   true,
 			}, nil
 		}
 	}

@@ -52,6 +52,19 @@ func TestLoadValidConfig(t *testing.T) {
 	if author.Type != "User" {
 		t.Fatalf("expected author to reference User, got %q", author.Type)
 	}
+
+	tag, ok := cfg.Types["Tag"]
+	if !ok {
+		t.Fatalf("expected type 'Tag' to be present")
+	}
+
+	if len(tag.InlineData) != 1 {
+		t.Fatalf("expected Tag to have 1 inline data item, got %d", len(tag.InlineData))
+	}
+
+	if value := tag.InlineData[0]["label"]; value != "Inline Tag" {
+		t.Fatalf("expected inline tag label 'Inline Tag', got %v", value)
+	}
 }
 
 func TestLoadRepeatedUniqueError(t *testing.T) {
