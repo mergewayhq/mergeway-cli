@@ -1,7 +1,7 @@
 version: 1
 entities:
   Person:
-    file_patterns:
+    include:
       - data/*.yaml
     fields:
       id:

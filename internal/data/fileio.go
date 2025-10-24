@@ -124,7 +124,7 @@ func (s *Store) removeFile(path string) error {
 func (s *Store) chooseCreateTarget(typeDef *config.TypeDefinition, id string) (*createTarget, error) {
 	var multiTarget *createTarget
 
-	for _, pattern := range typeDef.FilePatterns {
+	for _, pattern := range typeDef.Include {
 		absPattern := pattern
 		if !filepath.IsAbs(absPattern) {
 			absPattern = filepath.Join(s.root, filepath.Clean(pattern))

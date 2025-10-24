@@ -32,7 +32,7 @@ func loadTypeObjects(root string, typeDef *config.TypeDefinition) ([]*rawObject,
 	seenFiles := make(map[string]struct{})
 	var files []string
 
-	for _, pattern := range typeDef.FilePatterns {
+	for _, pattern := range typeDef.Include {
 		absPattern := filepath.Join(root, filepath.Clean(pattern))
 		matches, err := filepath.Glob(absPattern)
 		if err != nil {

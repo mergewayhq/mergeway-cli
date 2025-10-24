@@ -87,14 +87,14 @@ items:
 
 ## Validation Interaction
 
-- The CLI crawls files determined by each type’s `file_patterns`.
-- Keep unrelated assets outside the listed directories or use explicit `file_patterns` to avoid accidental ingestion.
+- The CLI crawls files determined by each type’s `include`.
+- Keep unrelated assets outside the listed directories or use explicit `include` to avoid accidental ingestion.
 - Aggregated validation errors include file paths, so consistent structure improves debugging.
 
 ## Future-Proofing
 
 - Consider a dedicated `includes/` folder if you plan to share fragments across multiple databases.
-- Keep `data/` sharded by stable heuristics (alphabetical prefix, domain grouping) once datasets grow, updating `file_patterns` accordingly.
+- Keep `data/` sharded by stable heuristics (alphabetical prefix, domain grouping) once datasets grow, updating `include` accordingly.
 - Binary assets should stay outside the database scope until support is introduced.
 
 ## Worked Example

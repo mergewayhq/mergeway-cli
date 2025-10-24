@@ -1,6 +1,6 @@
 entities:
   Comment:
-    file_patterns:
+    include:
       - data/comments/*.json
     fields:
       id:

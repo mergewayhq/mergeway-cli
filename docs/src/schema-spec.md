@@ -25,7 +25,7 @@ A schema file declares one or more entity definitions. The example below defines
 entities:
   Post:
     identifier: id
-    file_patterns:
+    include:
       - data/posts/*.yaml
     fields:
       id:
@@ -49,7 +49,7 @@ entities:
     identifier:
       field: id
       generated: true
-    file_patterns:
+    include:
       - data/posts/*.yaml
     fields:
       # ...
@@ -57,11 +57,11 @@ entities:
 
 ### Required Sections
 
-| Key             | Description                                                                                                                                                                                                                                            |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `identifier`    | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. |
-| `file_patterns` | Glob patterns pointing at the data files that belong to this entity.                                                                                                                                                                                   |
-| `fields`        | Map of field definitions.                                                                                                                                                                                                                              |
+| Key          | Description                                                                                                                                                                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `identifier` | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. |
+| `include`    | Glob patterns pointing at the data files that belong to this entity.                                                                                                                                                                                   |
+| `fields`     | Map of field definitions.                                                                                                                                                                                                                              |
 
 ### Field Attributes
 
@@ -89,7 +89,7 @@ body: |
   We are excited to announce the product launch.
 ```
 
-You can store one object per file (as above) or provide an `items:` array to keep several objects together. Adding the `type` key is optional when the file already matches the schema’s `file_patterns`, but keeping it makes each file self-describing.
+You can store one object per file (as above) or provide an `items:` array to keep several objects together. Adding the `type` key is optional when the file already matches the schema’s `include`, but keeping it makes each file self-describing.
 
 Identifier fields accept numeric payloads as well. For example, the following record is valid when the schema marks `id` as an `integer`:
 

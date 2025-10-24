@@ -1,6 +1,6 @@
 entities:
   User:
-    file_patterns:
+    include:
       - data/users/*.yaml
       - data/users/*.json
     fields:

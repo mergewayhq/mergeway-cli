@@ -1,6 +1,6 @@
 entities:
   Tag:
-    file_patterns:
+    include:
       - data/tags/*.yaml
     fields:
       id:

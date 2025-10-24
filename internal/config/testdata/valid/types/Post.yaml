@@ -1,6 +1,6 @@
 entities:
   Post:
-    file_patterns:
+    include:
       - data/posts/*.yaml
     fields:
       id:

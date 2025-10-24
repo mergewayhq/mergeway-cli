@@ -1,7 +1,7 @@
 version: 1
 entities:
   Item:
-    file_patterns:
+    include:
       - data/items/*.yaml
     fields:
       id:

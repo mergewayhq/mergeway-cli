@@ -1,7 +1,7 @@
 version: 1
 entities:
   User:
-    file_patterns:
+    include:
       - data/users/*.yaml
     fields:
       id:
@@ -15,7 +15,7 @@ entities:
         required: true
     identifier: id
   Post:
-    file_patterns:
+    include:
       - data/posts/*.yaml
     fields:
       id:
@@ -32,7 +32,7 @@ entities:
         repeated: true
     identifier: id
   Tag:
-    file_patterns:
+    include:
       - data/tags/*.yaml
     fields:
       id:

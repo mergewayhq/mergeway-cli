@@ -13,11 +13,11 @@ type Config struct {
 
 // TypeDefinition describes a single object type.
 type TypeDefinition struct {
-	Name         string
-	Source       string
-	Identifier   IdentifierDefinition
-	FilePatterns []string
-	Fields       map[string]*FieldDefinition
+	Name       string
+	Source     string
+	Identifier IdentifierDefinition
+	Include    []string
+	Fields     map[string]*FieldDefinition
 }
 
 // IdentifierDefinition specifies the identifier field metadata.
