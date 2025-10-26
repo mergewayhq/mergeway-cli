@@ -3,21 +3,27 @@ mergeway:
 
 entities:
   Post:
+    description: Blog posts published to the marketing site
     include:
       - data/posts/*.yaml
     fields:
       id:
         type: string
         required: true
+        description: Canonical post identifier
       title:
         type: string
         required: true
+        description: Human readable post headline
       author:
         type: User
         required: true
+        description: User identifier for the primary author
       tags:
         type: Tag
         repeated: true
+        description: Tags applied for categorization and filtering
       body:
         type: string
+        description: Markdown content rendered on the site
     identifier: id

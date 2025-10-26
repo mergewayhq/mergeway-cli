@@ -29,6 +29,7 @@ mergeway:
 
 entities:
   Post:
+    description: Blog posts surfaced on the marketing site
     identifier: id
     include:
       - data/posts/*.yaml
@@ -37,6 +38,7 @@ entities:
       title:
         type: string
         required: true
+        description: Human readable title
       body: string
       author:
         type: User
@@ -56,6 +58,7 @@ mergeway:
 
 entities:
   Post:
+    description: Blog posts surfaced on the marketing site
     identifier:
       field: id
       generated: true
@@ -73,6 +76,7 @@ mergeway:
 
 entities:
   User:
+    description: Directory of account holders sourced from JSON
     identifier: id
     include:
       - path: data/users.json
@@ -92,6 +96,8 @@ Strings remain a shorthand for `path` with no `selector`; Mergeway then reads th
 | `fields`     | Map of field definitions. Use either the shorthand `field: type` (defaults to optional) or the expanded mapping for advanced options.                                                                                                                     |
 | `data`       | Optional array of inline records. Each entry must contain the identifier field and follows the same schema rules as external data files.                                                                                                                  |
 
+Add `description` anywhere you need extra context. Entities accept it alongside `identifier`, and each field definition supports its own `description` value.
+
 ### Inline Data
 
 Inline data is helpful for tiny lookup tables or bootstrapping a demo without creating additional files. Define records directly inside the entity specification:
@@ -102,6 +108,7 @@ mergeway:
 
 entities:
   Person:
+    description: Lightweight profile objects
     identifier: id
     include:
       - data/people/*.yaml
@@ -110,6 +117,7 @@ entities:
       name:
         type: string
         required: true
+        description: Preferred display name
       age: integer
     data:
       - id: person-1

@@ -3,22 +3,28 @@ mergeway:
 
 entities:
   Comment:
+    description: Reader comments attached to blog posts
     include:
       - data/comments/*.json
     fields:
       id:
         type: string
         required: true
+        description: Comment identifier used for moderation tools
       post:
         type: Post
         required: true
+        description: Referenced post identifier
       author:
         type: User
         required: true
+        description: User identifier of the commenter
       content:
         type: string
         required: true
+        description: Freeform comment body
       created_at:
         type: string
         required: true
+        description: ISO 8601 timestamp when the comment was written
     identifier: id

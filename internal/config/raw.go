@@ -18,10 +18,11 @@ type rawMergewaySection struct {
 }
 
 type rawTypeSpec struct {
-	Identifier rawIdentifierSpec             `yaml:"identifier"`
-	Include    []rawIncludeDirective         `yaml:"include"`
-	Fields     map[string]rawFieldDefinition `yaml:"fields"`
-	Data       []map[string]any              `yaml:"data"`
+	Identifier  rawIdentifierSpec             `yaml:"identifier"`
+	Include     []rawIncludeDirective         `yaml:"include"`
+	Fields      map[string]rawFieldDefinition `yaml:"fields"`
+	Data        []map[string]any              `yaml:"data"`
+	Description string                        `yaml:"description"`
 }
 
 type rawIncludeDirective struct {
@@ -112,16 +113,17 @@ func (r *rawIdentifierSpec) UnmarshalYAML(node *yaml.Node) error {
 }
 
 type rawFieldDefinition struct {
-	Type       string                        `yaml:"type"`
-	Required   bool                          `yaml:"required"`
-	Repeated   bool                          `yaml:"repeated"`
-	Format     string                        `yaml:"format"`
-	Enum       []string                      `yaml:"enum"`
-	Default    any                           `yaml:"default"`
-	Properties map[string]rawFieldDefinition `yaml:"properties"`
-	Unique     *bool                         `yaml:"unique"`
-	Computed   bool                          `yaml:"computed"`
-	Pattern    string                        `yaml:"pattern"`
+	Type        string                        `yaml:"type"`
+	Required    bool                          `yaml:"required"`
+	Repeated    bool                          `yaml:"repeated"`
+	Format      string                        `yaml:"format"`
+	Enum        []string                      `yaml:"enum"`
+	Default     any                           `yaml:"default"`
+	Properties  map[string]rawFieldDefinition `yaml:"properties"`
+	Unique      *bool                         `yaml:"unique"`
+	Computed    bool                          `yaml:"computed"`
+	Pattern     string                        `yaml:"pattern"`
+	Description string                        `yaml:"description"`
 }
 
 func (r *rawFieldDefinition) UnmarshalYAML(node *yaml.Node) error {

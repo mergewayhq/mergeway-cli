@@ -80,8 +80,9 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 	inlineData := cloneInlineData(spec.Data)
 
 	return &TypeDefinition{
-		Name:   rawType.Name,
-		Source: rawType.Source,
+		Name:        rawType.Name,
+		Source:      rawType.Source,
+		Description: spec.Description,
 		Identifier: IdentifierDefinition{
 			Field:     spec.Identifier.Field,
 			Generated: spec.Identifier.Generated,
@@ -128,17 +129,18 @@ func normalizeFieldDefinition(name string, raw rawFieldDefinition, typeName stri
 	}
 
 	return &FieldDefinition{
-		Name:       name,
-		Type:       raw.Type,
-		Required:   raw.Required,
-		Repeated:   raw.Repeated,
-		Format:     raw.Format,
-		Enum:       append([]string(nil), raw.Enum...),
-		Default:    raw.Default,
-		Properties: properties,
-		Unique:     unique,
-		Computed:   raw.Computed,
-		Pattern:    raw.Pattern,
+		Name:        name,
+		Type:        raw.Type,
+		Required:    raw.Required,
+		Repeated:    raw.Repeated,
+		Format:      raw.Format,
+		Enum:        append([]string(nil), raw.Enum...),
+		Default:     raw.Default,
+		Properties:  properties,
+		Unique:      unique,
+		Computed:    raw.Computed,
+		Pattern:     raw.Pattern,
+		Description: raw.Description,
 	}, nil
 }
 

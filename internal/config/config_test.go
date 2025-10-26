@@ -28,8 +28,21 @@ func TestLoadValidConfig(t *testing.T) {
 		t.Fatalf("expected type 'Post' to be present")
 	}
 
+	if post.Description != "Primary blog post content type" {
+		t.Fatalf("expected Post description to be present")
+	}
+
 	if post.Identifier.Field != "id" {
 		t.Fatalf("expected Post identifier field 'id', got %q", post.Identifier.Field)
+	}
+
+	title, ok := post.Fields["title"]
+	if !ok {
+		t.Fatalf("expected Post field 'title' to be present")
+	}
+
+	if title.Description != "Human readable title shown in listings" {
+		t.Fatalf("expected title description, got %q", title.Description)
 	}
 
 	tags, ok := post.Fields["tags"]
