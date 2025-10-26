@@ -1,4 +1,6 @@
-version: 1
+mergeway:
+  version: 1
+
 entities:
   Item:
     identifier: id

@@ -6,6 +6,8 @@ Describe the recommended on-disk structure for the file-backed database so that 
 
 ## High-Level Structure
 
+The following is a conventional layout for a Mergeway database repository.
+
 ```
 repo-root/
   mergeway.yaml
@@ -22,7 +24,7 @@ repo-root/
 ```
 
 - `mergeway.yaml`: root configuration entry file that wires together entity definitions via includes.
-- `types/`: YAML files that define types and field metadata.
+- `entities/`: YAML files that define types and field metadata.
 - `data/`: Object files stored in JSON or YAML; folders are a convenience, not a requirement.
 - `docs/`: Specification documents (this folder).
 - `examples/`: Sample datasets referenced in documentation or tests.
@@ -34,7 +36,9 @@ repo-root/
 
 ```yaml
 # mergeway.yaml
-version: 1
+mergeway:
+  version: 1
+
 include:
   - types/*.yaml
 ```

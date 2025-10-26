@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/mergewayhq/mergeway-cli/internal/config"
 )
 
 func cmdInit(ctx *Context, args []string) int {
@@ -38,9 +40,10 @@ func ensureFile(path, content string) error {
 }
 
 func defaultConfigTemplate() string {
-	return `# This configuration file describes your mergeway set-up.
+	return fmt.Sprintf(`# This configuration file describes your mergeway set-up.
 
-version: 1  # Current config version. Leave at 1 unless release notes say otherwise.
+mergeway:
+  version: %[1]d  # Current config version. Leave at %[1]d unless release notes say otherwise.
 
 # Everything below lives under the entities map. Uncomment the sample and tweak names
 # to match your domain. You can duplicate the block to describe additional entities.
@@ -62,5 +65,5 @@ entities:
   #     - id: user-0001         # You can inline object, this works well for small data sets.
   #       name: Jane Doe
   #       email: jane@example.com
-`
+`, config.CurrentVersion)
 }

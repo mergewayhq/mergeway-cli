@@ -1,3 +1,6 @@
+mergeway:
+  version: 1
+
 entities:
   User:
     identifier:

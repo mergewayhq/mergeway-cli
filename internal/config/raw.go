@@ -8,9 +8,13 @@ import (
 )
 
 type rawConfigDocument struct {
-	Version  *int                   `yaml:"version"`
+	Mergeway *rawMergewaySection    `yaml:"mergeway"`
 	Include  []string               `yaml:"include"`
 	Entities map[string]rawTypeSpec `yaml:"entities"`
+}
+
+type rawMergewaySection struct {
+	Version *int `yaml:"version"`
 }
 
 type rawTypeSpec struct {

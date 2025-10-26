@@ -26,7 +26,9 @@ echo "Initializing repository..."
 "$MW_BIN" --root "$STATE_DIR" init
 
 cat > "$STATE_DIR/mergeway.yaml" <<'CONFIG'
-version: 1
+mergeway:
+  version: 1
+
 entities:
   User:
     identifier: id

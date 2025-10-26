@@ -31,7 +31,9 @@ The default configuration contains:
 
 ```yaml
 # mw configuration
-version: 1
+mergeway:
+  version: 1
+
 entities: {}
 ```
 
