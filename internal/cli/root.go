@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -23,6 +24,7 @@ type Context struct {
 func Run(args []string, stdout, stderr io.Writer) int {
 	fs := flag.NewFlagSet("mw", flag.ContinueOnError)
 	fs.SetOutput(stderr)
+	fs.Usage = func() {}
 
 	root := fs.String("root", ".", "Repository root containing config and data directories")
 	configPath := fs.String("config", "", "Path to configuration entry file")
@@ -32,12 +34,16 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	verbose := fs.Bool("verbose", false, "Enable verbose logging")
 
 	if err := fs.Parse(args); err != nil {
+		if errors.Is(err, flag.ErrHelp) {
+			printUsage(stdout, fs)
+			return 0
+		}
 		return 1
 	}
 
 	remaining := fs.Args()
 	if len(remaining) == 0 {
-		printUsage(stdout)
+		printUsage(stdout, fs)
 		return 1
 	}
 
@@ -80,16 +86,16 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	case "version":
 		return cmdVersion(ctx, remaining[1:])
 	case "help", "--help", "-h":
-		printUsage(stdout)
+		printUsage(stdout, fs)
 		return 0
 	default:
 		_, _ = fmt.Fprintf(stderr, "unknown command: %s\n", remaining[0])
-		printUsage(stderr)
+		printUsage(stderr, fs)
 		return 1
 	}
 }
 
-func printUsage(w io.Writer) {
+func printUsage(w io.Writer, fs *flag.FlagSet) {
 	_, _ = fmt.Fprintln(w, "Usage: mw [global flags] <command> [args]")
 	_, _ = fmt.Fprintln(w, "\nCommands:")
 	_, _ = fmt.Fprintln(w, "  init                      Scaffold repository structure")
@@ -105,4 +111,35 @@ func printUsage(w io.Writer) {
 	_, _ = fmt.Fprintln(w, "  config lint               Validate configuration files")
 	_, _ = fmt.Fprintln(w, "  config export             Export entity definition as JSON Schema")
 	_, _ = fmt.Fprintln(w, "  version                   Display CLI build information")
+
+	_, _ = fmt.Fprintln(w, "\nGlobal Flags:")
+	fs.VisitAll(func(f *flag.Flag) {
+		flagName, usage := flag.UnquoteUsage(f)
+		label := fmt.Sprintf("--%s", f.Name)
+		if flagName != "" {
+			label = fmt.Sprintf("%s %s", label, flagName)
+		}
+		line := fmt.Sprintf("  %-26s %s", label, usage)
+		if shouldShowDefault(f) {
+			line = fmt.Sprintf("%s (default %s)", line, formatDefault(f))
+		}
+		_, _ = fmt.Fprintln(w, line)
+	})
+}
+
+func shouldShowDefault(f *flag.Flag) bool {
+	if f.DefValue == "" {
+		return false
+	}
+	if f.DefValue == "false" {
+		return false
+	}
+	return true
+}
+
+func formatDefault(f *flag.Flag) string {
+	if _, ok := f.Value.(interface{ IsBoolFlag() bool }); ok && f.DefValue == "true" {
+		return f.DefValue
+	}
+	return fmt.Sprintf("%q", f.DefValue)
 }
