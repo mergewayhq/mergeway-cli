@@ -26,7 +26,9 @@ mw init
 Open `mergeway.yaml` and replace its contents with:
 
 ```yaml
-version: 1
+mergeway:
+  version: 1
+
 include:
   - types/*.yaml
 ```
@@ -38,6 +40,9 @@ This tells Mergeway to load every schema stored under `types/`.
 Create `types/Post.yaml`:
 
 ```yaml
+mergeway:
+  version: 1
+
 entities:
   Post:
     identifier: id

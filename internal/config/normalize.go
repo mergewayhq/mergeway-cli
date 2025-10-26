@@ -11,7 +11,11 @@ func normalizeAggregate(agg *aggregateConfig) (*Config, error) {
 	}
 
 	if !agg.VersionSet {
-		return nil, errors.New("config: version is required")
+		return nil, errors.New("config: mergeway.version is required")
+	}
+
+	if agg.Version != CurrentVersion {
+		return nil, fmt.Errorf("config: unsupported mergeway.version %d", agg.Version)
 	}
 
 	result := &Config{

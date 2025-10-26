@@ -9,12 +9,14 @@ Schemas live under `types/` and describe one entity per file. Mergeway also expe
 The workspace entry file declares the schema version and the files to load:
 
 ```yaml
-version: 1
+mergeway:
+  version: 1
+
 include:
   - types/*.yaml
 ```
 
-- `version` tracks breaking changes in the configuration format (keep it at `1`).
+- `mergeway.version` tracks breaking changes in the configuration format (keep it at `1`).
 - `include` is a list of glob patterns. Each matching file is merged into the configuration. Patterns must resolve to at least one file; otherwise Mergeway reports an error.
 
 ## Schema Files (`types/*.yaml`)
@@ -22,6 +24,9 @@ include:
 A schema file declares one or more entity definitions. The example below defines a `Post` entity:
 
 ```yaml
+mergeway:
+  version: 1
+
 entities:
   Post:
     identifier: id
@@ -46,6 +51,9 @@ entities:
 For advanced scenarios you can expand `identifier` into a mapping:
 
 ```yaml
+mergeway:
+  version: 1
+
 entities:
   Post:
     identifier:
@@ -60,6 +68,9 @@ entities:
 When several objects live in one file, provide a JSONPath selector to extract them:
 
 ```yaml
+mergeway:
+  version: 1
+
 entities:
   User:
     identifier: id
@@ -86,6 +97,9 @@ Strings remain a shorthand for `path` with no `selector`; Mergeway then reads th
 Inline data is helpful for tiny lookup tables or bootstrapping a demo without creating additional files. Define records directly inside the entity specification:
 
 ```yaml
+mergeway:
+  version: 1
+
 entities:
   Person:
     identifier: id

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -169,5 +170,52 @@ func TestLoadIncludeWithJSONPath(t *testing.T) {
 	}
 	if include.Selector != "$.items[*]" {
 		t.Fatalf("expected selector '$.items[*]', got %q", include.Selector)
+	}
+}
+
+func TestLoadMissingMergewayBlock(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`entities:
+  Foo:
+    identifier: id
+    fields:
+      id: string
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected error for missing mergeway block")
+	}
+
+	if got := err.Error(); !strings.Contains(got, "mergeway block is required") {
+		t.Fatalf("expected mergeway block error, got %q", got)
+	}
+}
+
+func TestLoadUnsupportedConfigVersion(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 2
+
+entities:
+  Foo:
+    identifier: id
+    fields:
+      id: string
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected error for unsupported version")
+	}
+
+	if got := err.Error(); !strings.Contains(got, "mergeway.version must be") {
+		t.Fatalf("expected unsupported version error, got %q", got)
 	}
 }

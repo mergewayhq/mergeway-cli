@@ -11,9 +11,11 @@ Define the configuration language that describes database structure, so the CLI 
 - Config files may `include` other files via glob patterns, letting teams split large schemas into focused modules per domain or type.
 
 ```yaml
-version: 1
+mergeway:
+  version: 1
+
 include:
-  - types/**/*.yaml
+  - entities/**/*.yaml
 ```
 
 The CLI resolves `include` relative to the parent file, expanding globs before merging the referenced documents.
@@ -23,7 +25,9 @@ The CLI resolves `include` relative to the parent file, expanding globs before m
 Every configuration document must conform to the following shape after include expansion:
 
 ```yaml
-version: <integer>
+mergeway:
+  version: 1
+
 entities:
   <TypeName>:
     identifier: <IdentifierDefinition|string>
@@ -35,7 +39,7 @@ entities:
       - <InlineRecord>
 ```
 
-- `version`: configuration schema version (start with `1`).
+- `mergeway.version`: configuration schema version (always equals `1`).
 - `entities`: map keyed by type identifiers (must start with an uppercase letter and otherwise follow identifier constraints outlined in `database-requirements.md`).
 
 ## Entity Definition

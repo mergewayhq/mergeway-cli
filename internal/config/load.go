@@ -107,7 +107,7 @@ func (a *aggregateConfig) merge(other *aggregateConfig) error {
 	if other.VersionSet {
 		if a.VersionSet {
 			if a.Version != other.Version {
-				return fmt.Errorf("config: version mismatch (got %d and %d)", a.Version, other.Version)
+				return fmt.Errorf("config: mergeway.version mismatch (got %d and %d)", a.Version, other.Version)
 			}
 		} else {
 			a.Version = other.Version
@@ -130,15 +130,25 @@ func (a *aggregateConfig) addDocument(doc *rawConfigDocument, source string) err
 		return nil
 	}
 
-	if doc.Version != nil {
-		if a.VersionSet {
-			if a.Version != *doc.Version {
-				return fmt.Errorf("config: version mismatch (got %d and %d)", a.Version, *doc.Version)
-			}
-		} else {
-			a.Version = *doc.Version
-			a.VersionSet = true
+	if doc.Mergeway == nil {
+		return fmt.Errorf("config: mergeway block is required in %s", source)
+	}
+
+	if doc.Mergeway.Version == nil {
+		return fmt.Errorf("config: mergeway.version is required in %s", source)
+	}
+
+	if *doc.Mergeway.Version != CurrentVersion {
+		return fmt.Errorf("config: mergeway.version must be %d in %s (got %d)", CurrentVersion, source, *doc.Mergeway.Version)
+	}
+
+	if a.VersionSet {
+		if a.Version != *doc.Mergeway.Version {
+			return fmt.Errorf("config: mergeway.version mismatch (got %d and %d)", a.Version, *doc.Mergeway.Version)
 		}
+	} else {
+		a.Version = *doc.Mergeway.Version
+		a.VersionSet = true
 	}
 
 	for name, spec := range doc.Entities {
