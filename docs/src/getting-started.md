@@ -45,6 +45,7 @@ mergeway:
 
 entities:
   Post:
+    description: Blog posts shown to customers
     identifier: id
     include:
       - data/posts/*.yaml
@@ -55,10 +56,11 @@ entities:
       title:
         type: string
         required: true
+        description: Human readable headline
       body: string
 ```
 
-This schema maps every YAML file in `data/posts/` to a `Post`. The `id` field acts as the primary key. The `body` field uses the shorthand `body: string`, which is equivalent to the longer mapping with `required: false`.
+This schema maps every YAML file in `data/posts/` to a `Post`. The `id` field acts as the primary key. The `description` entries are optional and help downstream tooling explain entities and fields. The `body` field uses the shorthand `body: string`, which is equivalent to the longer mapping with `required: false`.
 
 ## 3. Add the first record
 
@@ -77,8 +79,12 @@ body: |
 If you only need a couple of seed rows, you can embed them alongside the schema by adding a `data` section:
 
 ```yaml
+mergeway:
+  version: 1
+
 entities:
   Post:
+    description: Blog posts shown to customers
     identifier: id
     include:
       - data/posts/*.yaml

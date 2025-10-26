@@ -13,12 +13,13 @@ type Config struct {
 
 // TypeDefinition describes a single object type.
 type TypeDefinition struct {
-	Name       string
-	Source     string
-	Identifier IdentifierDefinition
-	Include    []IncludeDefinition
-	Fields     map[string]*FieldDefinition
-	InlineData []map[string]any
+	Name        string
+	Source      string
+	Description string
+	Identifier  IdentifierDefinition
+	Include     []IncludeDefinition
+	Fields      map[string]*FieldDefinition
+	InlineData  []map[string]any
 }
 
 // IncludeDefinition links a type to data files and selectors.
@@ -36,17 +37,18 @@ type IdentifierDefinition struct {
 
 // FieldDefinition holds schema information for a field.
 type FieldDefinition struct {
-	Name       string
-	Type       string
-	Required   bool
-	Repeated   bool
-	Format     string
-	Enum       []string
-	Default    any
-	Properties map[string]*FieldDefinition
-	Unique     bool
-	Computed   bool
-	Pattern    string
+	Name        string
+	Type        string
+	Required    bool
+	Repeated    bool
+	Format      string
+	Enum        []string
+	Default     any
+	Properties  map[string]*FieldDefinition
+	Unique      bool
+	Computed    bool
+	Pattern     string
+	Description string
 }
 
 // String returns a string representation for debugging purposes.

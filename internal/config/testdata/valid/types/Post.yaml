@@ -3,6 +3,7 @@ mergeway:
 
 entities:
   Post:
+    description: Primary blog post content type
     include:
       - data/posts/*.yaml
     fields:
@@ -12,6 +13,7 @@ entities:
       title:
         type: string
         required: true
+        description: Human readable title shown in listings
       author:
         type: User
         required: true

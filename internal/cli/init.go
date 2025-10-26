@@ -49,6 +49,7 @@ mergeway:
 # to match your domain. You can duplicate the block to describe additional entities.
 entities:
   # User:
+  #   description: Describe what this entity stores.
   #   fields:
   #     id:
   #       type: string
@@ -57,6 +58,7 @@ entities:
   #     email:
   #       type: string
   #       format: email         # Try formats, enums, references, or custom scalars.
+  #       description: Shown in notification emails.
   #   identifier: id            # Define which field to use as the identifier of the entity.
   #   include:
   #     - data/users/*.yaml     # Globs for YAML/JSON files on disk.

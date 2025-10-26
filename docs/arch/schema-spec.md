@@ -30,6 +30,7 @@ mergeway:
 
 entities:
   <TypeName>:
+    description: Optional human-readable summary
     identifier: <IdentifierDefinition|string>
     include:
       - <glob>
@@ -40,7 +41,8 @@ entities:
 ```
 
 - `mergeway.version`: configuration schema version (always equals `1`).
-- `entities`: map keyed by type identifiers (must start with an uppercase letter and otherwise follow identifier constraints outlined in `database-requirements.md`).
+- `entities`: map keyed by type identifiers (must start with an uppercase letter and otherwise follow identifier constraints outlined in `database-requirements.md`). Each entity may offer an optional `description` for tooling and documentation.
+- Field definitions accept an optional `description` to clarify usage in downstream tooling.
 
 ## Entity Definition
 
@@ -49,6 +51,7 @@ Each `<EntityDefinition>` entry provides the authoritative schema for a single o
 ```yaml
 entities:
   User:
+    description: Accounts used for authentication and ownership
     identifier:
       field: id
     include:
@@ -64,6 +67,7 @@ entities:
         type: string
         format: email
         required: true
+        description: Primary contact address
       profile:
         type: object
         properties:

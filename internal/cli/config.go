@@ -99,6 +99,10 @@ func buildJSONSchema(typeDef *config.TypeDefinition) map[string]any {
 			}
 		}
 
+		if field.Description != "" {
+			prop["description"] = field.Description
+		}
+
 		properties[name] = prop
 		if field.Required {
 			required = append(required, name)
@@ -109,6 +113,9 @@ func buildJSONSchema(typeDef *config.TypeDefinition) map[string]any {
 		"$schema":    "https://json-schema.org/draft/2020-12/schema",
 		"type":       "object",
 		"properties": properties,
+	}
+	if typeDef.Description != "" {
+		schema["description"] = typeDef.Description
 	}
 	if len(required) > 0 {
 		schema["required"] = required
