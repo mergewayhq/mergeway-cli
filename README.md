@@ -39,9 +39,9 @@ make build
 mw init my-dataset
 cd my-dataset
 
-# 2. Inspect the generated types and schemas
-mw type list
-mw type show User --format json
+# 2. Inspect the generated entities and schemas
+mw entity list
+mw entity show User --format json
 
 # 3. Add or update metadata
 mw create --type User --file payloads/jane.yaml
@@ -59,7 +59,7 @@ mw export --format json --output snapshot.json
 A sample workspace lives under `examples/full`. Point `mw` at it to see commands and responses in context:
 
 ```bash
-mw --root examples/full type list
+mw --root examples/full entity list
 mw --root examples/full list --type User
 mw --root examples/full get --type Post post-001 --format json
 mw --root examples/full validate

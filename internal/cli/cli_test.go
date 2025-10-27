@@ -11,12 +11,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func TestTypeList(t *testing.T) {
+func TestEntityList(t *testing.T) {
 	repo := copyFixture(t)
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	code := Run([]string{"--root", repo, "type", "list"}, stdout, stderr)
+	code := Run([]string{"--root", repo, "entity", "list"}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("exit code %d, stderr %s", code, stderr.String())
 	}

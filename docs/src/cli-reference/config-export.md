@@ -47,5 +47,5 @@ Validate your workspace (`mw config lint` or `mw validate`) after editing type f
 
 ## Related Commands
 
-- [`mw type show`](type-show.md) — view the full Mergeway representation of a type.
+- [`mw entity show`](entity-show.md) — view the full Mergeway representation of an entity.
 - [`mw validate`](validate.md) — ensure data conforms to the schema you just exported.

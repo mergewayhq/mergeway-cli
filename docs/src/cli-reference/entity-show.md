@@ -1,23 +1,23 @@
-# `mw type show`
+# `mw entity show`
 
 Last updated: 2025-10-22
 
-> **Synopsis:** Print the normalized schema for a given type.
+> **Synopsis:** Print the normalized schema for a given entity.
 
 ## Usage
 
 ```bash
-mw [global flags] type show <type>
+mw [global flags] entity show <entity>
 ```
 
 No additional flags. Use `--format json` if you prefer JSON output, and add the global `--root` flag when working outside the workspace root.
 
 ## Example
 
-Show the `Post` type in YAML form:
+Show the `Post` entity in YAML form:
 
 ```bash
-mw --root examples/full --format yaml type show Post
+mw --root examples/full --format yaml entity show Post
 ```
 
 Output (abridged):
@@ -42,5 +42,5 @@ fields:
 
 ## Related Commands
 
-- [`mw type list`](type-list.md) — find available types.
+- [`mw entity list`](entity-list.md) — find available entities.
 - [`mw config export`](config-export.md) — generate a JSON Schema from an entity definition.
