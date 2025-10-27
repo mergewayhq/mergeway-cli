@@ -17,14 +17,14 @@ No additional flags. Use `--format json` if you prefer JSON output, and add the 
 Show the `Post` type in YAML form:
 
 ```bash
-mw --root examples --format yaml type show Post
+mw --root examples/full --format yaml type show Post
 ```
 
 Output (abridged):
 
 ```yaml
 name: Post
-source: .../examples/types/Post.yaml
+source: .../examples/full/entities/Post.yaml
 identifier:
   field: id
 filepatterns:

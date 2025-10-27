@@ -6,7 +6,7 @@ Capture the expected surface of the `mw` command-line tool used to manage the fi
 
 ## Global Flags
 
-- `--root <path>`: filesystem root containing `mergeway.yaml`, `types/`, and `data/` (defaults to current directory).
+- `--root <path>`: filesystem root containing `mergeway.yaml` (defaults to current directory).
 - `--config <path>`: override the configuration entry point (defaults to `<root>/mergeway.yaml`).
 - `--format <yaml|json>`: preferred payload format for command output (default `yaml`).
 - `--fail-fast`: when supplied to validation commands, stop on the first error instead of aggregating.
@@ -18,7 +18,7 @@ Capture the expected surface of the `mw` command-line tool used to manage the fi
 
 `mw init [--root <path>]`
 
-- Scaffold folders (`types/`, `data/`, `docs/`, `examples/`) and a starter `mergeway.yaml` with comments.
+- Ensure `mergeway.yaml` exists (creating it from a commented template when missing). You can build out additional folders manually if your workflow benefits from them.
 - Never overwrite existing files unless `--force` is specified (future enhancement).
 
 ### 2. Type Introspection

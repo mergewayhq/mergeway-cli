@@ -14,14 +14,11 @@ cd blog-metadata
 mw init
 ```
 
-`mw init` creates the basic layout:
+`mw init` creates the basic layout in a `merggeway.yaml` file.
 
-```
-.
-├── mergeway.yaml   # configuration entry point
-├── data/           # object files live here
-└── types/          # schema definitions live here
-```
+That's all the CLI writes for you by default. Create supporting folders only when you need them—this guide will add an `entities/` folder shortly to keep the schema separate from data files.
+
+````
 
 Open `mergeway.yaml` and replace its contents with:
 
@@ -30,14 +27,18 @@ mergeway:
   version: 1
 
 include:
-  - types/*.yaml
-```
+  - entities/*.yaml
+````
 
-This tells Mergeway to load every schema stored under `types/`.
+This tells Mergeway to load every schema stored under `entities/`. For small experiments you can keep everything inline inside `mergeway.yaml`; we use separate files here to mirror how larger teams collaborate.
 
 ## 2. Describe the first schema
 
-Create `types/Post.yaml`:
+Create an `entities` directory and add `entities/Post.yaml` (or embed the same content directly in `mergeway.yaml` if you prefer a single file):
+
+```bash
+mkdir -p entities
+```
 
 ```yaml
 mergeway:
@@ -64,7 +65,13 @@ This schema maps every YAML file in `data/posts/` to a `Post`. The `id` field ac
 
 ## 3. Add the first record
 
-Create `data/posts/launch.yaml`:
+Create a folder for post data:
+
+```bash
+mkdir -p data/posts
+```
+
+Now create `data/posts/launch.yaml`:
 
 ```yaml
 type: Post
@@ -156,7 +163,7 @@ validation succeeded
 
 ## 5. Extend the model with references
 
-Add a user schema (`types/User.yaml`):
+Add a user schema (`entities/User.yaml`, or another include file that matches your layout):
 
 ```yaml
 entities:
@@ -173,7 +180,7 @@ entities:
       - data/users/*.yaml
 ```
 
-Update `types/Post.yaml` so each post points to a user:
+Update the post schema (whether inline or in `entities/Post.yaml`) so each post points to a user:
 
 ```yaml
 entities:

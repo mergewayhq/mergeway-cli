@@ -2,16 +2,16 @@
 
 ## Purpose
 
-Describe the recommended on-disk structure for the file-backed database so that teams can organize configuration and object data consistently.
+Describe conventional on-disk structures for the file-backed database so that teams can organize configuration and object data consistently while retaining flexibility for simpler setups.
 
 ## High-Level Structure
 
-The following is a conventional layout for a Mergeway database repository.
+The following is a conventional layout for a Mergeway database repository. Treat it as a starting point rather than a mandate—lightweight projects can stay within a single `mergeway.yaml`, while larger teams often break files out by responsibility.
 
 ```
 repo-root/
   mergeway.yaml
-  types/
+  entities/
     User.yaml
     Post.yaml
   data/
@@ -23,16 +23,16 @@ repo-root/
   examples/
 ```
 
-- `mergeway.yaml`: root configuration entry file that wires together entity definitions via includes.
-- `entities/`: YAML files that define types and field metadata.
-- `data/`: Object files stored in JSON or YAML; folders are a convenience, not a requirement.
+- `mergeway.yaml`: root configuration entry file that wires together entity definitions via includes. It can also embed the entire schema and inline data for small datasets.
+- `entities/`: YAML files that define types and field metadata (optional; use when the schema benefits from modularization).
+- `data/`: Object files stored in JSON or YAML; folders are a convenience, not a requirement, and can be introduced gradually.
 - `docs/`: Specification documents (this folder).
 - `examples/`: Sample datasets referenced in documentation or tests.
 
 ## Configuration Layout
 
 - `mergeway.yaml` is the entry point referenced by the CLI via `--config` (defaults to this path when present).
-- Split complex schemas into `types/<TypeName>.yaml` files and include them from the entry point using glob patterns.
+- Split complex schemas into `entities/<TypeName>.yaml` files (or another folder of your choosing) and include them from the entry point using glob patterns when the project size warrants it.
 
 ```yaml
 # mergeway.yaml
@@ -40,7 +40,7 @@ mergeway:
   version: 1
 
 include:
-  - types/*.yaml
+  - entities/*.yaml
 ```
 
 ## Data Layout Guidelines
@@ -49,6 +49,17 @@ include:
 - Use `.yaml` for human-edited files by default; `.json` remains supported for automation.
 - Files may hold a single object or multiple objects of a single type.
 - Multi-object files should wrap records under `items:` with a shared `type:` header to avoid ambiguity.
+
+## Choosing a Layout
+
+Pick an organization strategy that mirrors how teams maintain the data:
+
+- **Single-file setups**: Keep everything inline inside `mergeway.yaml` when the dataset is tiny, the schema rarely changes, or a single team owns both definitions and data. Inline records stay easy to review and avoid file churn.
+- **Split schemas**: Move entities into `entities/` (or another folder name) when the schema grows complex or when you want focused ownership per domain. This lets you gate changes via tooling such as `CODEOWNERS` or directory-specific reviews.
+- **Sharded data**: Break `data/` into multiple folders when several teams contribute records or when automation writes to specific subsets. Directory boundaries map cleanly to ownership rules, continuous integration filters, or deployment pipelines.
+- **Hybrid**: Combine inline records for lookup tables with file-backed data for high-churn entities. The CLI treats both sources uniformly, so you can pick whatever mix keeps editing friction low.
+
+Revisit the layout as the repository evolves; reorganizing includes and folders is safe as long as references stay consistent.
 
 ### Single Object Example
 

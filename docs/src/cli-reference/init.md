@@ -26,7 +26,7 @@ Output:
 Initialized repository at .
 ```
 
-`mw init` creates `types/`, `data/`, and a starter `mergeway.yaml`. Re-run the command safely; it only creates missing directories and leaves existing files untouched.
+`mw init` ensures a starter `mergeway.yaml` exists in the target directory. Add folders such as `entities/` or `data/` yourself once the project grows; keeping everything in a single file is perfectly valid. Re-run the command safely—it never overwrites existing files.
 The default configuration contains:
 
 ```yaml
