@@ -21,12 +21,12 @@ Capture the expected surface of the `mw` command-line tool used to manage the fi
 - Ensure `mergeway.yaml` exists (creating it from a commented template when missing). You can build out additional folders manually if your workflow benefits from them.
 - Never overwrite existing files unless `--force` is specified (future enhancement).
 
-### 2. Type Introspection
+### 2. Entity Introspection
 
-- `mw type list`
-  - Lists type identifiers defined in the configuration.
-- `mw type show <type>`
-  - Prints the effective schema for a type, including identifier metadata, field definitions, and file patterns pulled from the entity definition.
+- `mw entity list`
+  - Lists entity identifiers defined in the configuration.
+- `mw entity show <entity>`
+  - Prints the effective schema for an entity, including identifier metadata, field definitions, and file patterns pulled from the entity definition.
   - Accepts `--format` to output JSON or YAML.
 
 ### 3. Object CRUD

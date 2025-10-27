@@ -65,8 +65,8 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	switch remaining[0] {
 	case "init":
 		return cmdInit(ctx, remaining[1:])
-	case "type":
-		return cmdType(ctx, remaining[1:])
+	case "entity":
+		return cmdEntity(ctx, remaining[1:])
 	case "list":
 		return cmdList(ctx, remaining[1:])
 	case "get":
@@ -99,8 +99,8 @@ func printUsage(w io.Writer, fs *flag.FlagSet) {
 	_, _ = fmt.Fprintln(w, "Usage: mw [global flags] <command> [args]")
 	_, _ = fmt.Fprintln(w, "\nCommands:")
 	_, _ = fmt.Fprintln(w, "  init                      Scaffold repository structure")
-	_, _ = fmt.Fprintln(w, "  type list                 List known types")
-	_, _ = fmt.Fprintln(w, "  type show <type>          Show schema for a type")
+	_, _ = fmt.Fprintln(w, "  entity list               List known entities")
+	_, _ = fmt.Fprintln(w, "  entity show <name>        Show schema for an entity")
 	_, _ = fmt.Fprintln(w, "  list                      List object identifiers")
 	_, _ = fmt.Fprintln(w, "  get                       Get an object")
 	_, _ = fmt.Fprintln(w, "  create                    Create an object")

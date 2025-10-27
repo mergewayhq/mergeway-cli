@@ -45,11 +45,11 @@ entities:
         type: string
 CONFIG
 
-echo "Listing types..."
-"$MW_BIN" --root "$STATE_DIR" type list
+echo "Listing entities..."
+"$MW_BIN" --root "$STATE_DIR" entity list
 
-echo "Showing type User..."
-"$MW_BIN" --root "$STATE_DIR" --format json type show User
+echo "Showing entity User..."
+"$MW_BIN" --root "$STATE_DIR" --format json entity show User
 
 echo "Creating dummy object..."
 cat > "$INPUT_DIR/user.yaml" <<'PAYLOAD'

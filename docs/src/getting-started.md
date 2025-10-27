@@ -14,11 +14,9 @@ cd blog-metadata
 mw init
 ```
 
-`mw init` creates the basic layout in a `merggeway.yaml` file.
+`mw init` creates the basic layout in a `mergeway.yaml` file.
 
 That's all the CLI writes for you by default. Create supporting folders only when you need them—this guide will add an `entities/` folder shortly to keep the schema separate from data files.
-
-````
 
 Open `mergeway.yaml` and replace its contents with:
 
@@ -28,7 +26,7 @@ mergeway:
 
 include:
   - entities/*.yaml
-````
+```
 
 This tells Mergeway to load every schema stored under `entities/`. For small experiments you can keep everything inline inside `mergeway.yaml`; we use separate files here to mirror how larger teams collaborate.
 
@@ -117,7 +115,7 @@ Inline records load together with file-based data. They are intentionally read-o
 List the known entities:
 
 ```bash
-mw type list
+mw entity list
 ```
 
 Output:
@@ -129,7 +127,7 @@ Post
 Inspect the normalized schema (use `--format json` if you prefer JSON):
 
 ```bash
-mw --format yaml type show Post
+mw --format yaml entity show Post
 ```
 
 Output (abridged):
@@ -288,4 +286,4 @@ Next steps:
 
 - Use `mw create`, `mw update`, and `mw delete` to manage records from the command line.
 - Review the [CLI Reference](cli-reference/README.md) for every command and flag.
-- Keep the [Schema Format](schema-spec.md) page handy while evolving your types.
+- Keep the [Schema Format](schema-spec.md) page handy while evolving your entities.
