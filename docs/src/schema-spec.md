@@ -2,7 +2,7 @@
 
 Last updated: 2025-10-22
 
-Schemas live under `types/` and describe one entity per file. Mergeway also expects object data under `data/`; both pieces work together to give you referential integrity.
+Schemas can live entirely inside `mergeway.yaml` or be split across additional include files (for example under an `entities/` folder) for readability. Likewise, object data may be defined inline or stored under `data/`. Pick the mix that matches your editing workflow—comments below highlight conventions for modular repositories without requiring them. See [Storage Layout](../arch/storage-layout.md) for heuristics on choosing a structure.
 
 ## Configuration Entry (`mergeway.yaml`)
 
@@ -13,15 +13,15 @@ mergeway:
   version: 1
 
 include:
-  - types/*.yaml
+  - entities/*.yaml
 ```
 
 - `mergeway.version` tracks breaking changes in the configuration format (keep it at `1`).
 - `include` is a list of glob patterns. Each matching file is merged into the configuration. Patterns must resolve to at least one file; otherwise Mergeway reports an error.
 
-## Schema Files (`types/*.yaml`)
+## Schema Files (optional includes)
 
-A schema file declares one or more entity definitions. The example below defines a `Post` entity:
+A schema file declares one or more entity definitions. Store them in whichever folder makes sense for your workflow (many teams use `entities/`); the location has no semantic impact. The example below defines a `Post` entity:
 
 ```yaml
 mergeway:
