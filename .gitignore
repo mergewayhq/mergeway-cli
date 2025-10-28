@@ -1,3 +1,5 @@
+.envrc
+.devenv*
 .cache/
 bin/
 dist/
