@@ -9,3 +9,10 @@ src = "src"
 [output.html]
 default-theme = "light"
 site-url = "/"
+
+[preprocessor.gitinfo]
+enable = true
+hyperlink = true
+
+[preprocessor.gitinfo.message]
+footer = "<br><br>Generated at {{date}} (commit: {{hash}})"

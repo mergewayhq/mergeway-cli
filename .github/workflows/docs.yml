@@ -21,13 +21,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install mdBook
-        uses: peaceiris/actions-mdbook@v1
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16
         with:
-          mdbook-version: latest
+          name: devenv
+      - name: Install devenv.sh
+        run: nix profile install nixpkgs#devenv
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .devenv
+            /nix/store
+          key: ${{ runner.os }}-devenv-${{ hashFiles('**/devenv.lock') }}
 
       - name: Build documentation
-        run: mdbook build docs
+        run: devenv shell -- mdbook build docs
 
       - name: Deploy to GitHub Pages
         if: github.event_name == 'push'
