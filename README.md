@@ -48,7 +48,7 @@ mw create --type User --file payloads/jane.yaml
 mw list --type User
 
 # 4. Validate structure and relations before merging
-mw validate --summary
+mw validate
 
 # 5. Export your dataset as a single snapshot
 mw export --format json --output snapshot.json
