@@ -61,7 +61,6 @@ All object-focused commands require `--type <type>` unless the object payload em
 - Options:
   - `--phase <format|schema|references>` may be repeated to scope validation to selected phases (defaults to all).
   - `--fail-fast` triggers early exit on first error; otherwise the CLI aggregates and reports every violation with file context.
-  - `--summary` prints a concise success/failure report; default output enumerates errors grouped by phase.
 
 ### 6. Configuration Utilities
 

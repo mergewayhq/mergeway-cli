@@ -18,22 +18,24 @@ This guide distills the authoring standards from `docs-bck/good-documentation.md
 
 ## 3. Code & Examples
 
-- Fence code blocks with language tags (```` ```bash ````, ```` ```json ````, etc.) so mdBook enables syntax highlighting and copy buttons.
+- Fence code blocks with language tags (` ```bash `, ` ```json `, etc.) so mdBook enables syntax highlighting and copy buttons.
 - Provide both minimal and realistic examples:
 
-  ```markdown
+  ````markdown
   > **Example – Minimal setup**
+  >
   > ```bash
   > mw init
   > ```
   >
   > **Example – Advanced configuration**
+  >
   > ```bash
-  > mw validate --summary --output table
+  > mw validate --output table
   > ```
-  ```
+  ````
 
-- Inline commands with backticks (`mw validate --summary`) and link to the corresponding reference entry.
+- Inline commands with backticks (`mw validate`) and link to the corresponding reference entry.
 
 ## 4. Images & Diagrams
 
