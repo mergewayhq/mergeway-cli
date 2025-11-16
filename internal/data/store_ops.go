@@ -116,14 +116,26 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 		if err := s.writeFile(target.Path, fi); err != nil {
 			return nil, err
 		}
-		return &Object{Type: typeDef.Name, ID: idValue, Fields: cloneMap(normalized), File: target.Path}, nil
+		return &Object{
+			Type:     typeDef.Name,
+			ID:       idValue,
+			Fields:   cloneMap(normalized),
+			File:     target.Path,
+			ReadOnly: false,
+		}, nil
 	}
 
 	if err := s.writeSingle(target.Path, target.Format, normalized); err != nil {
 		return nil, err
 	}
 
-	return &Object{Type: typeDef.Name, ID: idValue, Fields: cloneMap(normalized), File: target.Path}, nil
+	return &Object{
+		Type:     typeDef.Name,
+		ID:       idValue,
+		Fields:   cloneMap(normalized),
+		File:     target.Path,
+		ReadOnly: false,
+	}, nil
 }
 
 // Update replaces or merges an object on disk.
@@ -172,14 +184,26 @@ func (s *Store) Update(typeName, id string, fields map[string]any, merge bool) (
 		if err := s.writeFile(loc.FilePath, loc.File); err != nil {
 			return nil, err
 		}
-		return &Object{Type: typeDef.Name, ID: id, Fields: cloneMap(updated), File: loc.FilePath}, nil
+		return &Object{
+			Type:     typeDef.Name,
+			ID:       id,
+			Fields:   cloneMap(updated),
+			File:     loc.FilePath,
+			ReadOnly: false,
+		}, nil
 	}
 
 	if err := s.writeSingle(loc.FilePath, loc.Format, updated); err != nil {
 		return nil, err
 	}
 
-	return &Object{Type: typeDef.Name, ID: id, Fields: cloneMap(updated), File: loc.FilePath}, nil
+	return &Object{
+		Type:     typeDef.Name,
+		ID:       id,
+		Fields:   cloneMap(updated),
+		File:     loc.FilePath,
+		ReadOnly: false,
+	}, nil
 }
 
 // Delete removes an object from disk.
