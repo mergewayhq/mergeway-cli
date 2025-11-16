@@ -40,7 +40,13 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 				if err != nil {
 					return nil, fmt.Errorf("data: %s in %s: %w", typeDef.Name, fc.Path, err)
 				}
-				objects = append(objects, &Object{Type: typeDef.Name, ID: idVal, Fields: cloneMap(item), File: fc.Path})
+				objects = append(objects, &Object{
+					Type:     typeDef.Name,
+					ID:       idVal,
+					Fields:   cloneMap(item),
+					File:     fc.Path,
+					ReadOnly: fc.ReadOnly,
+				})
 				seenIDs[idVal] = struct{}{}
 			}
 			continue
@@ -51,7 +57,13 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 			return nil, fmt.Errorf("data: %s in %s: %w", typeDef.Name, fc.Path, err)
 		}
 
-		objects = append(objects, &Object{Type: typeDef.Name, ID: idVal, Fields: cloneMap(fc.Single), File: fc.Path})
+		objects = append(objects, &Object{
+			Type:     typeDef.Name,
+			ID:       idVal,
+			Fields:   cloneMap(fc.Single),
+			File:     fc.Path,
+			ReadOnly: fc.ReadOnly,
+		})
 		seenIDs[idVal] = struct{}{}
 	}
 
@@ -63,7 +75,13 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 		if _, exists := seenIDs[idVal]; exists {
 			continue
 		}
-		objects = append(objects, &Object{Type: typeDef.Name, ID: idVal, Fields: cloneMap(item)})
+		objects = append(objects, &Object{
+			Type:     typeDef.Name,
+			ID:       idVal,
+			Fields:   cloneMap(item),
+			Inline:   true,
+			ReadOnly: true,
+		})
 		seenIDs[idVal] = struct{}{}
 	}
 

@@ -11,10 +11,12 @@ import (
 
 // Object represents a single database object loaded from disk.
 type Object struct {
-	Type   string
-	ID     string
-	Fields map[string]any
-	File   string
+	Type     string
+	ID       string
+	Fields   map[string]any
+	File     string
+	Inline   bool
+	ReadOnly bool
 }
 
 // Store coordinates reading and writing objects on disk.
@@ -59,14 +61,28 @@ func (loc *objectLocation) cloneObject() *Object {
 		return nil
 	}
 	id, _ := getString(loc.Object, loc.IDField)
-	return &Object{Type: loc.TypeName, ID: id, Fields: cloneMap(loc.Object), File: loc.FilePath}
+	return &Object{
+		Type:     loc.TypeName,
+		ID:       id,
+		Fields:   cloneMap(loc.Object),
+		File:     loc.FilePath,
+		Inline:   loc.Inline,
+		ReadOnly: loc.ReadOnly,
+	}
 }
 
 func (obj *Object) clone() *Object {
 	if obj == nil {
 		return nil
 	}
-	return &Object{Type: obj.Type, ID: obj.ID, Fields: cloneMap(obj.Fields), File: obj.File}
+	return &Object{
+		Type:     obj.Type,
+		ID:       obj.ID,
+		Fields:   cloneMap(obj.Fields),
+		File:     obj.File,
+		Inline:   obj.Inline,
+		ReadOnly: obj.ReadOnly,
+	}
 }
 
 // fileFormat represents the serialization format of a file.

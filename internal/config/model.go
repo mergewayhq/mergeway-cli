@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Version int
 	Types   map[string]*TypeDefinition
+	Write   WriteDefaults
 }
 
 // TypeDefinition describes a single object type.
@@ -20,7 +21,31 @@ type TypeDefinition struct {
 	Include     []IncludeDefinition
 	Fields      map[string]*FieldDefinition
 	InlineData  []map[string]any
+	Write       WriteDefinition
 }
+
+// WriteDefaults captures global defaults for write behaviour.
+type WriteDefaults struct {
+	Template string
+	Format   WriteFormat
+}
+
+// WriteDefinition describes how to emit a single object to disk.
+type WriteDefinition struct {
+	Template string
+	Format   WriteFormat
+}
+
+// WriteFormat enumerates supported serialization formats for writes.
+type WriteFormat string
+
+const (
+	WriteFormatYAML WriteFormat = "yaml"
+	WriteFormatJSON WriteFormat = "json"
+)
+
+// DefaultWriteTemplate is the canonical template used for new object files.
+const DefaultWriteTemplate = "{id}.yaml"
 
 // IncludeDefinition links a type to data files and selectors.
 type IncludeDefinition struct {

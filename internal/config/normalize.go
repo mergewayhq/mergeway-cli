@@ -21,6 +21,10 @@ func normalizeAggregate(agg *aggregateConfig) (*Config, error) {
 	result := &Config{
 		Version: agg.Version,
 		Types:   make(map[string]*TypeDefinition),
+		Write: WriteDefaults{
+			Template: DefaultWriteTemplate,
+			Format:   WriteFormatYAML,
+		},
 	}
 
 	for name, rawType := range agg.Entities {
@@ -31,6 +35,11 @@ func normalizeAggregate(agg *aggregateConfig) (*Config, error) {
 		typeDef, err := normalizeTypeDefinition(rawType)
 		if err != nil {
 			return nil, err
+		}
+
+		typeDef.Write = WriteDefinition{
+			Template: DefaultWriteTemplate,
+			Format:   WriteFormatYAML,
 		}
 
 		result.Types[name] = typeDef
