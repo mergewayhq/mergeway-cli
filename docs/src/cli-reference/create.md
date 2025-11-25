@@ -1,7 +1,5 @@
 # `mw create`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** Create a new object file that conforms to an entity definition.
 
 ## Usage

@@ -1,7 +1,5 @@
 # `mw init`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** Scaffold the directory layout and default configuration for a Mergeway workspace.
 
 ## Usage

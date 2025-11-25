@@ -1,7 +1,5 @@
 # `mw entity list`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** Show every entity Mergeway discovered from your configuration.
 
 ## Usage

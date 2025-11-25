@@ -1,7 +1,5 @@
 # `mw get`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** Print the fields of one object.
 
 ## Usage

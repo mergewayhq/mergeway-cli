@@ -1,7 +1,5 @@
 # `mw fmt`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** Format one or more data/config files using Mergeway’s canonical ordering.
 
 ## Usage

@@ -1,7 +1,5 @@
 # Concepts
 
-Last updated: 2025-10-22
-
 A Mergeway workspace is just a folder with a few predictable parts. Knowing the vocabulary makes the CLI output easier to read.
 
 ## Building Blocks

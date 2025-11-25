@@ -1,7 +1,5 @@
 # CLI Reference
 
-Last updated: 2025-10-22
-
 Every command shares a set of global flags:
 
 | Flag | Description |

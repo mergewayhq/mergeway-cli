@@ -1,7 +1,5 @@
 # `mw export`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** Export repository objects into a single JSON or YAML document.
 
 ## Usage

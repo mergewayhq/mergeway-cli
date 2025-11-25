@@ -1,7 +1,5 @@
 # `mw delete`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** Remove an object file from the workspace.
 
 ## Usage

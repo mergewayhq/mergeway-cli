@@ -1,7 +1,5 @@
 # `mw config export`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** Emit a JSON Schema for one of your types.
 
 ## Usage

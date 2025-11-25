@@ -1,7 +1,5 @@
 # Schema Format
 
-Last updated: 2025-10-22
-
 Schemas can live entirely inside `mergeway.yaml` or be split across additional include files (for example under an `entities/` folder) for readability. Likewise, object data may be defined inline or stored under `data/`. Pick the mix that matches your editing workflow—comments below highlight conventions for modular repositories without requiring them. See [Storage Layout](../arch/storage-layout.md) for heuristics on choosing a structure.
 
 ## Configuration Entry (`mergeway.yaml`)

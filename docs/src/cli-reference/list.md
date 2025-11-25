@@ -1,7 +1,5 @@
 # `mw list`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** List object identifiers for a given type, optionally filtered by a field.
 
 ## Usage

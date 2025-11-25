@@ -1,7 +1,5 @@
 # Install Mergeway
 
-Last updated: 2025-10-22
-
 Pick the method that fits your setup. Each installs a single binary named `mw`.
 
 ## Option 1 – Download a Release (macOS, Linux)

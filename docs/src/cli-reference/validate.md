@@ -1,7 +1,5 @@
 # `mw validate`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** Check schemas, records, and references, emitting formatted errors when something is wrong.
 
 ## Usage

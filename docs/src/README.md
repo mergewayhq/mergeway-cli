@@ -1,7 +1,5 @@
 # Mergeway Overview
 
-Last updated: 2025-10-20
-
 Mergeway is a lightweight CLI that keeps metadata honest by treating schemas as code. Instead of juggling spreadsheets or custom scripts, you describe entities in YAML/JSON, run a quick validation, and catch broken references before they reach production.
 
 ## What the CLI Does

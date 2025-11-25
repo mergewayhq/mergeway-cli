@@ -1,7 +1,5 @@
 # Getting Started with Mergeway
 
-Last updated: 2025-10-22
-
 Goal: scaffold a workspace, define an entity, evolve the layout as requirements grow, and learn the core Mergeway commands end-to-end.
 
 > All commands assume the `mw` binary is on your `PATH`.
@@ -211,6 +209,13 @@ Collect the full dataset into a single snapshot:
 mw export --format json --output market-snapshot.json
 cat market-snapshot.json
 ```
+
+## Keep the Workflow Running Smoothly
+
+Once the basics feel comfortable, automate formatting and reviews so the workspace stays healthy:
+
+- [Set Up Mergeway with GitHub](how-to/setup-mergeway-github.md) to enforce `mw fmt --lint` in Actions and route reviews through CODEOWNERS.
+- [Enforce Mergeway Formatting with pre-commit](how-to/setup-mergeway-pre-commit.md) so contributors run `mw fmt` locally before every commit.
 
 ## You're Done!
 

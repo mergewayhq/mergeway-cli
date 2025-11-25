@@ -1,7 +1,5 @@
 # `mw config lint`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** Validate configuration files (including includes) without touching data.
 
 ## Usage
