@@ -2,5 +2,7 @@
   "id": "user-bob",
   "name": "Bob Example",
   "email": "bob@example.com",
-  "roles": ["editor"]
+  "roles": [
+    "editor"
+  ]
 }

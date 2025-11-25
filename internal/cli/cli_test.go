@@ -179,6 +179,212 @@ func TestVersionCommand(t *testing.T) {
 	}
 }
 
+func TestFmtCommandInPlace(t *testing.T) {
+	repo := copyFixture(t)
+	target := filepath.Join(repo, "data", "posts", "posts.yaml")
+	content := `type: Post
+items:
+  - id: post-b
+    title: Beta
+  - id: post-a
+    title: Alpha
+`
+	if err := os.WriteFile(target, []byte(content), 0o644); err != nil {
+		t.Fatalf("write fixture: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "fmt", "--in-place", "data/posts/posts.yaml"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("fmt exit %d stderr %s", code, stderr.String())
+	}
+	if stdout.Len() != 0 {
+		t.Fatalf("expected empty stdout, got %s", stdout.String())
+	}
+
+	body, err := os.ReadFile(target)
+	if err != nil {
+		t.Fatalf("read formatted file: %v", err)
+	}
+	formatted := string(body)
+	idxA := strings.Index(formatted, "post-a")
+	idxB := strings.Index(formatted, "post-b")
+	if idxA == -1 || idxB == -1 || idxA > idxB {
+		t.Fatalf("expected post-a before post-b, got %s", formatted)
+	}
+}
+
+func TestFmtCommandStdout(t *testing.T) {
+	repo := copyFixture(t)
+	target := filepath.Join(repo, "data", "posts", "posts.yaml")
+	content := `items:
+  - id: post-b
+    title: Beta
+  - id: post-a
+    title: Alpha
+`
+	if err := os.WriteFile(target, []byte(content), 0o644); err != nil {
+		t.Fatalf("write fixture: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "fmt", "data/posts/posts.yaml"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("fmt exit %d stderr %s", code, stderr.String())
+	}
+	body := stdout.String()
+	idxA := strings.Index(body, "post-a")
+	idxB := strings.Index(body, "post-b")
+	if idxA == -1 || idxB == -1 || idxA > idxB {
+		t.Fatalf("expected post-a before post-b, got %s", body)
+	}
+
+	original, err := os.ReadFile(target)
+	if err != nil {
+		t.Fatalf("read original file: %v", err)
+	}
+	if string(original) != content {
+		t.Fatalf("expected file to remain unchanged")
+	}
+}
+
+func TestFmtCommandLintDefaultsToConfig(t *testing.T) {
+	repo := copyFixture(t)
+	target := filepath.Join(repo, "data", "posts", "posts.yaml")
+	content := `items:
+  - id: post-b
+    title: Beta
+  - id: post-a
+    title: Alpha
+`
+	if err := os.WriteFile(target, []byte(content), 0o644); err != nil {
+		t.Fatalf("write fixture: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "fmt", "--lint"}, stdout, stderr)
+	if code != 1 {
+		t.Fatalf("fmt --lint exit %d stderr %s", code, stderr.String())
+	}
+	if stdout.String() != "data/posts/posts.yaml\n" {
+		t.Fatalf("expected lint output path, got %q", stdout.String())
+	}
+}
+
+func TestFmtCommandLintClean(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "fmt", "--lint", "data/posts/posts.yaml"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("fmt --lint exit %d stderr %s", code, stderr.String())
+	}
+	if stdout.Len() != 0 {
+		t.Fatalf("expected no lint output, got %s", stdout.String())
+	}
+}
+
+func TestFmtCommandLintDetectsChanges(t *testing.T) {
+	repo := copyFixture(t)
+	target := filepath.Join(repo, "data", "posts", "posts.yaml")
+	content := `items:
+  - id: post-b
+    title: Beta
+  - id: post-a
+    title: Alpha
+`
+	if err := os.WriteFile(target, []byte(content), 0o644); err != nil {
+		t.Fatalf("write fixture: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "fmt", "--lint", "data/posts/posts.yaml"}, stdout, stderr)
+	if code != 1 {
+		t.Fatalf("fmt --lint exit %d stderr %s", code, stderr.String())
+	}
+	if stdout.String() != "data/posts/posts.yaml\n" {
+		t.Fatalf("expected lint output path, got %q", stdout.String())
+	}
+
+	body, err := os.ReadFile(target)
+	if err != nil {
+		t.Fatalf("read formatted file: %v", err)
+	}
+	if string(body) != content {
+		t.Fatalf("expected file to remain unchanged")
+	}
+}
+
+func TestFmtCommandOrdersFields(t *testing.T) {
+	repo := copyFixture(t)
+	target := filepath.Join(repo, "data", "posts", "posts.yaml")
+	content := `type: Post
+items:
+  - title: Beta
+    author: User-Alice
+    id: post-a
+`
+	if err := os.WriteFile(target, []byte(content), 0o644); err != nil {
+		t.Fatalf("write fixture: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "fmt", "--in-place", "data/posts/posts.yaml"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("fmt exit %d stderr %s", code, stderr.String())
+	}
+
+	body, err := os.ReadFile(target)
+	if err != nil {
+		t.Fatalf("read formatted file: %v", err)
+	}
+	formatted := string(body)
+	idxID := strings.Index(formatted, "id: post-a")
+	idxTitle := strings.Index(formatted, "title: Beta")
+	idxAuthor := strings.Index(formatted, "author: User-Alice")
+	if idxID == -1 || idxTitle == -1 || idxAuthor == -1 || idxID >= idxTitle || idxTitle >= idxAuthor {
+		t.Fatalf("expected id -> title -> author order, got:\n%s", formatted)
+	}
+}
+
+func TestFmtCommandRejectsUntrackedFile(t *testing.T) {
+	repo := copyFixture(t)
+	target := filepath.Join(repo, "extra.yaml")
+	if err := os.WriteFile(target, []byte("id: extra\n"), 0o644); err != nil {
+		t.Fatalf("write extra file: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "fmt", target}, stdout, stderr)
+	if code != 1 {
+		t.Fatalf("expected fmt to reject untracked file, exit %d stdout %s stderr %s", code, stdout.String(), stderr.String())
+	}
+	if !strings.Contains(stderr.String(), "not part of the configured data set") {
+		t.Fatalf("expected rejection message, got %s", stderr.String())
+	}
+}
+
+func TestFmtCommandLintInPlaceConflict(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "fmt", "--lint", "--in-place", "data/posts/posts.yaml"}, stdout, stderr)
+	if code != 1 {
+		t.Fatalf("fmt --lint --in-place exit %d stdout %s stderr %s", code, stdout.String(), stderr.String())
+	}
+	if !strings.Contains(stderr.String(), "--lint cannot be combined with --in-place") {
+		t.Fatalf("expected conflict message, got %s", stderr.String())
+	}
+}
+
 func copyFixture(t *testing.T) string {
 	t.Helper()
 	src := filepath.Join("..", "data", "testdata", "repo")

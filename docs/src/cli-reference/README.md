@@ -23,6 +23,7 @@ Every command shares a set of global flags:
 
 - [`mw entity list`](entity-list.md)
 - [`mw entity show`](entity-show.md)
+- [`mw fmt`](fmt.md)
 - [`mw config lint`](config-lint.md)
 - [`mw config export`](config-export.md)
 - [Schema Format](schema-spec.md)

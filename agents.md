@@ -27,7 +27,7 @@
 3. **Cache Constraints:** When invoking Go tooling in this sandbox, set `GOMODCACHE` and `GOCACHE` to local `.cache/...` directories to avoid permission issues.
 4. **No Network Installs:** `go mod tidy` may fail due to blocked proxy access; note the failure rather than retrying endlessly.
 5. **Tests & Lint:** Always run `go test ./...` (with the cached env vars) and `./scripts/check_gofmt.sh` after structural changes. Keep the `pre-commit` hook (`golangci-lint`) installed so commits fail fast on lint errors.
-6. **Docs Sync:** If you add/modify examples or CLI behavior, update docs (`README.md`, `docs/*.md`) and ensure e2e scripts still reflect reality.
+6. **Docs Sync:** If you add/modify examples or CLI behavior, update docs (`README.md`, `docs/*.md`) and ensure e2e scripts still reflect reality. Any CLI-visible flag/command change must be mirrored in `docs/src/cli-reference/`.
 7. **Clean Diff:** Remove generated outputs (`bin/`, `dist/`, `coverage.out`, etc.) before finalizing work; `.gitignore` already covers these.
 8. **Communication:** Document notable changes in `agents.md`, README, and docs when workflow or architecture updates occur.
 
