@@ -65,6 +65,8 @@ mw --root examples/full get --type Post post-001 --format json
 mw --root examples/full validate
 ```
 
+Curious about JSON Schema-backed entities? `examples/json-schema` demonstrates how an entity can derive its field definitions from an external JSON Schema file.
+
 For a deeper command reference, check `docs/cli-behavior.md`.
 
 ## Hacking on the CLI

@@ -1,0 +1,8 @@
+mergeway:
+  version: 1
+
+entities:
+  Empty:
+    identifier: id
+    include:
+      - data/*.yaml

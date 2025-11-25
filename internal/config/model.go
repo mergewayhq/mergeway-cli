@@ -17,6 +17,7 @@ type TypeDefinition struct {
 	Name        string
 	Source      string
 	Description string
+	JSONSchema  string
 	Identifier  IdentifierDefinition
 	Include     []IncludeDefinition
 	Fields      map[string]*FieldDefinition

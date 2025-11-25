@@ -1,0 +1,16 @@
+mergeway:
+  version: 1
+
+entities:
+  Product:
+    description: Products defined via JSON Schema
+    identifier: id
+    include:
+      - data/products/*.yaml
+    json_schema: schemas/product.json
+  User:
+    identifier: id
+    include:
+      - data/users/*.yaml
+    fields:
+      id: string

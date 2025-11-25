@@ -1,0 +1,9 @@
+contacts:
+  - email: ops@example.com
+    label: Primary
+  - email: finance@example.com
+    label: Billing
+# Example customer defined using the JSON Schema-backed entity.
+id: cust-001
+name: Example Industries
+tier: enterprise

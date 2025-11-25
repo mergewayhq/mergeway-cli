@@ -1,0 +1,11 @@
+mergeway:
+  version: 1
+
+entities:
+
+  Customer:
+    description: Customers defined via a JSON Schema file.
+    identifier: id
+    include:
+      - data/customers/*.yaml
+    json_schema: schemas/customer.json

@@ -91,7 +91,8 @@ Strings remain a shorthand for `path` with no `selector`; Mergeway then reads th
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `identifier` | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number.    |
 | `include`    | List of data sources. Each entry can be a glob string (shorthand) or a mapping with `path` and optional `selector` property. Omit only when you rely exclusively on inline `data`. Without a selector, Mergeway treats the whole file as a single object. |
-| `fields`     | Map of field definitions. Use either the shorthand `field: type` (defaults to optional) or the expanded mapping for advanced options.                                                                                                                     |
+| `fields`     | Map of field definitions. Use either the shorthand `field: type` (defaults to optional) or the expanded mapping for advanced options. Provide either `fields` or `json_schema` for each entity.                                                        |
+| `json_schema`| Path to a JSON Schema (draft 2020-12) file relative to the schema that declares the entity. When present, Mergeway derives field definitions from the JSON Schema and the `fields` block must be omitted.                                             |
 | `data`       | Optional array of inline records. Each entry must contain the identifier field and follows the same schema rules as external data files.                                                                                                                  |
 
 Add `description` anywhere you need extra context. Entities accept it alongside `identifier`, and each field definition supports its own `description` value.
@@ -142,6 +143,20 @@ When a field only needs a type, map entries can use the compact `field: type` sy
 | `description` | `Service owner team`                                  | Optional but recommended.                                                                 |
 | `enum`        | `[draft, active, retired]`                            | Allowed values.                                                                           |
 | `default`     | Any scalar                                            | Value injected when the field is missing.                                                 |
+
+### JSON Schema Entities
+
+For larger teams it can be convenient to author schemas once and consume them in multiple places. Entities now support a `json_schema` property that points to an on-disk JSON Schema document (draft 2020-12). The path is resolved relative to the file that declares the entity and must live inside the repository—external `$ref` documents and network lookups are rejected.
+
+When `json_schema` is present, omit the `fields` map. Mergeway parses the JSON Schema and converts to its native field definitions:
+
+- `type: object` becomes nested field groups, preserving `required` entries for each level.
+- `type: array` sets `repeated: true` and uses the `items` schema to determine the element type.
+- `enum`, `const`, or `oneOf` blocks translate into Mergeway enums (string values only).
+- `$ref` segments are resolved within the same JSON Schema file (e.g., `#/$defs/...`).
+- Custom references to other entities use the same `x-reference-type` property emitted by `mw config export`.
+
+See `examples/json-schema` for a runnable workspace that demonstrates this flow end-to-end.
 
 Keep schema files small and focused—one entity per file is the easiest to maintain.
 
