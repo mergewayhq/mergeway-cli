@@ -3,6 +3,8 @@ package config
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
+	"strings"
 )
 
 func normalizeAggregate(agg *aggregateConfig) (*Config, error) {
@@ -55,6 +57,16 @@ func normalizeAggregate(agg *aggregateConfig) (*Config, error) {
 func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error) {
 	spec := rawType.Spec
 
+	jsonSchemaPath := strings.TrimSpace(spec.JSONSchema)
+	fieldCount := len(spec.Fields.Entries)
+
+	switch {
+	case jsonSchemaPath != "" && fieldCount > 0:
+		return nil, fmt.Errorf("config: type %q cannot define both fields and json_schema", rawType.Name)
+	case jsonSchemaPath == "" && fieldCount == 0:
+		return nil, fmt.Errorf("config: type %q must define fields or json_schema", rawType.Name)
+	}
+
 	if !spec.Identifier.set || spec.Identifier.Field == "" {
 		return nil, fmt.Errorf("config: type %q missing identifier in %s", rawType.Name, rawType.Source)
 	}
@@ -67,26 +79,42 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		return nil, fmt.Errorf("config: type %q must declare at least one include or provide inline data", rawType.Name)
 	}
 
-	fields := make(map[string]*FieldDefinition, len(spec.Fields.Entries))
-	fieldOrder := make([]string, 0, len(spec.Fields.Entries))
-	for _, entry := range spec.Fields.Entries {
-		fieldName := entry.Name
-		rawField := entry.Value
-		if fieldName == "" {
-			return nil, fmt.Errorf("config: type %q has unnamed field", rawType.Name)
-		}
+	var fields map[string]*FieldDefinition
+	var fieldOrder []string
 
-		if !isValidIdentifier(fieldName) {
-			return nil, fmt.Errorf("config: type %q has invalid field identifier %q", rawType.Name, fieldName)
+	if jsonSchemaPath != "" {
+		schemaPath := jsonSchemaPath
+		if !filepath.IsAbs(schemaPath) {
+			baseDir := filepath.Dir(rawType.Source)
+			schemaPath = filepath.Join(baseDir, schemaPath)
 		}
-
-		fieldDef, err := normalizeFieldDefinition(fieldName, rawField, rawType.Name)
+		var err error
+		fields, fieldOrder, err = loadJSONSchemaFields(rawType.Name, schemaPath, jsonSchemaPath)
 		if err != nil {
 			return nil, err
 		}
+	} else {
+		fields = make(map[string]*FieldDefinition, len(spec.Fields.Entries))
+		fieldOrder = make([]string, 0, len(spec.Fields.Entries))
+		for _, entry := range spec.Fields.Entries {
+			fieldName := entry.Name
+			rawField := entry.Value
+			if fieldName == "" {
+				return nil, fmt.Errorf("config: type %q has unnamed field", rawType.Name)
+			}
 
-		fields[fieldName] = fieldDef
-		fieldOrder = append(fieldOrder, fieldName)
+			if !isValidIdentifier(fieldName) {
+				return nil, fmt.Errorf("config: type %q has invalid field identifier %q", rawType.Name, fieldName)
+			}
+
+			fieldDef, err := normalizeFieldDefinition(fieldName, rawField, rawType.Name)
+			if err != nil {
+				return nil, err
+			}
+
+			fields[fieldName] = fieldDef
+			fieldOrder = append(fieldOrder, fieldName)
+		}
 	}
 
 	inlineData := cloneInlineData(spec.Data)
@@ -95,6 +123,7 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		Name:        rawType.Name,
 		Source:      rawType.Source,
 		Description: spec.Description,
+		JSONSchema:  jsonSchemaPath,
 		Identifier: IdentifierDefinition{
 			Field:     spec.Identifier.Field,
 			Generated: spec.Identifier.Generated,

@@ -1,0 +1,11 @@
+mergeway:
+  version: 1
+
+entities:
+  Conflicted:
+    identifier: id
+    include:
+      - data/*.yaml
+    json_schema: schema.json
+    fields:
+      id: string

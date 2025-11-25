@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Values derived from a JSON Schema file",
+  "required": ["id", "title", "status", "owner"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique product identifier"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "description": "Lifecycle state",
+      "oneOf": [
+        {"const": "draft"},
+        {"const": "active"},
+        {"const": "retired"}
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "owner": {
+      "type": "string",
+      "x-reference-type": "User",
+      "description": "Owning user"
+    },
+    "attributes": {
+      "$ref": "#/$defs/Attributes"
+    }
+  },
+  "$defs": {
+    "Attributes": {
+      "type": "object",
+      "required": ["sku"],
+      "properties": {
+        "sku": {
+          "type": "string",
+          "description": "Internal SKU"
+        },
+        "metrics": {
+          "$ref": "#/$defs/Metrics"
+        }
+      }
+    },
+    "Metrics": {
+      "type": "object",
+      "properties": {
+        "weight": {
+          "type": "number",
+          "description": "Weight in kilograms"
+        }
+      }
+    }
+  }
+}

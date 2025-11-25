@@ -232,3 +232,105 @@ entities:
 		t.Fatalf("expected unsupported version error, got %q", got)
 	}
 }
+
+func TestLoadJSONSchemaEntity(t *testing.T) {
+	path := filepath.Join("testdata", "jsonschema", "mergeway.yaml")
+
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load returned error: %v", err)
+	}
+
+	product, ok := cfg.Types["Product"]
+	if !ok {
+		t.Fatalf("expected type 'Product' to be present")
+	}
+
+	if product.JSONSchema != "schemas/product.json" {
+		t.Fatalf("expected Product json_schema to be stored, got %q", product.JSONSchema)
+	}
+
+	status, ok := product.Fields["status"]
+	if !ok {
+		t.Fatalf("expected Product field 'status'")
+	}
+	if status.Type != "enum" {
+		t.Fatalf("expected status to map to enum, got %q", status.Type)
+	}
+	if len(status.Enum) != 3 {
+		t.Fatalf("expected status enum values, got %v", status.Enum)
+	}
+	if !status.Required {
+		t.Fatalf("expected status to be required")
+	}
+
+	tags, ok := product.Fields["tags"]
+	if !ok {
+		t.Fatalf("expected Product field 'tags'")
+	}
+	if !tags.Repeated || tags.Type != "string" {
+		t.Fatalf("expected tags to become repeated string field, got repeated=%v type=%q", tags.Repeated, tags.Type)
+	}
+
+	owner, ok := product.Fields["owner"]
+	if !ok {
+		t.Fatalf("expected Product field 'owner'")
+	}
+	if owner.Type != "User" {
+		t.Fatalf("expected owner to resolve x-reference-type, got %q", owner.Type)
+	}
+
+	attributes, ok := product.Fields["attributes"]
+	if !ok {
+		t.Fatalf("expected Product field 'attributes'")
+	}
+	if attributes.Type != "object" {
+		t.Fatalf("expected attributes to be object, got %q", attributes.Type)
+	}
+	sku, ok := attributes.Properties["sku"]
+	if !ok {
+		t.Fatalf("expected attributes.sku property")
+	}
+	if !sku.Required {
+		t.Fatalf("expected attributes.sku to be required")
+	}
+	metrics, ok := attributes.Properties["metrics"]
+	if !ok {
+		t.Fatalf("expected attributes.metrics property")
+	}
+	if metrics.Type != "object" {
+		t.Fatalf("expected attributes.metrics to be object, got %q", metrics.Type)
+	}
+	weight, ok := metrics.Properties["weight"]
+	if !ok {
+		t.Fatalf("expected attributes.metrics.weight property")
+	}
+	if weight.Type != "number" {
+		t.Fatalf("expected attributes.metrics.weight number type, got %q", weight.Type)
+	}
+	if weight.Description != "Weight in kilograms" {
+		t.Fatalf("expected weight description to be preserved")
+	}
+}
+
+func TestLoadJSONSchemaConflict(t *testing.T) {
+	path := filepath.Join("testdata", "jsonschema_conflict", "mergeway.yaml")
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected error for json_schema and fields defined together")
+	}
+	if got := err.Error(); !strings.Contains(got, "cannot define both fields and json_schema") {
+		t.Fatalf("expected json_schema conflict error, got %q", got)
+	}
+}
+
+func TestLoadJSONSchemaMissingDefinition(t *testing.T) {
+	path := filepath.Join("testdata", "jsonschema_missing", "mergeway.yaml")
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected error for missing fields/json_schema")
+	}
+	if got := err.Error(); !strings.Contains(got, "must define fields or json_schema") {
+		t.Fatalf("expected missing schema error, got %q", got)
+	}
+}

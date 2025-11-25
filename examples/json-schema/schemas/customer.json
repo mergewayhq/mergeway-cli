@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Customer metadata defined with JSON Schema",
+  "required": ["id", "name", "tier"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Customer identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name"
+    },
+    "tier": {
+      "description": "Billing tier",
+      "oneOf": [
+        {"const": "trial"},
+        {"const": "starter"},
+        {"const": "enterprise"}
+      ]
+    },
+    "contacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "email"],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        }
+      }
+    }
+  }
+}
