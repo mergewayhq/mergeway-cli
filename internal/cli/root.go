@@ -81,6 +81,8 @@ func Run(args []string, stdout, stderr io.Writer) int {
 		return cmdExport(ctx, remaining[1:])
 	case "validate":
 		return cmdValidate(ctx, remaining[1:])
+	case "fmt":
+		return cmdFmt(ctx, remaining[1:])
 	case "config":
 		return cmdConfig(ctx, remaining[1:])
 	case "version":
@@ -108,6 +110,7 @@ func printUsage(w io.Writer, fs *flag.FlagSet) {
 	_, _ = fmt.Fprintln(w, "  delete                    Delete an object")
 	_, _ = fmt.Fprintln(w, "  export                    Export repository data")
 	_, _ = fmt.Fprintln(w, "  validate                  Validate repository contents")
+	_, _ = fmt.Fprintln(w, "  fmt                       Format database files")
 	_, _ = fmt.Fprintln(w, "  config lint               Validate configuration files")
 	_, _ = fmt.Fprintln(w, "  config export             Export entity definition as JSON Schema")
 	_, _ = fmt.Fprintln(w, "  version                   Display CLI build information")

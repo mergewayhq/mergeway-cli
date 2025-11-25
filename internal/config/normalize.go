@@ -67,9 +67,11 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		return nil, fmt.Errorf("config: type %q must declare at least one include or provide inline data", rawType.Name)
 	}
 
-	fields := make(map[string]*FieldDefinition, len(spec.Fields))
-
-	for fieldName, rawField := range spec.Fields {
+	fields := make(map[string]*FieldDefinition, len(spec.Fields.Entries))
+	fieldOrder := make([]string, 0, len(spec.Fields.Entries))
+	for _, entry := range spec.Fields.Entries {
+		fieldName := entry.Name
+		rawField := entry.Value
 		if fieldName == "" {
 			return nil, fmt.Errorf("config: type %q has unnamed field", rawType.Name)
 		}
@@ -84,6 +86,7 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		}
 
 		fields[fieldName] = fieldDef
+		fieldOrder = append(fieldOrder, fieldName)
 	}
 
 	inlineData := cloneInlineData(spec.Data)
@@ -99,6 +102,7 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		},
 		Include:    normalizeIncludeDirectives(spec.Include),
 		Fields:     fields,
+		FieldOrder: fieldOrder,
 		InlineData: inlineData,
 	}, nil
 }
@@ -112,13 +116,16 @@ func normalizeFieldDefinition(name string, raw rawFieldDefinition, typeName stri
 		return nil, fmt.Errorf("config: field %s.%s cannot declare unique=true when repeated", typeName, name)
 	}
 
-	if raw.Properties != nil && raw.Type != "object" {
+	if len(raw.Properties.Entries) > 0 && raw.Type != "object" {
 		return nil, fmt.Errorf("config: field %s.%s defines properties but type is %q", typeName, name, raw.Type)
 	}
 
 	properties := make(map[string]*FieldDefinition)
+	var propertyOrder []string
 	if raw.Type == "object" {
-		for propName, propField := range raw.Properties {
+		for _, entry := range raw.Properties.Entries {
+			propName := entry.Name
+			propField := entry.Value
 			if !isValidIdentifier(propName) {
 				return nil, fmt.Errorf("config: field %s.%s has invalid property identifier %q", typeName, name, propName)
 			}
@@ -129,6 +136,7 @@ func normalizeFieldDefinition(name string, raw rawFieldDefinition, typeName stri
 			}
 
 			properties[propName] = child
+			propertyOrder = append(propertyOrder, propName)
 		}
 	}
 
@@ -138,18 +146,19 @@ func normalizeFieldDefinition(name string, raw rawFieldDefinition, typeName stri
 	}
 
 	return &FieldDefinition{
-		Name:        name,
-		Type:        raw.Type,
-		Required:    raw.Required,
-		Repeated:    raw.Repeated,
-		Format:      raw.Format,
-		Enum:        append([]string(nil), raw.Enum...),
-		Default:     raw.Default,
-		Properties:  properties,
-		Unique:      unique,
-		Computed:    raw.Computed,
-		Pattern:     raw.Pattern,
-		Description: raw.Description,
+		Name:          name,
+		Type:          raw.Type,
+		Required:      raw.Required,
+		Repeated:      raw.Repeated,
+		Format:        raw.Format,
+		Enum:          append([]string(nil), raw.Enum...),
+		Default:       raw.Default,
+		Properties:    properties,
+		PropertyOrder: propertyOrder,
+		Unique:        unique,
+		Computed:      raw.Computed,
+		Pattern:       raw.Pattern,
+		Description:   raw.Description,
 	}, nil
 }
 

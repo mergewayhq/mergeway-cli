@@ -73,40 +73,21 @@ func buildJSONSchema(typeDef *config.TypeDefinition) map[string]any {
 	properties := make(map[string]any)
 	required := make([]string, 0)
 
+	seen := make(map[string]struct{})
+	for _, name := range typeDef.FieldOrder {
+		field := typeDef.Fields[name]
+		if field == nil {
+			continue
+		}
+		properties[name], required = appendFieldSchema(properties[name], required, name, field)
+		seen[name] = struct{}{}
+	}
+
 	for name, field := range typeDef.Fields {
-		prop := map[string]any{}
-
-		switch field.Type {
-		case "string", "integer", "number", "boolean":
-			prop["type"] = field.Type
-		case "enum":
-			prop["type"] = "string"
-			if len(field.Enum) > 0 {
-				prop["enum"] = field.Enum
-			}
-		case "object":
-			sub := &config.TypeDefinition{Fields: field.Properties}
-			prop = buildJSONSchema(sub)
-		default:
-			prop["type"] = "string"
-			prop["x-reference-type"] = field.Type
+		if _, ok := seen[name]; ok {
+			continue
 		}
-
-		if field.Repeated {
-			prop = map[string]any{
-				"type":  "array",
-				"items": prop,
-			}
-		}
-
-		if field.Description != "" {
-			prop["description"] = field.Description
-		}
-
-		properties[name] = prop
-		if field.Required {
-			required = append(required, name)
-		}
+		properties[name], required = appendFieldSchema(properties[name], required, name, field)
 	}
 
 	schema := map[string]any{
@@ -121,4 +102,47 @@ func buildJSONSchema(typeDef *config.TypeDefinition) map[string]any {
 		schema["required"] = required
 	}
 	return schema
+}
+
+func appendFieldSchema(existing any, required []string, name string, field *config.FieldDefinition) (map[string]any, []string) {
+	if field == nil {
+		return map[string]any{}, required
+	}
+
+	prop := map[string]any{}
+
+	switch field.Type {
+	case "string", "integer", "number", "boolean":
+		prop["type"] = field.Type
+	case "enum":
+		prop["type"] = "string"
+		if len(field.Enum) > 0 {
+			prop["enum"] = field.Enum
+		}
+	case "object":
+		sub := &config.TypeDefinition{
+			Fields:     field.Properties,
+			FieldOrder: field.PropertyOrder,
+		}
+		prop = buildJSONSchema(sub)
+	default:
+		prop["type"] = "string"
+		prop["x-reference-type"] = field.Type
+	}
+
+	if field.Repeated {
+		prop = map[string]any{
+			"type":  "array",
+			"items": prop,
+		}
+	}
+
+	if field.Description != "" {
+		prop["description"] = field.Description
+	}
+
+	if field.Required {
+		required = append(required, name)
+	}
+	return prop, required
 }

@@ -18,11 +18,11 @@ type rawMergewaySection struct {
 }
 
 type rawTypeSpec struct {
-	Identifier  rawIdentifierSpec             `yaml:"identifier"`
-	Include     []rawIncludeDirective         `yaml:"include"`
-	Fields      map[string]rawFieldDefinition `yaml:"fields"`
-	Data        []map[string]any              `yaml:"data"`
-	Description string                        `yaml:"description"`
+	Identifier  rawIdentifierSpec     `yaml:"identifier"`
+	Include     []rawIncludeDirective `yaml:"include"`
+	Fields      rawFieldMap           `yaml:"fields"`
+	Data        []map[string]any      `yaml:"data"`
+	Description string                `yaml:"description"`
 }
 
 type rawIncludeDirective struct {
@@ -113,17 +113,17 @@ func (r *rawIdentifierSpec) UnmarshalYAML(node *yaml.Node) error {
 }
 
 type rawFieldDefinition struct {
-	Type        string                        `yaml:"type"`
-	Required    bool                          `yaml:"required"`
-	Repeated    bool                          `yaml:"repeated"`
-	Format      string                        `yaml:"format"`
-	Enum        []string                      `yaml:"enum"`
-	Default     any                           `yaml:"default"`
-	Properties  map[string]rawFieldDefinition `yaml:"properties"`
-	Unique      *bool                         `yaml:"unique"`
-	Computed    bool                          `yaml:"computed"`
-	Pattern     string                        `yaml:"pattern"`
-	Description string                        `yaml:"description"`
+	Type        string      `yaml:"type"`
+	Required    bool        `yaml:"required"`
+	Repeated    bool        `yaml:"repeated"`
+	Format      string      `yaml:"format"`
+	Enum        []string    `yaml:"enum"`
+	Default     any         `yaml:"default"`
+	Properties  rawFieldMap `yaml:"properties"`
+	Unique      *bool       `yaml:"unique"`
+	Computed    bool        `yaml:"computed"`
+	Pattern     string      `yaml:"pattern"`
+	Description string      `yaml:"description"`
 }
 
 func (r *rawFieldDefinition) UnmarshalYAML(node *yaml.Node) error {
@@ -147,7 +147,7 @@ func (r *rawFieldDefinition) UnmarshalYAML(node *yaml.Node) error {
 		r.Format = ""
 		r.Enum = nil
 		r.Default = nil
-		r.Properties = nil
+		r.Properties = rawFieldMap{}
 		r.Unique = nil
 		r.Computed = false
 		r.Pattern = ""
@@ -164,6 +164,62 @@ func (r *rawFieldDefinition) UnmarshalYAML(node *yaml.Node) error {
 		return node.Decode(r)
 	default:
 		return fmt.Errorf("config: field definition must be a string or mapping, got %s", node.ShortTag())
+	}
+}
+
+type rawFieldMap struct {
+	Entries []rawFieldEntry
+}
+
+type rawFieldEntry struct {
+	Name  string
+	Value rawFieldDefinition
+}
+
+func (m *rawFieldMap) UnmarshalYAML(node *yaml.Node) error {
+	if node == nil {
+		return nil
+	}
+
+	switch node.Kind {
+	case 0:
+		return nil
+	case yaml.MappingNode:
+		if len(node.Content)%2 != 0 {
+			return fmt.Errorf("config: expected even number of nodes in mapping, got %d", len(node.Content))
+		}
+		entries := make([]rawFieldEntry, 0, len(node.Content)/2)
+		for i := 0; i < len(node.Content); i += 2 {
+			keyNode := node.Content[i]
+			valNode := node.Content[i+1]
+			var name string
+			if err := keyNode.Decode(&name); err != nil {
+				return err
+			}
+			name = strings.TrimSpace(name)
+			if name == "" {
+				return fmt.Errorf("config: field name must be a non-empty string")
+			}
+			var value rawFieldDefinition
+			if err := valNode.Decode(&value); err != nil {
+				return err
+			}
+			entries = append(entries, rawFieldEntry{Name: name, Value: value})
+		}
+		m.Entries = entries
+		return nil
+	case yaml.AliasNode:
+		if node.Alias == nil {
+			return fmt.Errorf("config: alias node missing target")
+		}
+		return node.Alias.Decode(m)
+	case yaml.ScalarNode:
+		if node.ShortTag() == "!!null" {
+			return nil
+		}
+		fallthrough
+	default:
+		return fmt.Errorf("config: fields/properties must be a mapping, got %s", node.ShortTag())
 	}
 }
 

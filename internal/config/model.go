@@ -20,6 +20,7 @@ type TypeDefinition struct {
 	Identifier  IdentifierDefinition
 	Include     []IncludeDefinition
 	Fields      map[string]*FieldDefinition
+	FieldOrder  []string
 	InlineData  []map[string]any
 	Write       WriteDefinition
 }
@@ -62,18 +63,19 @@ type IdentifierDefinition struct {
 
 // FieldDefinition holds schema information for a field.
 type FieldDefinition struct {
-	Name        string
-	Type        string
-	Required    bool
-	Repeated    bool
-	Format      string
-	Enum        []string
-	Default     any
-	Properties  map[string]*FieldDefinition
-	Unique      bool
-	Computed    bool
-	Pattern     string
-	Description string
+	Name          string
+	Type          string
+	Required      bool
+	Repeated      bool
+	Format        string
+	Enum          []string
+	Default       any
+	Properties    map[string]*FieldDefinition
+	Unique        bool
+	Computed      bool
+	Pattern       string
+	Description   string
+	PropertyOrder []string
 }
 
 // String returns a string representation for debugging purposes.
