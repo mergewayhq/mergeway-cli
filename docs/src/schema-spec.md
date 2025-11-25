@@ -147,10 +147,10 @@ Keep schema files small and focused—one entity per file is the easiest to main
 
 ## Data Files (`data/...`)
 
-Each data file must declare a `type` and provide the fields required by its entity definition:
+Each data file provides the fields required by its entity definition. Declaring a `type` at the top is optional—the CLI infers it from the entity that referenced the file (through `include`/`selector`) and only errors when a conflicting `type` value is present. Keeping it in the file can still be helpful for humans who open an arbitrary YAML document.
 
 ```yaml
-type: Post
+type: Post             # optional; falls back to the entity that included this file
 id: post-001
 title: Launch Day
 author: user-alice
@@ -158,14 +158,13 @@ body: |
   We are excited to announce the product launch.
 ```
 
-You can store one object per file (as above) or provide an `items:` array to keep several objects together. Adding the `type` key is optional when the file already matches the schema’s `include`, but keeping it makes each file self-describing.
+You can store one object per file (as above) or provide an `items:` array to keep several objects together. Mergeway removes any top-level `type` key before validating the record, so referencing the same file from multiple entities requires the selector approach described below.
 
 JSONPath selectors let you extract objects from nested structures—handy when you need to read a subset of a larger document. For example, `selector: "$.users[*]"` walks through the `users` array in a JSON file and emits one record per element. Mergeway validates that the selector returns objects; any other shape triggers a format error.
 
 Identifier fields accept numeric payloads as well. For example, the following record is valid when the schema marks `id` as an `integer`:
 
 ```yaml
-type: Person
 id: 42
 name: Numeric Identifier
 ```
