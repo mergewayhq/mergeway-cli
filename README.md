@@ -9,6 +9,15 @@
 - **Automate comfortably**: Scriptable CRUD commands with YAML/JSON output slot into CI pipelines and other tooling.
 - **Spin up fast**: Scaffold a new workspace in seconds with sensible defaults that scale with your dataset.
 
+## Key Features
+
+- **Workspace scaffolding**: `mw init` bootstraps `mergeway.yaml`, entity templates, and data folders so you can start committing metadata immediately.
+- **Flexible schemas**: Define entities inline in YAML or point `json_schema` at a JSON Schema (draft 2020-12) file; mix inline data, globbed includes, or JSONPath selectors to source records.
+- **Complete CRUD workflow**: `list`, `get`, `create`, `update`, and `delete` commands operate on the same files Git tracks, supporting STDIN/STDOUT automation and partial updates.
+- **Deterministic formatting**: `mw fmt` rewrites YAML/JSON to a canonical layout (or lints it) so reviews stay focused on substance.
+- **Layered validation**: `mw validate` runs format, schema, and reference phases, surfacing missing fields, enum mismatches, and cross-entity linkage issues before merge time.
+- **Schema introspection**: `mw entity show` and `mw config export` emit normalized schemas or JSON Schema for tooling, keeping downstream integrations in sync.
+
 ## Install
 
 ### Using Go
