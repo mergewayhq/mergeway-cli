@@ -1,7 +1,5 @@
 # `mw entity show`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** Print the normalized schema for a given entity.
 
 ## Usage

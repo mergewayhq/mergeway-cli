@@ -1,7 +1,5 @@
 # `mw version`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** Display the CLI build metadata (semantic version, commit, build date).
 
 ## Usage

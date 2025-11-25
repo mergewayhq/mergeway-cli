@@ -1,7 +1,5 @@
 # `mw update`
 
-Last updated: 2025-10-22
-
 > **Synopsis:** Modify an existing object. You can replace the object entirely or merge in a subset of fields.
 
 ## Usage
