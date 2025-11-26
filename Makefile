@@ -35,6 +35,7 @@ race:
 
 coverage:
 	$(GORUN) test -coverprofile=coverage.out ./...
+	$(GORUN) tool cover -html=coverage.out -o coverage.html
 
 ci: fmt-check lint test race coverage
 

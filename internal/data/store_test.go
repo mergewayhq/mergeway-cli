@@ -316,6 +316,30 @@ func setupStore(t *testing.T, fixture string) (*Store, string) {
 	return store, repo
 }
 
+func TestStoreRemoveFile(t *testing.T) {
+	store, repo := setupStore(t, "repo")
+	target := filepath.Join(repo, "data", "temp.yaml")
+	if err := os.WriteFile(target, []byte("id: temp\n"), 0o644); err != nil {
+		t.Fatalf("write temp file: %v", err)
+	}
+
+	if err := store.removeFile(target); err != nil {
+		t.Fatalf("removeFile: %v", err)
+	}
+	if _, err := os.Stat(target); !os.IsNotExist(err) {
+		t.Fatalf("expected file to be removed, err=%v", err)
+	}
+}
+
+func TestStoreRemoveFileErrors(t *testing.T) {
+	store, repo := setupStore(t, "repo")
+	missing := filepath.Join(repo, "data", "nope.yaml")
+	err := store.removeFile(missing)
+	if err == nil || !strings.Contains(err.Error(), "remove") {
+		t.Fatalf("expected remove error, got %v", err)
+	}
+}
+
 func copyRepo(t *testing.T, fixture string) string {
 	t.Helper()
 	_, filename, _, ok := runtime.Caller(0)

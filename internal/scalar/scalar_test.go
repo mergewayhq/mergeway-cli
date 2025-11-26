@@ -2,6 +2,7 @@ package scalar
 
 import (
 	"encoding/json"
+	"math"
 	"testing"
 )
 
@@ -17,6 +18,8 @@ func TestAsString(t *testing.T) {
 		{name: "uint", input: uint(7), expected: "7", ok: true},
 		{name: "float", input: 3.14, expected: "3.14", ok: true},
 		{name: "jsonNumber", input: json.Number("99"), expected: "99", ok: true},
+		{name: "stringer", input: testStringer("value"), expected: "value", ok: true},
+		{name: "nan", input: math.NaN(), expected: "", ok: false},
 		{name: "empty", input: "", expected: "", ok: false},
 		{name: "unsupported", input: []int{1}, expected: "", ok: false},
 	}
@@ -35,4 +38,10 @@ func TestAsString(t *testing.T) {
 			}
 		})
 	}
+}
+
+type testStringer string
+
+func (t testStringer) String() string {
+	return string(t)
 }

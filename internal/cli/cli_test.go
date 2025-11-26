@@ -460,6 +460,185 @@ func TestCreateRespectsCustomIdentifier(t *testing.T) {
 	}
 }
 
+func TestConfigLintCommand(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "config", "lint"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("config lint exit %d stderr %s", code, stderr.String())
+	}
+	if !strings.Contains(stdout.String(), "configuration valid") {
+		t.Fatalf("expected success message, got %s", stdout.String())
+	}
+}
+
+func TestConfigLintCommandMissingConfig(t *testing.T) {
+	root := t.TempDir()
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", root, "config", "lint"}, stdout, stderr)
+	if code == 0 {
+		t.Fatalf("expected config lint to fail without config file")
+	}
+	if !strings.Contains(stderr.String(), "config lint") {
+		t.Fatalf("expected lint error message, got %s", stderr.String())
+	}
+}
+
+func TestEntityShowCommand(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "entity", "show", "User"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("entity show exit %d stderr %s", code, stderr.String())
+	}
+	if !strings.Contains(stdout.String(), "fields:") {
+		t.Fatalf("expected schema output, got %s", stdout.String())
+	}
+}
+
+func TestEntityShowUnknown(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "entity", "show", "Missing"}, stdout, stderr)
+	if code == 0 {
+		t.Fatalf("expected entity show to fail for unknown type")
+	}
+	if !strings.Contains(stderr.String(), "unknown entity") {
+		t.Fatalf("expected unknown entity message, got %s", stderr.String())
+	}
+}
+
+func TestInitCommandScaffoldsConfig(t *testing.T) {
+	root := t.TempDir()
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", root, "init"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("init exit %d stderr %s", code, stderr.String())
+	}
+
+	configPath := filepath.Join(root, "mergeway.yaml")
+	body, err := os.ReadFile(configPath)
+	if err != nil {
+		t.Fatalf("read config: %v", err)
+	}
+	if !strings.Contains(string(body), "mergeway:") {
+		t.Fatalf("expected default config contents, got %s", string(body))
+	}
+}
+
+func TestInitCommandRejectsArgs(t *testing.T) {
+	root := t.TempDir()
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", root, "init", "extra"}, stdout, stderr)
+	if code == 0 {
+		t.Fatalf("expected init to reject positional args")
+	}
+	if !strings.Contains(stderr.String(), "no arguments") {
+		t.Fatalf("expected rejection message, got %s", stderr.String())
+	}
+}
+
+func TestUpdateCommandMerge(t *testing.T) {
+	repo := copyFixture(t)
+	payload := filepath.Join(t.TempDir(), "update.yaml")
+	if err := os.WriteFile(payload, []byte("role: maintainer\n"), 0o644); err != nil {
+		t.Fatalf("write payload: %v", err)
+	}
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "update", "--type", "User", "--id", "User-Alice", "--file", payload, "--merge"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("update --merge exit %d stderr %s", code, stderr.String())
+	}
+
+	body, err := os.ReadFile(filepath.Join(repo, "data", "users", "user-alice.yaml"))
+	if err != nil {
+		t.Fatalf("read updated user: %v", err)
+	}
+	content := string(body)
+	if !strings.Contains(content, "role: maintainer") {
+		t.Fatalf("expected merged field, got %s", content)
+	}
+	if !strings.Contains(content, "name: Alice Example") {
+		t.Fatalf("expected existing fields to remain, got %s", content)
+	}
+}
+
+func TestUpdateCommandReplace(t *testing.T) {
+	repo := copyFixture(t)
+	payload := filepath.Join(t.TempDir(), "replace.yaml")
+	content := "name: Alicia Example\nemail: alicia@example.com\n"
+	if err := os.WriteFile(payload, []byte(content), 0o644); err != nil {
+		t.Fatalf("write payload: %v", err)
+	}
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "update", "--type", "User", "--id", "User-Bob", "--file", payload}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("update replace exit %d stderr %s", code, stderr.String())
+	}
+
+	body, err := os.ReadFile(filepath.Join(repo, "data", "users", "user-bob.yaml"))
+	if err != nil {
+		t.Fatalf("read updated user: %v", err)
+	}
+	text := string(body)
+	if strings.Contains(text, "role:") {
+		t.Fatalf("expected previous fields to be replaced, got %s", text)
+	}
+	if !strings.Contains(text, "name: Alicia Example") || !strings.Contains(text, "email: alicia@example.com") {
+		t.Fatalf("expected replacement fields, got %s", text)
+	}
+}
+
+func TestDeleteCommandYesSkipsPrompt(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "--yes", "delete", "--type", "Tag", "Tag-Writing"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("delete --yes exit %d stderr %s", code, stderr.String())
+	}
+	if _, err := os.Stat(filepath.Join(repo, "data", "tags", "tag-writing.yaml")); !os.IsNotExist(err) {
+		t.Fatalf("expected tag file to be removed, err=%v", err)
+	}
+}
+
+func TestDeleteCommandAbortWithoutConfirmation(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	withStdin(t, "n\n", func() {
+		code := Run([]string{"--root", repo, "delete", "--type", "Tag", "Tag-Product"}, stdout, stderr)
+		if code == 0 {
+			t.Fatalf("expected delete to abort without confirmation")
+		}
+	})
+
+	if !strings.Contains(stderr.String(), "aborted") {
+		t.Fatalf("expected abort message, got %s", stderr.String())
+	}
+	if _, err := os.Stat(filepath.Join(repo, "data", "tags", "tag-product.yaml")); err != nil {
+		t.Fatalf("expected tag to remain after abort: %v", err)
+	}
+}
+
 func copyFixture(t *testing.T) string {
 	t.Helper()
 	src := filepath.Join("..", "data", "testdata", "repo")
@@ -515,4 +694,25 @@ entities:
 		t.Fatalf("create data dir: %v", err)
 	}
 	return root
+}
+
+func withStdin(t *testing.T, input string, fn func()) {
+	t.Helper()
+	orig := os.Stdin
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("pipe: %v", err)
+	}
+	if _, err := w.Write([]byte(input)); err != nil {
+		t.Fatalf("write stdin: %v", err)
+	}
+	if err := w.Close(); err != nil {
+		t.Fatalf("close stdin writer: %v", err)
+	}
+	os.Stdin = r
+	defer func() {
+		_ = r.Close()
+		os.Stdin = orig
+	}()
+	fn()
 }
