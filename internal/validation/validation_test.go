@@ -156,7 +156,7 @@ func TestValidateFieldConstraints(t *testing.T) {
 		t.Fatalf("expected several schema errors for field constraints, got %v", res.Errors)
 	}
 
-	var foundPattern, foundFormat, foundComputed bool
+	var foundPattern, foundFormat bool
 	for _, e := range res.Errors {
 		if strings.Contains(e.Message, "pattern") {
 			foundPattern = true
@@ -164,12 +164,9 @@ func TestValidateFieldConstraints(t *testing.T) {
 		if strings.Contains(e.Message, "format") {
 			foundFormat = true
 		}
-		if strings.Contains(e.Message, "computed") {
-			foundComputed = true
-		}
 	}
-	if !foundPattern || !foundFormat || !foundComputed {
-		t.Fatalf("expected pattern/format/computed errors, got %v", res.Errors)
+	if !foundPattern || !foundFormat {
+		t.Fatalf("expected pattern/format errors, got %v", res.Errors)
 	}
 }
 

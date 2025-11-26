@@ -104,7 +104,6 @@ Extra validation knobs let future tooling derive JSON Schema while preserving ri
 
 - `unique`: ensure a field’s value is unique across all objects of this type. Only applicable to non-repeated fields.
 - When `type` equals another defined type name, the field stores the referenced type’s identifier (similar to a foreign key). For repeated fields this models one-to-many links implicitly.
-- `computed`: mark fields derived during build/publish; the CLI can warn if supplied manually.
 
 ## File Association
 

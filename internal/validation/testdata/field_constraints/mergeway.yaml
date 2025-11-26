@@ -24,4 +24,3 @@ entities:
         format: uri
       checksum:
         type: string
-        computed: true

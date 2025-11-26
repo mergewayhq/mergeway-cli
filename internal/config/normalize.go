@@ -185,7 +185,6 @@ func normalizeFieldDefinition(name string, raw rawFieldDefinition, typeName stri
 		Properties:    properties,
 		PropertyOrder: propertyOrder,
 		Unique:        unique,
-		Computed:      raw.Computed,
 		Pattern:       raw.Pattern,
 		Description:   raw.Description,
 	}, nil
