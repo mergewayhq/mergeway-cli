@@ -84,7 +84,7 @@ entities:
         name: Tools Team
 ```
 
-`identifier` accepts either a plain string (e.g., `identifier: id`) or a mapping with `field`, optional `generated`, and `pattern` keys when you need additional behavior. Field entries also accept the shorthand `field: type` when no other metadata is needed; these default to optional fields.
+`identifier` accepts either a plain string (e.g., `identifier: id`) or a mapping with `field`, optional `generated`, and `pattern` keys when you need additional behavior. The `generated` flag is advisory for tooling; the CLI still expects identifiers to be supplied (inline or via `--id`). Field entries also accept the shorthand `field: type` when no other metadata is needed; these default to optional fields.
 
 Inline records declared under `data` are optional and most useful for tiny lookup sets or bootstrapping demos without creating separate files.
 

@@ -77,7 +77,7 @@ mw --root examples/full validate
 
 Curious about JSON Schema-backed entities? `examples/json-schema` demonstrates how an entity can derive its field definitions from an external JSON Schema file.
 
-For a deeper command reference, check [`docs/arch/cli-behavior.md`](docs/arch/cli-behavior.md).
+For a deeper command reference, check [`docs/src/cli-reference/README.md`](docs/src/cli-reference/README.md).
 
 ## Hacking on the CLI
 
