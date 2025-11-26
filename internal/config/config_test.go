@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -205,6 +206,32 @@ func TestLoadMissingMergewayBlock(t *testing.T) {
 
 	if got := err.Error(); !strings.Contains(got, "mergeway block is required") {
 		t.Fatalf("expected mergeway block error, got %q", got)
+	}
+}
+
+func TestConfigStringAndSources(t *testing.T) {
+	cfg := &Config{
+		Version: 1,
+		Types: map[string]*TypeDefinition{
+			"User": {Source: "types/User.yaml"},
+			"Post": {Source: "types/Post.yaml"},
+		},
+	}
+	if got := cfg.String(); !strings.Contains(got, "version:1") || !strings.Contains(got, "types:2") {
+		t.Fatalf("unexpected string output: %s", got)
+	}
+	sources := cfg.Sources()
+	expected := []string{"types/Post.yaml", "types/User.yaml"}
+	if !reflect.DeepEqual(sources, expected) {
+		t.Fatalf("expected %v, got %v", expected, sources)
+	}
+
+	var nilCfg *Config
+	if nilCfg.String() != "<nil>" {
+		t.Fatalf("expected <nil> string, got %s", nilCfg.String())
+	}
+	if nilCfg.Sources() != nil {
+		t.Fatalf("expected nil sources slice")
 	}
 }
 
