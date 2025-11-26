@@ -17,6 +17,11 @@ func cmdInit(ctx *Context, args []string) int {
 		return 1
 	}
 
+	if fs.NArg() > 0 {
+		_, _ = fmt.Fprintln(ctx.Stderr, "init: no arguments are supported")
+		return 1
+	}
+
 	configPath := ctx.Config
 	if err := ensureFile(configPath, defaultConfigTemplate()); err != nil {
 		_, _ = fmt.Fprintf(ctx.Stderr, "init: %v\n", err)
