@@ -257,6 +257,48 @@ func TestStoreNumericIdentifiers(t *testing.T) {
 	}
 }
 
+func TestStoreCreateBubblesLookupErrors(t *testing.T) {
+	repo := t.TempDir()
+	cfgBody := `mergeway:
+  version: 1
+
+entities:
+  Thing:
+    identifier: id
+    include:
+      - data/things.yaml
+    fields:
+      id:
+        type: string
+`
+	cfgPath := filepath.Join(repo, "mergeway.yaml")
+	if err := os.WriteFile(cfgPath, []byte(cfgBody), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	dataDir := filepath.Join(repo, "data")
+	if err := os.MkdirAll(dataDir, 0o755); err != nil {
+		t.Fatalf("mkdir data: %v", err)
+	}
+	invalid := "type: Thing\nitems:\n  - id: thing-1\n    name: ok\n  - [bad\n"
+	if err := os.WriteFile(filepath.Join(dataDir, "things.yaml"), []byte(invalid), 0o644); err != nil {
+		t.Fatalf("write invalid file: %v", err)
+	}
+
+	cfg, err := config.Load(cfgPath)
+	if err != nil {
+		t.Fatalf("load config: %v", err)
+	}
+	store, err := NewStore(repo, cfg)
+	if err != nil {
+		t.Fatalf("new store: %v", err)
+	}
+
+	_, err = store.Create("Thing", map[string]any{"id": "thing-new"})
+	if err == nil || !strings.Contains(err.Error(), "parse") {
+		t.Fatalf("expected parse error during duplicate check, got %v", err)
+	}
+}
+
 func setupStore(t *testing.T, fixture string) (*Store, string) {
 	t.Helper()
 	repo := copyRepo(t, fixture)

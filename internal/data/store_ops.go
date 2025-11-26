@@ -79,7 +79,9 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 		return nil, fmt.Errorf("data: %s create: %w", typeName, err)
 	}
 
-	if existing, _ := s.Get(typeName, idValue); existing != nil {
+	if loc, err := s.findObject(typeDef, idValue); err != nil {
+		return nil, err
+	} else if loc != nil {
 		return nil, fmt.Errorf("data: %s %q already exists", typeName, idValue)
 	}
 
