@@ -1,0 +1,9 @@
+items:
+  - id: item-1
+    attributes:
+      color: red
+      size: large
+  - id: item-2
+    attributes:
+      size: large
+      color: red

@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
@@ -31,6 +32,8 @@ func validateTypeSchema(objects []*rawObject, typeDef *config.TypeDefinition, in
 		index.byType[typeDef.Name] = make(map[string]*rawObject)
 	}
 
+	// Track seen values per field to surface uniqueness errors, normalizing values
+	// via fmt.Sprintf since fields may be typed differently (string vs integer).
 	uniqueTrack := make(map[string]map[string]string)
 
 	for _, obj := range objects {
@@ -110,7 +113,7 @@ func validateTypeSchema(objects []*rawObject, typeDef *config.TypeDefinition, in
 					uniqueTrack[fieldName] = make(map[string]string)
 				}
 				if value, exists := obj.data[fieldName]; exists {
-					key := fmt.Sprintf("%v", value)
+					key := normalizedUniqueKey(value)
 					if key != "" {
 						if firstID, seen := uniqueTrack[fieldName][key]; seen {
 							errs = append(errs, Error{
@@ -135,6 +138,31 @@ func validateTypeSchema(objects []*rawObject, typeDef *config.TypeDefinition, in
 	}
 
 	return errs
+}
+
+func normalizedUniqueKey(value any) string {
+	switch v := value.(type) {
+	case string:
+		return v
+	case fmt.Stringer:
+		return v.String()
+	case bool:
+		if v {
+			return "true"
+		}
+		return "false"
+	case int, int8, int16, int32, int64:
+		return fmt.Sprintf("%d", v)
+	case uint, uint8, uint16, uint32, uint64:
+		return fmt.Sprintf("%d", v)
+	case float32, float64:
+		return fmt.Sprintf("%g", v)
+	case []any, map[string]any:
+		if data, err := json.Marshal(v); err == nil {
+			return string(data)
+		}
+	}
+	return fmt.Sprintf("%v", value)
 }
 
 func validateField(field *config.FieldDefinition, value any, obj *rawObject, fieldName string) []Error {
