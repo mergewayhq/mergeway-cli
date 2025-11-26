@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -67,6 +68,56 @@ func TestCreateAndList(t *testing.T) {
 
 	if !strings.Contains(stdout.String(), "Tag-New") {
 		t.Fatalf("expected new tag in list, got %s", stdout.String())
+	}
+}
+
+func TestListSortsIdentifiers(t *testing.T) {
+	repo := copyFixture(t)
+	payload := filepath.Join(repo, "data", "users", "user-new.yaml")
+	if err := os.WriteFile(payload, []byte("id: User-Zeta\nname: Z\nemail: z@example.com\n"), 0o644); err != nil {
+		t.Fatalf("write payload: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "list", "--type", "User"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("list exit %d stderr %s", code, stderr.String())
+	}
+	// Should use store.List ordering, so the lexicographically last id prints last.
+	out := strings.Fields(stdout.String())
+	if len(out) == 0 || out[len(out)-1] != "User-Zeta" {
+		t.Fatalf("expected deterministic ordering with new id last, got %v", out)
+	}
+}
+
+func TestListFilterSortsResults(t *testing.T) {
+	repo := copyFixture(t)
+	extra := `type: Post
+items:
+  - id: Post-Z
+    title: Late
+    author: User-Bob
+    tags: []
+  - id: Post-A
+    title: Early
+    author: User-Bob
+    tags: []
+`
+	if err := os.WriteFile(filepath.Join(repo, "data", "posts", "extra.yaml"), []byte(extra), 0o644); err != nil {
+		t.Fatalf("write extra posts: %v", err)
+	}
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "list", "--type", "Post", "--filter", "author=User-Bob"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("list --filter exit %d stderr %s", code, stderr.String())
+	}
+	// Filtered output should still appear sorted even though we had to load objects.
+	lines := strings.Fields(stdout.String())
+	expected := []string{"Post-A", "Post-Z"}
+	if !reflect.DeepEqual(lines, expected) {
+		t.Fatalf("expected %v, got %v", expected, lines)
 	}
 }
 

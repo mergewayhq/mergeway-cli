@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -101,6 +102,45 @@ func parseFilter(expr string) (string, string) {
 		return "", ""
 	}
 	return parts[0], parts[1]
+}
+
+func emitList(ctx *Context, store *data.Store, typeName, filterExpr string) error {
+	key, value := parseFilter(filterExpr)
+
+	if key == "" {
+		// Fast path: identifier-only listing can use the store summary without
+		// decoding every record.
+		ids, err := store.List(typeName)
+		if err != nil {
+			return err
+		}
+		for _, id := range ids {
+			_, _ = fmt.Fprintln(ctx.Stdout, id)
+		}
+		return nil
+	}
+
+	// Fallback to loading full objects only when filtering is needed so we avoid
+	// decoding every record when the caller just needs identifiers.
+	// Filter needs object fields, so load the dataset despite the heavier cost.
+	objects, err := store.LoadAll(typeName)
+    if err != nil {
+        return err
+    }
+
+    var filtered []string
+    for _, obj := range objects {
+        if val, ok := obj.Fields[key]; ok && fmt.Sprint(val) == value {
+            filtered = append(filtered, obj.ID)
+        }
+    }
+	// Emit identifiers deterministically so list output is stable even when
+	// filtering narrows down the set.
+	sort.Strings(filtered)
+    for _, id := range filtered {
+        _, _ = fmt.Fprintln(ctx.Stdout, id)
+    }
+    return nil
 }
 
 func confirm(in io.Reader, out io.Writer, prompt string) (bool, error) {
