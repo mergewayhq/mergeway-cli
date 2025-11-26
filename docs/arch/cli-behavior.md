@@ -40,7 +40,7 @@ All object-focused commands require `--type <type>` unless the object payload em
 - `mw create --type <type> --file <path> [--id <id>]`
   - Creates a new object from a payload file or STDIN.
   - Validates format/schema before writing unless `--skip-validate` is provided.
-  - Generates an identifier when the type definition flags `identifier.generated: true` and `--id` is omitted.
+  - Honors the identifier field defined in the schema. The `identifier.generated` flag is advisory for tooling; the CLI still expects identifiers to be supplied (either inline or via `--id`).
 - `mw update --type <type> --id <id> --file <path>`
   - Replaces the stored document with the provided payload (use `--merge` for deep merges).
   - Supports partial updates with `--merge` to deep-merge fields instead of replacing wholesale.

@@ -65,6 +65,7 @@ entities:
     fields:
       # ...
 ```
+`generated: true` is an advisory hint for downstream automation (code generators, UI scaffolding). The CLI still requires either inline identifiers or an explicit `--id` flag when creating objects.
 
 When several objects live in one file, provide a JSONPath selector to extract them:
 
@@ -89,7 +90,7 @@ Strings remain a shorthand for `path` with no `selector`; Mergeway then reads th
 
 | Key          | Description                                                                                                                                                                                                                                               |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identifier` | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number.    |
+| `identifier` | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. The `generated` flag is advisory for tooling—the CLI still expects identifiers to be supplied (inline or via `--id`). |
 | `include`    | List of data sources. Each entry can be a glob string (shorthand) or a mapping with `path` and optional `selector` property. Omit only when you rely exclusively on inline `data`. Without a selector, Mergeway treats the whole file as a single object. |
 | `fields`     | Map of field definitions. Use either the shorthand `field: type` (defaults to optional) or the expanded mapping for advanced options. Provide either `fields` or `json_schema` for each entity.                                                        |
 | `json_schema`| Path to a JSON Schema (draft 2020-12) file relative to the schema that declares the entity. When present, Mergeway derives field definitions from the JSON Schema and the `fields` block must be omitted.                                             |
