@@ -124,23 +124,23 @@ func emitList(ctx *Context, store *data.Store, typeName, filterExpr string) erro
 	// decoding every record when the caller just needs identifiers.
 	// Filter needs object fields, so load the dataset despite the heavier cost.
 	objects, err := store.LoadAll(typeName)
-    if err != nil {
-        return err
-    }
+	if err != nil {
+		return err
+	}
 
-    var filtered []string
-    for _, obj := range objects {
-        if val, ok := obj.Fields[key]; ok && fmt.Sprint(val) == value {
-            filtered = append(filtered, obj.ID)
-        }
-    }
+	var filtered []string
+	for _, obj := range objects {
+		if val, ok := obj.Fields[key]; ok && fmt.Sprint(val) == value {
+			filtered = append(filtered, obj.ID)
+		}
+	}
 	// Emit identifiers deterministically so list output is stable even when
 	// filtering narrows down the set.
 	sort.Strings(filtered)
-    for _, id := range filtered {
-        _, _ = fmt.Fprintln(ctx.Stdout, id)
-    }
-    return nil
+	for _, id := range filtered {
+		_, _ = fmt.Fprintln(ctx.Stdout, id)
+	}
+	return nil
 }
 
 func confirm(in io.Reader, out io.Writer, prompt string) (bool, error) {

@@ -19,4 +19,10 @@ repos:
       - id: golangci-lint
         args: ["--config=.golangci.yml"]
         pass_filenames: false
-
+  - repo: local
+    hooks:
+      - id: go-fmt
+        name: go fmt ./...
+        entry: go fmt ./...
+        language: system
+        pass_filenames: false
