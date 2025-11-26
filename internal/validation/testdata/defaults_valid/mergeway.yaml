@@ -1,0 +1,16 @@
+mergeway:
+  version: 1
+
+entities:
+  Feature:
+    identifier: id
+    include:
+      - data/features/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      status:
+        type: string
+        required: true
+        default: active

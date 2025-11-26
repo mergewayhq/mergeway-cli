@@ -59,6 +59,30 @@ func validateTypeSchema(objects []*rawObject, typeDef *config.TypeDefinition, in
 		}
 
 		objID := idValue
+		if pat := typeDef.Identifier.Pattern; pat != "" {
+			if ok, err := matchPattern(pat, objID); err != nil {
+				errs = append(errs, Error{
+					Phase:   PhaseSchema,
+					Type:    typeDef.Name,
+					ID:      objID,
+					File:    objectLocation(obj),
+					Message: fmt.Sprintf("identifier pattern %q is invalid: %v", pat, err),
+				})
+				hadError = true
+				continue
+			} else if !ok {
+				errs = append(errs, Error{
+					Phase:   PhaseSchema,
+					Type:    typeDef.Name,
+					ID:      objID,
+					File:    objectLocation(obj),
+					Message: fmt.Sprintf("identifier must match pattern %q", pat),
+				})
+				hadError = true
+				continue
+			}
+		}
+
 		objIDExisting := index.byType[typeDef.Name][objID]
 		if objIDExisting != nil {
 			errs = append(errs, Error{
@@ -117,15 +141,30 @@ func validateField(field *config.FieldDefinition, value any, obj *rawObject, fie
 	var errs []Error
 
 	if value == nil {
-		if field.Required {
-			errs = append(errs, Error{
-				Phase:   PhaseSchema,
-				Type:    obj.typeDef.Name,
-				ID:      obj.id,
-				File:    objectLocation(obj),
-				Message: fmt.Sprintf("missing required field %q", fieldName),
-			})
+		if field.Default != nil {
+			value = field.Default
+		} else {
+			if field.Required {
+				errs = append(errs, Error{
+					Phase:   PhaseSchema,
+					Type:    obj.typeDef.Name,
+					ID:      obj.id,
+					File:    objectLocation(obj),
+					Message: fmt.Sprintf("missing required field %q", fieldName),
+				})
+			}
+			return errs
 		}
+	}
+
+	if field.Computed {
+		errs = append(errs, Error{
+			Phase:   PhaseSchema,
+			Type:    obj.typeDef.Name,
+			ID:      obj.id,
+			File:    objectLocation(obj),
+			Message: fmt.Sprintf("field %q is computed and must be omitted", fieldName),
+		})
 		return errs
 	}
 

@@ -2,16 +2,34 @@ package validation
 
 import (
 	"fmt"
+	"net/mail"
+	"net/url"
+	"regexp"
+	"strings"
+	"sync"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
 	"github.com/mergewayhq/mergeway-cli/internal/scalar"
 )
 
+var (
+	patternCache     sync.Map
+	formatValidators = map[string]func(string) bool{
+		"email": isValidEmail,
+		"uri":   isValidURI,
+		"url":   isValidURI,
+	}
+)
+
 func validateFieldValue(field *config.FieldDefinition, value any, obj *rawObject, fieldName string) *Error {
 	switch field.Type {
 	case "string":
-		if _, ok := value.(string); !ok {
+		str, ok := value.(string)
+		if !ok {
 			return typeError(obj, fieldName, "string")
+		}
+		if err := enforceStringConstraints(field, str, obj, fieldName); err != nil {
+			return err
 		}
 	case "integer":
 		switch value.(type) {
@@ -52,6 +70,9 @@ func validateFieldValue(field *config.FieldDefinition, value any, obj *rawObject
 				}
 			}
 		}
+		if err := enforceStringConstraints(field, str, obj, fieldName); err != nil {
+			return err
+		}
 	case "object":
 		child, ok := value.(map[string]any)
 		if !ok {
@@ -70,6 +91,77 @@ func validateFieldValue(field *config.FieldDefinition, value any, obj *rawObject
 	}
 
 	return nil
+}
+
+func enforceStringConstraints(field *config.FieldDefinition, value string, obj *rawObject, fieldName string) *Error {
+	if field.Pattern != "" {
+		ok, err := matchPattern(field.Pattern, value)
+		if err != nil {
+			return &Error{
+				Phase:   PhaseSchema,
+				Type:    obj.typeDef.Name,
+				ID:      obj.id,
+				File:    objectLocation(obj),
+				Message: fmt.Sprintf("field %q has invalid pattern %q: %v", fieldName, field.Pattern, err),
+			}
+		}
+		if !ok {
+			return &Error{
+				Phase:   PhaseSchema,
+				Type:    obj.typeDef.Name,
+				ID:      obj.id,
+				File:    objectLocation(obj),
+				Message: fmt.Sprintf("field %q must match pattern %q", fieldName, field.Pattern),
+			}
+		}
+	}
+
+	if field.Format != "" {
+		if validator := formatValidators[strings.ToLower(field.Format)]; validator != nil {
+			if !validator(value) {
+				return &Error{
+					Phase:   PhaseSchema,
+					Type:    obj.typeDef.Name,
+					ID:      obj.id,
+					File:    objectLocation(obj),
+					Message: fmt.Sprintf("field %q must satisfy format %q", fieldName, field.Format),
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func matchPattern(pattern, value string) (bool, error) {
+	if pattern == "" {
+		return true, nil
+	}
+	if cached, ok := patternCache.Load(pattern); ok {
+		return cached.(*regexp.Regexp).MatchString(value), nil
+	}
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return false, err
+	}
+	patternCache.Store(pattern, re)
+	return re.MatchString(value), nil
+}
+
+func isValidEmail(value string) bool {
+	addr, err := mail.ParseAddress(value)
+	if err != nil {
+		return false
+	}
+	return addr.Address == value
+}
+
+func isValidURI(value string) bool {
+	u, err := url.ParseRequestURI(value)
+	if err != nil {
+		return false
+	}
+	return u.Scheme != "" && u.Host != ""
 }
 
 func typeError(obj *rawObject, field, expected string) *Error {
