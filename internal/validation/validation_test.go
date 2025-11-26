@@ -183,6 +183,29 @@ func TestValidateAllowsDefaultsForMissingFields(t *testing.T) {
 	}
 }
 
+func TestValidateUniqueComplexFields(t *testing.T) {
+	root := fixturePath(t, "unique_structs")
+	cfg := loadConfig(t, root)
+
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+	if len(res.Errors) == 0 {
+		t.Fatalf("expected uniqueness violation for duplicate attributes, got none")
+	}
+	found := false
+	for _, e := range res.Errors {
+		if strings.Contains(e.Message, "must be unique") {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("expected unique field error, got %v", res.Errors)
+	}
+}
+
 func fixturePath(t *testing.T, name string) string {
 	t.Helper()
 	path := filepath.Join("testdata", name)
