@@ -31,21 +31,9 @@ func cmdList(ctx *Context, args []string) int {
 		return 1
 	}
 
-	objects, err := store.LoadAll(*typeName)
-	if err != nil {
+	if err := emitList(ctx, store, *typeName, *filterExpr); err != nil {
 		_, _ = fmt.Fprintf(ctx.Stderr, "list: %v\n", err)
 		return 1
-	}
-
-	key, value := parseFilter(*filterExpr)
-
-	for _, obj := range objects {
-		if key != "" {
-			if val, ok := obj.Fields[key]; !ok || fmt.Sprint(val) != value {
-				continue
-			}
-		}
-		_, _ = fmt.Fprintln(ctx.Stdout, obj.ID)
 	}
 
 	return 0
