@@ -2,6 +2,7 @@ package validation
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
@@ -139,6 +140,49 @@ func TestValidateAllowsNumericIdentifiers(t *testing.T) {
 
 	if len(res.Errors) != 0 {
 		t.Fatalf("expected no errors, got %v", res.Errors)
+	}
+}
+
+func TestValidateFieldConstraints(t *testing.T) {
+	root := fixturePath(t, "field_constraints")
+	cfg := loadConfig(t, root)
+
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+
+	if len(res.Errors) < 4 {
+		t.Fatalf("expected several schema errors for field constraints, got %v", res.Errors)
+	}
+
+	var foundPattern, foundFormat, foundComputed bool
+	for _, e := range res.Errors {
+		if strings.Contains(e.Message, "pattern") {
+			foundPattern = true
+		}
+		if strings.Contains(e.Message, "format") {
+			foundFormat = true
+		}
+		if strings.Contains(e.Message, "computed") {
+			foundComputed = true
+		}
+	}
+	if !foundPattern || !foundFormat || !foundComputed {
+		t.Fatalf("expected pattern/format/computed errors, got %v", res.Errors)
+	}
+}
+
+func TestValidateAllowsDefaultsForMissingFields(t *testing.T) {
+	root := fixturePath(t, "defaults_valid")
+	cfg := loadConfig(t, root)
+
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+	if len(res.Errors) != 0 {
+		t.Fatalf("expected defaults to satisfy required fields, got %v", res.Errors)
 	}
 }
 

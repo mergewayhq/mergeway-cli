@@ -1,0 +1,27 @@
+mergeway:
+  version: 1
+
+entities:
+  User:
+    identifier:
+      field: id
+      pattern: "^user-[0-9]+$"
+    include:
+      - data/users/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      email:
+        type: string
+        format: email
+        required: true
+      badge:
+        type: string
+        pattern: "^badge-[a-z]+$"
+      profileUrl:
+        type: string
+        format: uri
+      checksum:
+        type: string
+        computed: true
