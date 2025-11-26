@@ -10,10 +10,11 @@ mw [global flags] fmt [--in-place|--lint] [<file>...]
 
 | Flag         | Description                                                                            |
 | ------------ | -------------------------------------------------------------------------------------- |
-| `--in-place` | Rewrite each file on disk with the formatted content.                                  |
+| `--in-place` | Rewrite each file on disk with the formatted content (default when no other flag set). |
+| `--stdout`   | Print formatted content to stdout instead of touching files.                           |
 | `--lint`     | Do not rewrite files; exit `1` if any file would change and print the offending paths. |
 
-You cannot combine `--in-place` with `--lint`. When neither flag is supplied, `mw fmt` prints the formatted content to stdout, leaving the original files untouched.
+You cannot combine `--stdout` with `--lint` or `--in-place`. When neither flag is supplied, `mw fmt` rewrites files in place and prints a line for each path it touched.
 
 If you omit file arguments entirely, the command formats every file referenced by the `include` directives in `mergeway.yaml`. Supplying explicit files narrows the scope, but each file must belong to the configured data set—`mw fmt` fails fast when a path is not declared in the config.
 
@@ -21,16 +22,16 @@ When formatting entity data, field order follows the definition in your schema s
 
 ## Examples
 
-Format a single file and capture the result without modifying disk:
+Preview a single file without modifying disk:
 
 ```bash
-mw fmt data/posts/posts.yaml > /tmp/posts.yaml
+mw fmt --stdout data/posts/posts.yaml > /tmp/posts.yaml
 ```
 
-Rewrite files in place (useful before committing):
+Rewrite files in place (default behavior, useful before committing):
 
 ```bash
-mw fmt --in-place data/posts/posts.yaml data/users.yaml
+mw fmt data/posts/posts.yaml data/users.yaml
 ```
 
 Use lint mode in CI to ensure working tree files are already formatted:

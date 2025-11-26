@@ -19,12 +19,21 @@ func cmdFmt(ctx *Context, args []string) int {
 	fs.SetOutput(ctx.Stderr)
 	inPlace := fs.Bool("in-place", false, "Rewrite files in place")
 	lint := fs.Bool("lint", false, "Fail if formatting differs from the canonical form")
+	stdoutMode := fs.Bool("stdout", false, "Print formatted output to STDOUT instead of rewriting files")
 	if err := fs.Parse(args); err != nil {
 		return 1
 	}
 
 	if *lint && *inPlace {
 		_, _ = fmt.Fprintln(ctx.Stderr, "fmt: --lint cannot be combined with --in-place")
+		return 1
+	}
+	if *lint && *stdoutMode {
+		_, _ = fmt.Fprintln(ctx.Stderr, "fmt: --lint cannot be combined with --stdout")
+		return 1
+	}
+	if *inPlace && *stdoutMode {
+		_, _ = fmt.Fprintln(ctx.Stderr, "fmt: --stdout cannot be combined with --in-place")
 		return 1
 	}
 
@@ -90,6 +99,10 @@ func cmdFmt(ctx *Context, args []string) int {
 
 	if *lint {
 		return fmtLint(ctx, absRoot, targets, schemaFor)
+	}
+	// Default to rewriting files so users can run `mw fmt` without extra flags.
+	if !*stdoutMode && !*inPlace {
+		*inPlace = true
 	}
 	if *inPlace {
 		return fmtWriteInPlace(ctx, absRoot, targets, schemaFor)
@@ -312,6 +325,7 @@ func fmtWriteInPlace(ctx *Context, root string, paths []string, schemaFor func(s
 			_, _ = fmt.Fprintf(ctx.Stderr, "fmt: rewrite %s: %v\n", displayPath(root, path), err)
 			return 1
 		}
+		_, _ = fmt.Fprintf(ctx.Stdout, "Formatted %s\n", displayPath(root, path))
 	}
 	return 0
 }

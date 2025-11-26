@@ -13,7 +13,7 @@ Mergeway is a lightweight CLI that keeps metadata honest by treating schemas as 
 - **Workspace scaffolding**: `mw init` writes a starter `mergeway.yaml` into your working directory so you can begin defining entities immediately.
 - **Dual schema sources**: Author entity fields inline in YAML or reference existing JSON Schema documents (`json_schema`) so teams can reuse specs.
 - **Object lifecycle commands**: `list`, `get`, `create`, `update`, and `delete` operate on local YAML/JSON files, honoring generated IDs and inline data.
-- **Deterministic formatting**: `mw fmt` emits canonical structure (and rewrites files when you add `--in-place`) to keep diffs clean.
+- **Deterministic formatting**: `mw fmt` emits canonical structure and rewrites files in place (use `--stdout` to preview changes) to keep diffs clean.
 - **Layered validation**: Format, schema, and reference phases catch structural, typing, and cross-entity errors before they land in main.
 - **Schema introspection**: `mw entity show` and `mw config export` surface normalized schemas or derived JSON Schema for documentation and automation.
 

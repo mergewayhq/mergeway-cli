@@ -246,12 +246,12 @@ items:
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := Run([]string{"--root", repo, "fmt", "--in-place", "data/posts/posts.yaml"}, stdout, stderr)
+	code := Run([]string{"--root", repo, "fmt", "data/posts/posts.yaml"}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("fmt exit %d stderr %s", code, stderr.String())
 	}
-	if stdout.Len() != 0 {
-		t.Fatalf("expected empty stdout, got %s", stdout.String())
+	if stdout.String() != "Formatted data/posts/posts.yaml\n" {
+		t.Fatalf("expected formatted file notice, got %q", stdout.String())
 	}
 
 	body, err := os.ReadFile(target)
@@ -281,7 +281,7 @@ func TestFmtCommandStdout(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := Run([]string{"--root", repo, "fmt", "data/posts/posts.yaml"}, stdout, stderr)
+	code := Run([]string{"--root", repo, "fmt", "--stdout", "data/posts/posts.yaml"}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("fmt exit %d stderr %s", code, stderr.String())
 	}
