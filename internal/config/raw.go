@@ -122,7 +122,6 @@ type rawFieldDefinition struct {
 	Default     any         `yaml:"default"`
 	Properties  rawFieldMap `yaml:"properties"`
 	Unique      *bool       `yaml:"unique"`
-	Computed    bool        `yaml:"computed"`
 	Pattern     string      `yaml:"pattern"`
 	Description string      `yaml:"description"`
 }
@@ -150,7 +149,6 @@ func (r *rawFieldDefinition) UnmarshalYAML(node *yaml.Node) error {
 		r.Default = nil
 		r.Properties = rawFieldMap{}
 		r.Unique = nil
-		r.Computed = false
 		r.Pattern = ""
 		return nil
 	case yaml.MappingNode:

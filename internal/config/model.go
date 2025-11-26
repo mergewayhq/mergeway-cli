@@ -73,7 +73,6 @@ type FieldDefinition struct {
 	Default       any
 	Properties    map[string]*FieldDefinition
 	Unique        bool
-	Computed      bool
 	Pattern       string
 	Description   string
 	PropertyOrder []string

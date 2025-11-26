@@ -157,17 +157,6 @@ func validateField(field *config.FieldDefinition, value any, obj *rawObject, fie
 		}
 	}
 
-	if field.Computed {
-		errs = append(errs, Error{
-			Phase:   PhaseSchema,
-			Type:    obj.typeDef.Name,
-			ID:      obj.id,
-			File:    objectLocation(obj),
-			Message: fmt.Sprintf("field %q is computed and must be omitted", fieldName),
-		})
-		return errs
-	}
-
 	if field.Repeated {
 		slice, ok := value.([]any)
 		if !ok {
