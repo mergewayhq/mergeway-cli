@@ -385,6 +385,30 @@ func TestFmtCommandLintInPlaceConflict(t *testing.T) {
 	}
 }
 
+func TestCreateRespectsCustomIdentifier(t *testing.T) {
+	repo := customIdentifierRepo(t)
+	payload := filepath.Join(t.TempDir(), "payload.yaml")
+	if err := os.WriteFile(payload, []byte("name: Gadget\n"), 0o644); err != nil {
+		t.Fatalf("write payload: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "create", "--type", "Gadget", "--file", payload, "--id", "gadget-42"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("create exit %d stderr %s", code, stderr.String())
+	}
+	expected := filepath.Join(repo, "data", "gadgets", "gadget-42.yaml")
+	body, err := os.ReadFile(expected)
+	if err != nil {
+		t.Fatalf("read created file: %v", err)
+	}
+	content := string(body)
+	if !strings.Contains(content, "slug: gadget-42") {
+		t.Fatalf("expected slug field, got %s", content)
+	}
+}
+
 func copyFixture(t *testing.T) string {
 	t.Helper()
 	src := filepath.Join("..", "data", "testdata", "repo")
@@ -412,4 +436,32 @@ func copyFixture(t *testing.T) string {
 	}
 
 	return dest
+}
+
+func customIdentifierRepo(t *testing.T) string {
+	t.Helper()
+	root := t.TempDir()
+	config := `mergeway:
+  version: 1
+
+entities:
+  Gadget:
+    identifier:
+      field: slug
+    include:
+      - data/gadgets/*.yaml
+    fields:
+      slug:
+        type: string
+        required: true
+      name:
+        type: string
+`
+	if err := os.WriteFile(filepath.Join(root, "mergeway.yaml"), []byte(config), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(root, "data", "gadgets"), 0o755); err != nil {
+		t.Fatalf("create data dir: %v", err)
+	}
+	return root
 }

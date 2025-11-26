@@ -113,14 +113,24 @@ func cmdCreate(ctx *Context, args []string) int {
 		return 1
 	}
 
-	if *idFlag != "" {
-		payload["id"] = *idFlag
-	}
-
 	cfg, err := loadConfig(ctx)
 	if err != nil {
 		_, _ = fmt.Fprintf(ctx.Stderr, "create: %v\n", err)
 		return 1
+	}
+
+	typeDef, ok := cfg.Types[*typeName]
+	if !ok {
+		_, _ = fmt.Fprintf(ctx.Stderr, "create: unknown type %s\n", *typeName)
+		return 1
+	}
+
+	if *idFlag != "" {
+		idField := typeDef.Identifier.Field
+		if idField == "" {
+			idField = "id"
+		}
+		payload[idField] = *idFlag
 	}
 
 	store, err := loadStore(ctx, cfg)
