@@ -34,7 +34,7 @@ repos:
     hooks:
       - id: mergeway-fmt
         name: mergeway fmt
-        entry: mw fmt --in-place
+        entry: mw fmt
         language: system
         pass_filenames: false
         files: ^data/(products|categories)/.*\.(ya?ml|json)$
@@ -42,7 +42,7 @@ repos:
 
 Why these settings?
 
-- `entry: mw fmt --in-place` rewrites any out-of-format records before the commit proceeds.
+- `entry: mw fmt` rewrites any out-of-format records before the commit proceeds (it defaults to in-place mode).
 - `pass_filenames: false` lets Mergeway discover files from `mergeway.yaml` rather than only the files staged by Git—useful when your workspace spans multiple folders.
 - `files` narrows execution to the GrainBox data directories so unrelated commits (docs, code) skip the hook. Adjust the regex for your layout or remove the key to run on everything.
 
@@ -73,6 +73,6 @@ pre-commit run mergeway-fmt --all-files
 ```
 
 - If the repo already follows Mergeway’s canonical layout, the command prints `mergeway-fmt..................................Passed`.
-- If output shows `Failed`, inspect the listed files, rerun `mw fmt --in-place <file>` manually if needed, then stage the changes.
+- If output shows `Failed`, inspect the listed files, rerun `mw fmt <file>` manually if needed, then stage the changes.
 
 Developers now get immediate feedback before commits ever leave their machines, and CI stays clean because repositories reach GitHub with consistent Mergeway formatting.
