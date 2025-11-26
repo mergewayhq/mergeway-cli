@@ -11,10 +11,10 @@
 
 ## Key Features
 
-- **Workspace scaffolding**: `mw init` bootstraps `mergeway.yaml`, entity templates, and data folders so you can start committing metadata immediately.
+- **Workspace scaffolding**: `mw init` bootstraps `mergeway.yaml` in the working directory so you can start committing metadata immediately.
 - **Flexible schemas**: Define entities inline in YAML or point `json_schema` at a JSON Schema (draft 2020-12) file; mix inline data, globbed includes, or JSONPath selectors to source records.
 - **Complete CRUD workflow**: `list`, `get`, `create`, `update`, and `delete` commands operate on the same files Git tracks, supporting STDIN/STDOUT automation and partial updates.
-- **Deterministic formatting**: `mw fmt` rewrites YAML/JSON to a canonical layout (or lints it) so reviews stay focused on substance.
+- **Deterministic formatting**: `mw fmt` prints canonical YAML/JSON (or rewrites files with `--in-place`) so reviews stay focused on substance.
 - **Layered validation**: `mw validate` runs format, schema, and reference phases, surfacing missing fields, enum mismatches, and cross-entity linkage issues before merge time.
 - **Schema introspection**: `mw entity show` and `mw config export` emit normalized schemas or JSON Schema for tooling, keeping downstream integrations in sync.
 
@@ -45,8 +45,9 @@ make build
 
 ```bash
 # 1. Scaffold a workspace
-mw init my-dataset
+mkdir my-dataset
 cd my-dataset
+mw init
 
 # 2. Inspect the generated entities and schemas
 mw entity list
@@ -76,7 +77,7 @@ mw --root examples/full validate
 
 Curious about JSON Schema-backed entities? `examples/json-schema` demonstrates how an entity can derive its field definitions from an external JSON Schema file.
 
-For a deeper command reference, check `docs/cli-behavior.md`.
+For a deeper command reference, check [`docs/arch/cli-behavior.md`](docs/arch/cli-behavior.md).
 
 ## Hacking on the CLI
 

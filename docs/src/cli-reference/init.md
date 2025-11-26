@@ -8,7 +8,7 @@
 mw [global flags] init
 ```
 
-No command-specific flags. Add the global `--root` flag if you want to scaffold somewhere other than the current directory.
+`mw init` always targets the directory referenced by `--root` (default `.`) and does not accept positional arguments. Use `mkdir`/`cd` before running the command if you want to initialize a new folder.
 
 ## Example
 
@@ -18,7 +18,7 @@ cd blog-metadata
 mw init
 ```
 
-Output:
+Output resembles:
 
 ```
 Initialized repository at .
