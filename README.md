@@ -17,6 +17,7 @@
 - **Deterministic formatting**: `mw fmt` rewrites YAML/JSON in place (add `--stdout` to preview) so reviews stay focused on substance.
 - **Layered validation**: `mw validate` runs format, schema, and reference phases, surfacing missing fields, enum mismatches, and cross-entity linkage issues before merge time.
 - **Schema introspection**: `mw entity show` and `mw config export` emit normalized schemas or JSON Schema for tooling, keeping downstream integrations in sync.
+- **Visualization**: `mw gen-erd` generates an Entity Relationship Diagram (ERD) using Graphviz, visualizing your data model's entities and their relationships.
 
 ## Install
 

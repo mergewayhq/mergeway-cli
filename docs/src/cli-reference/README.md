@@ -24,6 +24,7 @@ Every command shares a set of global flags:
 - [`mw fmt`](fmt.md)
 - [`mw config lint`](config-lint.md)
 - [`mw config export`](config-export.md)
+- [`mw gen-erd`](gen-erd.md)
 - [Schema Format](schema-spec.md)
 
 ## Object operations

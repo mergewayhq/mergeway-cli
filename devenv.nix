@@ -19,6 +19,7 @@ in
     pkgs.go_1_24
     pkgs.golangci-lint
     pkgs.mdbook
+    pkgs.graphviz
     pkgs.shellcheck
     mdbook-gitinfo
   ];

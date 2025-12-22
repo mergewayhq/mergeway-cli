@@ -87,6 +87,8 @@ func Run(args []string, stdout, stderr io.Writer) int {
 		return cmdConfig(ctx, remaining[1:])
 	case "version":
 		return cmdVersion(ctx, remaining[1:])
+	case "gen-erd":
+		return cmdGenERD(ctx, remaining[1:])
 	case "help", "--help", "-h":
 		printUsage(stdout, fs)
 		return 0

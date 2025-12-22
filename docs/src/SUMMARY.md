@@ -20,5 +20,6 @@
   - [`mw create`](cli-reference/create.md)
   - [`mw update`](cli-reference/update.md)
   - [`mw delete`](cli-reference/delete.md)
+  - [`mw gen-erd`](cli-reference/gen-erd.md)
   - [`mw export`](cli-reference/export.md)
   - [`mw version`](cli-reference/version.md)
