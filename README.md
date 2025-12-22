@@ -29,6 +29,20 @@ go install github.com/mergewayhq/mergeway-cli@latest
 
 Ensure your `GOBIN` (or `GOPATH/bin`) is on `PATH`, then confirm with `mw version`.
 
+### Using Nix
+
+You can install the CLI using Nix:
+
+```bash
+nix profile install github:mergewayhq/mergeway-cli
+```
+
+Or run it directly:
+
+```bash
+nix run github:mergewayhq/mergeway-cli -- help
+```
+
 ### Download a Release Binary
 
 Each GitHub release ships macOS and Linux archives. Drop the `mw` binary somewhere on `PATH` and make it executable (`chmod +x`).
