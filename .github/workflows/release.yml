@@ -9,9 +9,8 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  goreleaser:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,47 +23,11 @@ jobs:
           go-version: '1.24'
           cache: true
 
-      - name: Validate tag matches version file
-        id: version
-        shell: bash
-        run: |
-          TAG="${GITHUB_REF##*/}"
-          VERSION_FILE="internal/version/version.txt"
-          VERSION=$(cat "$VERSION_FILE")
-          if [[ "$TAG" != "v${VERSION}" ]]; then
-            echo "Tag $TAG does not match version ${VERSION} in ${VERSION_FILE}" >&2
-            exit 1
-          fi
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-
-      - name: Verify fmt
-        run: make fmt-check
-
-      - name: Lint
-        uses: golangci/golangci-lint-action@v3
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
         with:
-          version: v1.55.2
-
-      - name: Run tests
-        run: make test
-
-      - name: Build binaries
-        run: ./scripts/build_binaries.sh
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: mergeway-binaries-${{ steps.version.outputs.version }}
-          path: dist/*
-          if-no-files-found: error
-
-      - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: Mergeway ${{ steps.version.outputs.version }}
-          files: dist/*
-          draft: false
-          prerelease: false
+          distribution: goreleaser
+          version: latest
+          args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

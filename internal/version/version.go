@@ -1,13 +1,9 @@
 package version
 
 import (
-	_ "embed"
 	"fmt"
 	"strings"
 )
-
-//go:embed version.txt
-var rawNumber string
 
 var (
 	// Number is the semantic version for this build. Override via -ldflags when cutting releases.
@@ -17,12 +13,6 @@ var (
 	// BuildDate records when the binary was built (ISO-8601, UTC).
 	BuildDate = "unknown"
 )
-
-func init() {
-	if v := strings.TrimSpace(rawNumber); v != "" {
-		Number = v
-	}
-}
 
 // Info describes the current build metadata.
 type Info struct {
