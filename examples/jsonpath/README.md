@@ -1,3 +1,11 @@
 # JSONPath Includes Example
 
-This example demonstrates how to load multiple objects from a single data file using a JSONPath selector. The configuration in `mergeway.yaml` binds the `User` entity to `data/users.json` and extracts each user object with `$.users[*]`.
+Loads multiple records from a single JSON document by applying a JSONPath selector.
+
+## What it demonstrates
+- `include` entry that reads `data/users.json` and selects objects with `$.users[*]`
+- Simple `User` entity with a minimal field set and primary key
+- Keeping source data in one file while still generating a normalized dataset
+
+## Diagram
+![ERD](./erd.png)
