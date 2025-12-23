@@ -43,6 +43,14 @@ jobs:
         run: |
           go run . version
 
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@v30
+
+      - name: Validate nix flake
+        run: |
+          nix build .
+          ./result/bin/mergeway-cli version
+
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
