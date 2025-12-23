@@ -6,12 +6,12 @@ Generates an Entity Relationship Diagram (ERD) of your data model.
 mw gen-erd --path <output-file>
 ```
 
-This command inspects your configuration and generates a visual representation of your entities and their relationships. It relies on [graphviz](https://graphviz.org/) (specifically the `dot` command) to produce the output image.
+This command inspects your configuration and generates a visual representation of your entities and their relationships. It relies on [Graphviz](https://graphviz.org/) (specifically the `dot` command) to produce the output image.
 
 ## Arguments
 
-| Argument | Description |
-| --- | --- |
+| Argument | Description                                                                                                                         |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `--path` | **Required.** The path where the generated image will be saved. The file extension determines the output format (e.g., .png, .svg). |
 
 ## Examples
@@ -27,6 +27,10 @@ Generate an SVG:
 ```bash
 mw gen-erd --path schema.svg
 ```
+
+Example output, based on the [full example](https://github.com/mergewayhq/mergeway-cli/tree/main/examples/full):
+
+![ERD of the full example](assets/erd-example-full.png)
 
 ## Requirements
 
