@@ -5,11 +5,9 @@ MDBOOK ?= mdbook
 DOCS_DIR ?= docs
 
 PKG := github.com/mergewayhq/mergeway-cli
-VERSION_FILE := internal/version/version.txt
-VERSION := $(shell cat $(VERSION_FILE))
 GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
 BUILD_DATE := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
-LDFLAGS := -X $(PKG)/internal/version.Number=$(VERSION) -X $(PKG)/internal/version.Commit=$(GIT_COMMIT) -X $(PKG)/internal/version.BuildDate=$(BUILD_DATE)
+LDFLAGS := -X $(PKG)/internal/version.Commit=$(GIT_COMMIT) -X $(PKG)/internal/version.BuildDate=$(BUILD_DATE)
 
 GOFILES := $(shell find . -type f -name '*.go' -not -path './.git/*' -not -path './.cache/*')
 
@@ -22,7 +20,7 @@ fmt:
 	gofmt -w $(GOFILES)
 
 fmt-check:
-	@./scripts/check_gofmt.sh
+	@gofmt -l -d $(GOFILES)
 
 lint:
 	golangci-lint run

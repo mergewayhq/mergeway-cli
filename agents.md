@@ -14,7 +14,7 @@
 
 ## Tooling & Commands
 
-- **Formatting:** `make fmt`, `make fmt-check` (or `./scripts/check_gofmt.sh`).
+- **Formatting:** `make fmt`, `make fmt-check`
 - **Lint:** `make lint` (`golangci-lint run`). Installed in `pre-commit` (`pre-commit install`) so lint fires before every commit.
 - **Tests:** `make test`, `make race`, `make coverage`; coverage inspect via `go tool cover -func=coverage.out` or HTML report.
 - **CI:** GitHub Action at `.github/workflows/ci.yml` mirrors the make targets.
@@ -26,7 +26,7 @@
 2. **Respect Existing Patterns:** Use helper packages (`config`, `data`, `validation`) rather than duplicating logic.
 3. **Cache Constraints:** When invoking Go tooling in this sandbox, set `GOMODCACHE` and `GOCACHE` to local `.cache/...` directories to avoid permission issues.
 4. **No Network Installs:** `go mod tidy` may fail due to blocked proxy access; note the failure rather than retrying endlessly.
-5. **Tests & Lint:** Always run `go test ./...` (with the cached env vars) and `./scripts/check_gofmt.sh` after structural changes. Keep the `pre-commit` hook (`golangci-lint`) installed so commits fail fast on lint errors.
+5. **Tests & Lint:** Always run `go test ./...` (with the cached env vars) and `make fmt-check` after structural changes. Keep the `pre-commit` hook (`golangci-lint`) installed so commits fail fast on lint errors.
 6. **Docs Sync:** If you add/modify examples or CLI behavior, update docs (`README.md`, `docs/*.md`) and ensure e2e scripts still reflect reality. Any CLI-visible flag/command change must be mirrored in `docs/src/cli-reference/`.
 7. **Clean Diff:** Remove generated outputs (`bin/`, `dist/`, `coverage.out`, etc.) before finalizing work; `.gitignore` already covers these.
 8. **Communication:** Document notable changes in `agents.md`, README, and docs when workflow or architecture updates occur.
