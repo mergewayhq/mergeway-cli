@@ -14,5 +14,8 @@ site-url = "/"
 enable = true
 hyperlink = true
 
+[preprocessor.yml-header]
+enable = true
+
 [preprocessor.gitinfo.message]
 footer = "<br><br>Generated at {{date}} (commit: {{hash}})"

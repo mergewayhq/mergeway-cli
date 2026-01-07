@@ -1,4 +1,7 @@
-# `mw export`
+---
+title: "mergeway-cli export"
+linkTitle: "export"
+---
 
 > **Synopsis:** Export repository objects into a single JSON or YAML document.
 
@@ -8,9 +11,9 @@
 mw [global flags] export [--output <path>] [entity...]
 ```
 
-| Flag | Description |
-| --- | --- |
-| `--output` | Optional path to write the exported document. Defaults to STDOUT. |
+| Flag        | Description                                                                                              |
+| ----------- | -------------------------------------------------------------------------------------------------------- |
+| `--output`  | Optional path to write the exported document. Defaults to STDOUT.                                        |
 | `entity...` | Optional list of type names to include. Omitting the list exports every entity defined in the workspace. |
 
 The export format matches the global `--format` flag (`yaml` by default).

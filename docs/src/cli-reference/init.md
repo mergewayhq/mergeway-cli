@@ -1,4 +1,7 @@
-# `mw init`
+---
+title: "mergeway-cli init"
+linkTitle: "init"
+---
 
 > **Synopsis:** Scaffold the directory layout and default configuration for a Mergeway workspace.
 
@@ -10,7 +13,7 @@ mw [global flags] init
 
 `mw init` always targets the directory referenced by `--root` (default `.`) and does not accept positional arguments. Use `mkdir`/`cd` before running the command if you want to initialize a new folder.
 
-Need a walkthrough after initialization? Continue with the [Getting Started guide](../getting-started.md).
+Need a walkthrough after initialization? Continue with the [Getting Started guide](/cli/docs/getting-started/).
 
 ## Example
 

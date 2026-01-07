@@ -1,4 +1,7 @@
-# `mw list`
+---
+title: "mergeway-cli list"
+linkTitle: "list"
+---
 
 > **Synopsis:** List object identifiers for a given type, optionally filtered by a field.
 
@@ -8,9 +11,9 @@
 mw [global flags] list --type <type> [--filter key=value]
 ```
 
-| Flag | Description |
-| --- | --- |
-| `--type` | Required. Type identifier to query. |
+| Flag       | Description                                                                                                                    |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `--type`   | Required. Type identifier to query.                                                                                            |
 | `--filter` | Optional `key=value` string used to filter objects before listing their IDs. The comparison is a simple string equality check. |
 
 ## Example

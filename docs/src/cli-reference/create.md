@@ -1,4 +1,7 @@
-# `mw create`
+---
+title: "mergeway-cli create"
+linkTitle: "create"
+---
 
 > **Synopsis:** Create a new object file that conforms to an entity definition.
 
@@ -8,11 +11,11 @@
 mw [global flags] create --type <type> [--file path] [--id value]
 ```
 
-| Flag | Description |
-| --- | --- |
-| `--type` | Required. Type identifier to create. |
-| `--file` | Optional path to a YAML/JSON payload. If omitted, data is read from STDIN. |
-| `--id` | Optional identifier override. Useful when the payload omits the `id` field. |
+| Flag     | Description                                                                 |
+| -------- | --------------------------------------------------------------------------- |
+| `--type` | Required. Type identifier to create.                                        |
+| `--file` | Optional path to a YAML/JSON payload. If omitted, data is read from STDIN.  |
+| `--id`   | Optional identifier override. Useful when the payload omits the `id` field. |
 
 ## Example
 

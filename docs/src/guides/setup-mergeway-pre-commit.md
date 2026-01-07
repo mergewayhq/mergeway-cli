@@ -1,4 +1,8 @@
-# Enforce Mergeway Formatting with pre-commit
+---
+title: "Enforce Mergeway Formatting with pre-commit"
+linkTitle: "Pre-commit integration"
+weight: 30
+---
 
 Goal: run `mw fmt` automatically before every commit so contributors push consistently formatted GrainBox Market data.
 

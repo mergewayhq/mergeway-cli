@@ -1,4 +1,7 @@
-# `mw fmt`
+---
+title: "mergeway-cli fmt"
+linkTitle: "fmt"
+---
 
 > **Synopsis:** Format one or more data/config files using Mergeway’s canonical ordering.
 

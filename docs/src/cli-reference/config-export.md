@@ -1,4 +1,8 @@
-# `mw config export`
+---
+title: "mergeway-cli config export"
+linkTitle: "config export"
+type: docs
+---
 
 > **Synopsis:** Emit a JSON Schema for one of your types.
 
@@ -8,8 +12,8 @@
 mw [global flags] config export --type <type>
 ```
 
-| Flag | Description |
-| --- | --- |
+| Flag     | Description                          |
+| -------- | ------------------------------------ |
 | `--type` | Required. Type identifier to export. |
 
 ## Example

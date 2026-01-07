@@ -1,6 +1,10 @@
-# Schema Format
+---
+title: "Schema format"
+linkTitle: "Schema format"
+weight: 30
+---
 
-Schemas can live entirely inside `mergeway.yaml` or be split across additional include files (for example under an `entities/` folder) for readability. Likewise, object data may be defined inline or stored under `data/`. Pick the mix that matches your editing workflow—comments below highlight conventions for modular repositories without requiring them. See [Storage Layout](../arch/storage-layout.md) for heuristics on choosing a structure.
+Schemas can live entirely inside `mergeway.yaml` or be split across additional include files (for example under an `entities/` folder) for readability. Likewise, object data may be defined inline or stored under `data/`. Pick the mix that matches your editing workflow—comments below highlight conventions for modular repositories without requiring them. See [Storage Layout](/cli/docs/arch/storage-layout/) for heuristics on choosing a structure.
 
 ## Configuration Entry (`mergeway.yaml`)
 
@@ -65,6 +69,7 @@ entities:
     fields:
       # ...
 ```
+
 `generated: true` is an advisory hint for downstream automation (code generators, UI scaffolding). The CLI still requires either inline identifiers or an explicit `--id` flag when creating objects.
 
 When several objects live in one file, provide a JSONPath selector to extract them:
@@ -88,13 +93,13 @@ Strings remain a shorthand for `path` with no `selector`; Mergeway then reads th
 
 ### Required Sections
 
-| Key          | Description                                                                                                                                                                                                                                               |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identifier` | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. The `generated` flag is advisory for tooling—the CLI still expects identifiers to be supplied (inline or via `--id`). |
-| `include`    | List of data sources. Each entry can be a glob string (shorthand) or a mapping with `path` and optional `selector` property. Omit only when you rely exclusively on inline `data`. Without a selector, Mergeway treats the whole file as a single object. |
-| `fields`     | Map of field definitions. Use either the shorthand `field: type` (defaults to optional) or the expanded mapping for advanced options. Provide either `fields` or `json_schema` for each entity.                                                        |
-| `json_schema`| Path to a JSON Schema (draft 2020-12) file relative to the schema that declares the entity. When present, Mergeway derives field definitions from the JSON Schema and the `fields` block must be omitted.                                             |
-| `data`       | Optional array of inline records. Each entry must contain the identifier field and follows the same schema rules as external data files.                                                                                                                  |
+| Key           | Description                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `identifier`  | Name of the identifier field inside each record (must be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. The `generated` flag is advisory for tooling—the CLI still expects identifiers to be supplied (inline or via `--id`). |
+| `include`     | List of data sources. Each entry can be a glob string (shorthand) or a mapping with `path` and optional `selector` property. Omit only when you rely exclusively on inline `data`. Without a selector, Mergeway treats the whole file as a single object.                                                                                                                    |
+| `fields`      | Map of field definitions. Use either the shorthand `field: type` (defaults to optional) or the expanded mapping for advanced options. Provide either `fields` or `json_schema` for each entity.                                                                                                                                                                              |
+| `json_schema` | Path to a JSON Schema (draft 2020-12) file relative to the schema that declares the entity. When present, Mergeway derives field definitions from the JSON Schema and the `fields` block must be omitted.                                                                                                                                                                    |
+| `data`        | Optional array of inline records. Each entry must contain the identifier field and follows the same schema rules as external data files.                                                                                                                                                                                                                                     |
 
 Add `description` anywhere you need extra context. Entities accept it alongside `identifier`, and each field definition supports its own `description` value.
 
@@ -161,12 +166,12 @@ See `examples/json-schema` for a runnable workspace that demonstrates this flow 
 
 Keep schema files small and focused—one entity per file is the easiest to maintain.
 
-## Data Files (`data/...`)
+## Data Files
 
 Each data file provides the fields required by its entity definition. Declaring a `type` at the top is optional—the CLI infers it from the entity that referenced the file (through `include`/`selector`) and only errors when a conflicting `type` value is present. Keeping it in the file can still be helpful for humans who open an arbitrary YAML document.
 
 ```yaml
-type: Post             # optional; falls back to the entity that included this file
+type: Post # optional; falls back to the entity that included this file
 id: post-001
 title: Launch Day
 author: user-alice
@@ -191,4 +196,4 @@ name: Numeric Identifier
 - Group files in predictable folders (`data/posts/`, `data/users/`, etc.).
 - Run `mw validate` after every change to catch problems immediately.
 
-Need more context? Return to the [Concepts](../concepts/README.md) page for the bigger picture.
+Need more context? Return to the [Concepts](/cli/docs/concepts/) page for the bigger picture.

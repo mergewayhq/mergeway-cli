@@ -1,4 +1,8 @@
-# Install Mergeway
+---
+title: "Install Mergeway CLI"
+linkTitle: "Installation"
+weight: 10
+---
 
 Pick the method that fits your setup. Each installs a single binary named `mw`.
 

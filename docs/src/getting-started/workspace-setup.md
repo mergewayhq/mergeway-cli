@@ -1,4 +1,8 @@
-# Getting Started with Mergeway
+---
+title: "Mergeway workspace set-up"
+linkTitle: "Workspace set-up"
+weight: 20
+---
 
 Goal: scaffold a workspace, define an entity, evolve the layout as requirements grow, and learn the core Mergeway commands end-to-end.
 
@@ -214,8 +218,8 @@ cat market-snapshot.json
 
 Once the basics feel comfortable, automate formatting and reviews so the workspace stays healthy:
 
-- [Set Up Mergeway with GitHub](how-to/setup-mergeway-github.md) to enforce `mw fmt --lint` in Actions and route reviews through CODEOWNERS.
-- [Enforce Mergeway Formatting with pre-commit](how-to/setup-mergeway-pre-commit.md) so contributors run `mw fmt` locally before every commit.
+- [Set Up Mergeway with GitHub](/cli/guides/setup-mergeway-github/) to enforce `mw fmt --lint` in Actions and route reviews through CODEOWNERS.
+- [Enforce Mergeway Formatting with pre-commit](/cli/guides/setup-mergeway-pre-commit/) so contributors run `mw fmt` locally before every commit.
 
 ## You're Done!
 

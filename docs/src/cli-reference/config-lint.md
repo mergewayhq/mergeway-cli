@@ -1,4 +1,7 @@
-# `mw config lint`
+---
+title: "mergeway-cli config lint"
+linkTitle: "config lint"
+---
 
 > **Synopsis:** Validate configuration files (including includes) without touching data.
 

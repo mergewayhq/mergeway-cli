@@ -1,4 +1,7 @@
-# `mw entity show`
+---
+title: "mergeway-cli entity show"
+linkTitle: "entity show"
+---
 
 > **Synopsis:** Print the normalized schema for a given entity.
 

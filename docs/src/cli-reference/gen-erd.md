@@ -1,4 +1,7 @@
-# `mw gen-erd`
+---
+title: "mergeway-cli gen-erd"
+linkTitle: "gen-erd"
+---
 
 Generates an Entity Relationship Diagram (ERD) of your data model.
 

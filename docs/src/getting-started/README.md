@@ -1,4 +1,11 @@
-# Concepts
+---
+title: "Getting Started with Mergeway"
+linkTitle: "Getting Started"
+weight: 10
+---
+
+This guide introduces the basic concepts and structure of a Mergeway workspace.
+It is intended for new users who want to understand how to set up and use Mergeway effectively.
 
 A Mergeway workspace is just a folder with a few predictable parts. Knowing the vocabulary makes the CLI output easier to read.
 

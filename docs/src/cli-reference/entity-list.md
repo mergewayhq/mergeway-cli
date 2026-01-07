@@ -1,4 +1,7 @@
-# `mw entity list`
+---
+title: "mergeway-cli entity list"
+linkTitle: "entity list"
+---
 
 > **Synopsis:** Show every entity Mergeway discovered from your configuration.
 

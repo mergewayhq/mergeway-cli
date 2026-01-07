@@ -1,4 +1,7 @@
-# `mw validate`
+---
+title: "mergeway-cli validate"
+linkTitle: "validate"
+---
 
 > **Synopsis:** Check schemas, records, and references, emitting formatted errors when something is wrong.
 
@@ -8,10 +11,10 @@
 mw [global flags] validate [--phase format|schema|references]... [--fail-fast]
 ```
 
-| Flag | Description |
-| --- | --- |
-| `--phase` | Optional. Repeat to run a subset of phases. By default all phases run (`format`, `schema`, then `references`). |
-| `--fail-fast` | Stop after the first error. Defaults to the global `--fail-fast` flag. |
+| Flag          | Description                                                                                                    |
+| ------------- | -------------------------------------------------------------------------------------------------------------- |
+| `--phase`     | Optional. Repeat to run a subset of phases. By default all phases run (`format`, `schema`, then `references`). |
+| `--fail-fast` | Stop after the first error. Defaults to the global `--fail-fast` flag.                                         |
 
 When you request the `references` phase, Mergeway automatically includes the `schema` phase so reference checks have the information they need.
 

@@ -1,4 +1,7 @@
-# `mw delete`
+---
+title: "mergeway-cli delete"
+linkTitle: "delete"
+---
 
 > **Synopsis:** Remove an object file from the workspace.
 
@@ -8,10 +11,10 @@
 mw [global flags] delete --type <type> <id>
 ```
 
-| Flag | Description |
-| --- | --- |
-| `--type` | Required. Type identifier. |
-| `<id>` | Required positional argument identifying the object to delete. |
+| Flag     | Description                                                    |
+| -------- | -------------------------------------------------------------- |
+| `--type` | Required. Type identifier.                                     |
+| `<id>`   | Required positional argument identifying the object to delete. |
 
 The command prompts for confirmation unless you pass the global `--yes` flag.
 

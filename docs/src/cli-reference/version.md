@@ -1,4 +1,7 @@
-# `mw version`
+---
+title: "mergeway-cli version"
+linkTitle: "version"
+---
 
 > **Synopsis:** Display the CLI build metadata (semantic version, commit, build date).
 

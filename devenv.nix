@@ -22,5 +22,6 @@ in
     pkgs.graphviz
     pkgs.shellcheck
     mdbook-gitinfo
+    pkgs.mdbook-yml-header
   ];
 }

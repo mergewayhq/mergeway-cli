@@ -1,4 +1,7 @@
-# `mw get`
+---
+title: "mergeway-cli get"
+linkTitle: "get"
+---
 
 > **Synopsis:** Print the fields of one object.
 
@@ -8,10 +11,10 @@
 mw [global flags] get --type <type> <id>
 ```
 
-| Flag | Description |
-| --- | --- |
-| `--type` | Required. Type identifier that owns the object. |
-| `<id>` | Required positional argument representing the object identifier. |
+| Flag     | Description                                                      |
+| -------- | ---------------------------------------------------------------- |
+| `--type` | Required. Type identifier that owns the object.                  |
+| `<id>`   | Required positional argument representing the object identifier. |
 
 Use `--format json` if you prefer JSON output.
 
@@ -30,7 +33,7 @@ Output:
 ```yaml
 author: user-alice
 body: |
-    We are excited to announce the product launch.
+  We are excited to announce the product launch.
 id: post-001
 title: Launch Day
 ```

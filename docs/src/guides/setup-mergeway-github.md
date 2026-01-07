@@ -1,4 +1,8 @@
-# Set Up Mergeway with GitHub
+---
+title: "Set up Mergeway with GitHub Actions"
+linkTitle: "Github Actions CI/CD"
+weight: 30
+---
 
 Goal: wire Mergeway into GitHub so formatting stays consistent and ownership of datasets is clearly distributed across teams.
 
