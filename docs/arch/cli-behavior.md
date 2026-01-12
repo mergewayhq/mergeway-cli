@@ -19,7 +19,7 @@ Capture the expected surface of the `mw` command-line tool used to manage the fi
 `mw init [--root <path>]`
 
 - Ensure `mergeway.yaml` exists (creating it from a commented template when missing). You can build out additional folders manually if your workflow benefits from them.
-- Never overwrite existing files unless `--force` is specified (future enhancement).
+- By default, existing files stay untouched; a future `--force` flag would allow overwrites.
 
 ### 2. Entity Introspection
 
@@ -31,7 +31,7 @@ Capture the expected surface of the `mw` command-line tool used to manage the fi
 
 ### 3. Object CRUD
 
-All object-focused commands require `--type <type>` unless the object payload embeds `type`.
+All object-focused commands use `--type <type>` unless the object payload embeds `type`.
 
 - `mw list --type <type> [--filter <expr>]`
   - Streams object identifiers, optionally filtered by simple expressions (e.g., `status=active`).
@@ -90,4 +90,4 @@ All object-focused commands require `--type <type>` unless the object payload em
 ## Extensibility Considerations
 
 - Subcommands should be implemented as discrete modules to allow future plug-ins (e.g., migrations once versioning is added).
-- All commands must operate offline on local files to honor the mergeway-cli scope; remote backends are out-of-scope but future-compatible via the `--root` abstraction.
+- All commands operate offline on local files to honor the mergeway-cli scope; remote backends are out-of-scope but future-compatible via the `--root` abstraction.

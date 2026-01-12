@@ -5,14 +5,14 @@ This guide distills the authoring standards from `docs-bck/good-documentation.md
 ## 1. Voice & Tone
 
 - Use active voice and direct, outcome-focused verbs (`Run`, `Validate`, `Inspect`).
-- Avoid filler words (`just`, `simply`, `obviously`) and state preconditions and side effects explicitly.
+- Try to avoid filler words (`just`, `simply`, `obviously`) and state preconditions and side effects explicitly.
 - Prefer short paragraphs (2–3 sentences). Break complex ideas into bullet points or ordered lists.
 - Address the reader directly (`You can…`, `Run…`).
 
 ## 2. Structure & Headings
 
 - Each page begins with an `# H1` that mirrors the entry in `SUMMARY.md`.
-- Follow a consistent heading hierarchy (`##`, then `###`). Do not skip levels.
+- Follow a consistent heading hierarchy (`##`, then `###`). Try not to skip levels.
 - Include a brief "Why this matters" lead paragraph after the title.
 - Finish guides with a "Next steps" or "Related reading" section to aid navigation.
 
@@ -35,7 +35,7 @@ This guide distills the authoring standards from `docs-bck/good-documentation.md
   > ```
   ````
 
-- Inline commands with backticks (`mw validate`) and link to the corresponding reference entry.
+- Inline commands with backticks (`mw validate`) and link to the corresponding reference entry when it helps navigation.
 
 ## 4. Images & Diagrams
 
@@ -58,12 +58,12 @@ Refer to the templates under `docs/templates/` when drafting:
 
 ## 6. Style Automation
 
-- Include a "Last updated: YYYY-MM-DD" line near the top of each page (automation can fill this in later).
+- Include a "Last updated: YYYY-MM-DD" line near the top of each page (automation can fill this in later) when it fits the page structure.
 - If introducing alternative linters, document how to run them in contributor guidance.
 
 ## 7. Maintenance Rituals
 
-- Every feature PR should update documentation or explicitly explain why no update is needed.
+- For every feature PR, aim to update documentation or explicitly explain why no update is needed.
 - Review key chapters quarterly. Owners and the review checklist are documented in `docs/README.md`.
 - When refactoring sections, update `SUMMARY.md` and ensure legacy links redirect or are noted in release notes.
 

@@ -73,7 +73,7 @@ data/categories/ @grainbox/category-mgmt
 
 Key considerations:
 
-- Teams must exist inside your GitHub organization (for example `@org/team-slug`). If you do not have teams yet, either create them under **Settings → Teams** or list specific people such as `@alice` and `@bob`.
+- Teams need to exist inside your GitHub organization (for example `@org/team-slug`). If you don't have teams yet, either create them under **Settings → Teams** or list specific people such as `@alice` and `@bob`.
 - You can mix teams and individuals to cover overlapping areas—for instance, keep `mergeway.yaml` owned by `@grainbox/data-platform` and also list `@lead-architect` for extra oversight.
 - CODEOWNERS applies to all pull requests, so combining it with the workflow guarantees every Mergeway change is reviewed by someone who understands that slice of the dataset.
 

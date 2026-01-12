@@ -37,4 +37,4 @@ Example output, based on the [full example](https://github.com/mergewayhq/mergew
 
 ## Requirements
 
-The `dot` executable from [Graphviz](https://graphviz.org/) must be installed and available in your system's PATH.
+The `dot` executable from [Graphviz](https://graphviz.org/) needs to be installed and available in your system's PATH.

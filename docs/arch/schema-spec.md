@@ -22,7 +22,7 @@ The CLI resolves `include` relative to the parent file, expanding globs before m
 
 ## Top-Level Structure
 
-Every configuration document must conform to the following shape after include expansion:
+Every configuration document is expected to conform to the following shape after include expansion:
 
 ```yaml
 mergeway:
@@ -41,7 +41,7 @@ entities:
 ```
 
 - `mergeway.version`: configuration schema version (always equals `1`).
-- `entities`: map keyed by type identifiers (must start with an uppercase letter and otherwise follow identifier constraints outlined in `database-requirements.md`). Each entity may offer an optional `description` for tooling and documentation.
+- `entities`: map keyed by type identifiers (start with an uppercase letter and otherwise follow identifier constraints outlined in `database-requirements.md`). Each entity may offer an optional `description` for tooling and documentation.
 - Field definitions accept an optional `description` to clarify usage in downstream tooling.
 
 ## Entity Definition
@@ -96,7 +96,7 @@ Inline records declared under `data` are optional and most useful for tiny looku
 - `format`: optional semantic hint (URI, email, date-time, etc.); aligns with JSON Schema semantics.
 - `enum`: array of allowed values when `type: enum`.
 - `default`: optional default value filled in by tooling.
-- `properties`: nested field definitions used when `type: object`. When combined with `repeated: true`, each array element must respect the nested definition.
+- `properties`: nested field definitions used when `type: object`. When combined with `repeated: true`, each array element follows the nested definition.
 
 ### Validation Extensions
 
@@ -116,7 +116,7 @@ include:
     selector: "$.users[*]"
 ```
 
-Without a selector, Mergeway treats the entire file as one object (falling back to an `items:` array when present). With `selector`, each match must be an object; the CLI surfaces an error otherwise.
+Without a selector, Mergeway treats the entire file as one object (falling back to an `items:` array when present). With `selector`, each match needs to be an object; the CLI surfaces an error otherwise.
 
 Inline data defined within the schema participates in validation and read operations just like file-backed records. When both inline and file data supply the same identifier, the file-sourced record wins. Inline data is intentionally immutable at runtime; mutating commands continue to operate on disk files only.
 

@@ -48,7 +48,7 @@ include:
 - File naming should reflect object identifiers (`post-hello-world.yaml`).
 - Use `.yaml` for human-edited files by default; `.json` remains supported for automation.
 - Files may hold a single object or multiple objects of a single type.
-- Multi-object files should wrap records under `items:` with a shared `type:` header to avoid ambiguity.
+- Multi-object files typically wrap records under `items:` with a shared `type:` header to avoid ambiguity.
 
 ## Choosing a Layout
 
@@ -90,27 +90,27 @@ items:
 
 ## Identifier Rules
 
-- Object identifiers must use alphanumeric characters, hyphens, or underscores.
+- Object identifiers use alphanumeric characters, hyphens, or underscores.
 - Identifiers are unique per type, so different types may reuse the same string.
 - Preserve case when naming files to match the identifier.
 
 ## Cross-Type References
 
 - To link records, define fields with `reference: <TypeName>` in the configuration. These fields store the identifier of the target type.
-- Referenced type names must start with an uppercase letter and match a defined type.
+- Referenced type names start with an uppercase letter and match a defined type.
 - When a field’s `type` equals another defined type, it stores that type’s identifier. Combined with `repeated: true` it models one-to-many relationships implicitly. File contents do not need to repeat the type name; the configuration determines the target type per file pattern.
 
 ## Validation Interaction
 
 - The CLI crawls files determined by each type’s `include`.
-- Keep unrelated assets outside the listed directories or use explicit `include` to avoid accidental ingestion.
+- Try to keep unrelated assets outside the listed directories or use explicit `include` to avoid accidental ingestion.
 - Aggregated validation errors include file paths, so consistent structure improves debugging.
 
 ## Future-Proofing
 
 - Consider a dedicated `includes/` folder if you plan to share fragments across multiple databases.
 - Keep `data/` sharded by stable heuristics (alphabetical prefix, domain grouping) once datasets grow, updating `include` accordingly.
-- Binary assets should stay outside the database scope until support is introduced.
+- Binary assets are best kept outside the database scope until support is introduced.
 
 ## Worked Example
 

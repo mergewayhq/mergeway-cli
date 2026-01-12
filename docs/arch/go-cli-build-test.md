@@ -23,7 +23,7 @@ repo-root/
 
 - Keep the top-level `main.go` minimal—parse flags and hand off to internal packages.
 - Group core logic under `internal/` by domain (configuration loading, storage, validation pipeline, command orchestration).
-- Add `pkg/` only when symbols must be consumed by other modules; otherwise prefer `internal/` for encapsulation.
+- Add `pkg/` only when symbols need to be consumed by other modules; otherwise prefer `internal/` for encapsulation.
 
 ## Build Workflow
 
@@ -48,7 +48,7 @@ Document these commands in the README so contributors follow the canonical workf
 - Race detection: `go test -race ./...` in CI at least once per pipeline.
 - Integration tests: leverage `t.TempDir()` to create temporary repository structures and execute command flows via package APIs or `exec.Command` wrappers.
 - Fixtures: store canonical configs/data under `testdata/`, mirroring representative scenarios from `docs/examples/` (single objects, repeated fields, cross-type references).
-- Coverage target: ≥ 80% across `internal/config`, `internal/data`, `internal/validation`, and CLI orchestration packages.
+- Coverage target: aim for ≥ 80% across `internal/config`, `internal/data`, `internal/validation`, and CLI orchestration packages.
 
 ## Continuous Integration Expectations
 
@@ -64,7 +64,7 @@ Use `actions/setup-go` (or equivalent) pinned to Go 1.25.x and enable module dow
 ## Release Artifacts
 
 - Build static binaries for Linux (`amd64`, optionally `arm64`) and macOS (`amd64`, `arm64`) using environment matrices (`GOOS`, `GOARCH`).
-- Output binaries as `dist/mw_<os>_<arch>`; ensure executables are stripped of debug symbols for release builds.
+- Output binaries as `dist/mw_<os>_<arch>`; strip debug symbols for release builds.
 - Windows support can be added later when requirements expand.
 
 ## Dependency Management

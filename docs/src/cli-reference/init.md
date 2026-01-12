@@ -11,7 +11,7 @@ linkTitle: "init"
 mw [global flags] init
 ```
 
-`mw init` always targets the directory referenced by `--root` (default `.`) and does not accept positional arguments. Use `mkdir`/`cd` before running the command if you want to initialize a new folder.
+`mw init` targets the directory referenced by `--root` (default `.`) and does not accept positional arguments. Use `mkdir`/`cd` before running the command if you want to initialize a new folder.
 
 Need a walkthrough after initialization? Continue with the [Getting Started guide](/cli/docs/getting-started/).
 
@@ -29,7 +29,7 @@ Output resembles:
 Initialized repository at .
 ```
 
-`mw init` ensures a starter `mergeway.yaml` exists in the target directory. Add folders such as `entities/` or `data/` yourself once the project grows; keeping everything in a single file is perfectly valid. Re-run the command safely—it never overwrites existing files.
+`mw init` ensures a starter `mergeway.yaml` exists in the target directory. Add folders such as `entities/` or `data/` yourself once the project grows; keeping everything in a single file is perfectly valid. Re-run the command safely—it won't overwrite existing files.
 
 The default configuration contains:
 

@@ -1,6 +1,6 @@
 # 🧭 1. Principles of Good Technical Documentation
 
-Good documentation serves as both **a learning resource** and **a reference**. It should enable a developer to:
+Good documentation serves as both **a learning resource** and **a reference**. It should help a developer:
 
 - **Understand** what the tool does and why it exists,
 - **Get started quickly**, and
@@ -11,7 +11,7 @@ The core attributes of good developer documentation are:
 | Attribute          | Description                                                        |
 | ------------------ | ------------------------------------------------------------------ |
 | **Clear**          | Uses precise, simple language. Avoids jargon unless defined.       |
-| **Concise**        | Focused, minimal fluff. Every sentence should serve a purpose.     |
+| **Concise**        | Focused, minimal fluff. Each sentence earns its place.             |
 | **Complete**       | Covers all user journeys: installation → usage → troubleshooting.  |
 | **Consistent**     | Terminology, formatting, and tone are uniform throughout.          |
 | **Discoverable**   | Content is well-structured and easily searchable.                  |
@@ -204,7 +204,7 @@ Optional sections for completeness:
 | ---------------------------- | --------------------------------------------------------------------- |
 | **Docs-as-code**             | Keep documentation versioned alongside the source (e.g., in `/docs`). |
 | **Automate updates**         | Generate API/CLI docs automatically from source annotations.          |
-| **Review with each release** | Treat docs changes as mandatory for new features.                     |
+| **Review with each release** | Plan docs changes alongside new features.                             |
 | **Link to issues**           | Use inline references to GitHub issues or PRs when relevant.          |
 | **Continuous feedback**      | Provide a “Suggest edit” or “Was this helpful?” mechanism.            |
 

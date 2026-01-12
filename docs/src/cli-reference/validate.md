@@ -52,7 +52,7 @@ Output when the `Post` schema requires an `author` but the record is missing it:
   message: missing required field "author"
 ```
 
-The command writes errors to standard output and still exits with status `0`, so automation should check whether any errors were returned.
+The command writes errors to standard output and still exits with status `0`, so automation can check whether any errors were returned.
 
 ## Related Commands
 

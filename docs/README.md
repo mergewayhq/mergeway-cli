@@ -39,7 +39,7 @@ Add new pages under `docs/src/` and register them in `SUMMARY.md`.
 ## Maintenance
 
 - Follow the writing guidance in [`docs/STYLEGUIDE.md`](STYLEGUIDE.md) and reuse snippets from [`docs/templates/`](templates/).
-- Every feature PR should either update docs or state why no change is needed.
+- For every feature PR, aim to update docs or note why no change is needed.
 - Once a quarter, skim Overview, Installation, Getting Started, Concepts, Reference, and Troubleshooting to ensure they still match the CLI. Track follow-up work in GitHub issues labeled `docs-review`.
 
 ## License
