@@ -2,7 +2,6 @@ package cli
 
 import (
 	"bytes"
-	"flag"
 	"fmt"
 	"os/exec"
 	"path/filepath"
@@ -11,6 +10,7 @@ import (
 	"text/template"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
+	"github.com/spf13/cobra"
 )
 
 const erdTemplate = `
@@ -67,56 +67,65 @@ type erdData struct {
 	Edges []erdEdge
 }
 
-func cmdGenERD(ctx *Context, args []string) int {
-	fs := flag.NewFlagSet("gen-erd", flag.ContinueOnError)
-	fs.SetOutput(ctx.Stderr)
-	path := fs.String("path", "", "Output path for the generated image")
+func newGenERDCommand() *cobra.Command {
+	var path string
 
-	if err := fs.Parse(args); err != nil {
-		return 1
+	cmd := &cobra.Command{
+		Use:   "gen-erd",
+		Short: "Generate an entity-relationship diagram",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, err := contextFromCommand(cmd)
+			if err != nil {
+				return err
+			}
+
+			if path == "" {
+				_, _ = fmt.Fprintln(ctx.Stderr, "gen-erd: --path is required")
+				return newExitError(1)
+			}
+
+			cfg, err := loadConfig(ctx)
+			if err != nil {
+				_, _ = fmt.Fprintf(ctx.Stderr, "gen-erd: %v\n", err)
+				return newExitError(1)
+			}
+
+			data := prepareERDData(cfg)
+
+			tmpl, err := template.New("erd").Parse(erdTemplate)
+			if err != nil {
+				_, _ = fmt.Fprintf(ctx.Stderr, "gen-erd: parse template: %v\n", err)
+				return newExitError(1)
+			}
+
+			var buf bytes.Buffer
+			if err := tmpl.Execute(&buf, data); err != nil {
+				_, _ = fmt.Fprintf(ctx.Stderr, "gen-erd: execute template: %v\n", err)
+				return newExitError(1)
+			}
+
+			ext := strings.TrimPrefix(filepath.Ext(path), ".")
+			if ext == "" {
+				ext = "png"
+			}
+
+			runCmd := exec.Command("dot", "-T"+ext, "-o", path)
+			runCmd.Stdin = &buf
+			runCmd.Stdout = ctx.Stdout
+			runCmd.Stderr = ctx.Stderr
+
+			if err := runCmd.Run(); err != nil {
+				_, _ = fmt.Fprintf(ctx.Stderr, "gen-erd: graphviz execution failed: %v\n", err)
+				return newExitError(1)
+			}
+
+			return nil
+		},
 	}
 
-	if *path == "" {
-		_, _ = fmt.Fprintln(ctx.Stderr, "gen-erd: --path is required")
-		return 1
-	}
+	cmd.Flags().StringVar(&path, "path", "", "Output path for the generated image")
 
-	cfg, err := loadConfig(ctx)
-	if err != nil {
-		_, _ = fmt.Fprintf(ctx.Stderr, "gen-erd: %v\n", err)
-		return 1
-	}
-
-	data := prepareERDData(cfg)
-
-	tmpl, err := template.New("erd").Parse(erdTemplate)
-	if err != nil {
-		_, _ = fmt.Fprintf(ctx.Stderr, "gen-erd: parse template: %v\n", err)
-		return 1
-	}
-
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, data); err != nil {
-		_, _ = fmt.Fprintf(ctx.Stderr, "gen-erd: execute template: %v\n", err)
-		return 1
-	}
-
-	ext := strings.TrimPrefix(filepath.Ext(*path), ".")
-	if ext == "" {
-		ext = "png"
-	}
-
-	cmd := exec.Command("dot", "-T"+ext, "-o", *path)
-	cmd.Stdin = &buf
-	cmd.Stdout = ctx.Stdout
-	cmd.Stderr = ctx.Stderr
-
-	if err := cmd.Run(); err != nil {
-		_, _ = fmt.Fprintf(ctx.Stderr, "gen-erd: graphviz execution failed: %v\n", err)
-		return 1
-	}
-
-	return 0
+	return cmd
 }
 
 func prepareERDData(cfg *config.Config) erdData {

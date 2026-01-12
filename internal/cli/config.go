@@ -1,72 +1,97 @@
 package cli
 
 import (
-	"flag"
 	"fmt"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
+	"github.com/spf13/cobra"
 )
 
-func cmdConfig(ctx *Context, args []string) int {
-	if len(args) == 0 {
-		_, _ = fmt.Fprintln(ctx.Stderr, "config subcommand required (lint|export)")
-		return 1
+func newConfigCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "config",
+		Short: "Manage configuration files",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, err := contextFromCommand(cmd)
+			if err != nil {
+				return err
+			}
+			_, _ = fmt.Fprintln(ctx.Stderr, "config subcommand required (lint|export)")
+			return newExitError(1)
+		},
 	}
 
-	switch args[0] {
-	case "lint":
-		return cmdConfigLint(ctx, args[1:])
-	case "export":
-		return cmdConfigExport(ctx, args[1:])
-	default:
-		_, _ = fmt.Fprintf(ctx.Stderr, "unknown config subcommand: %s\n", args[0])
-		return 1
-	}
+	cmd.AddCommand(
+		newConfigLintCommand(),
+		newConfigExportCommand(),
+	)
+
+	return cmd
 }
 
-func cmdConfigLint(ctx *Context, args []string) int {
-	fs := flag.NewFlagSet("config lint", flag.ContinueOnError)
-	fs.SetOutput(ctx.Stderr)
-	if err := fs.Parse(args); err != nil {
-		return 1
+func newConfigLintCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "lint",
+		Short: "Validate configuration files",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, err := contextFromCommand(cmd)
+			if err != nil {
+				return err
+			}
+
+			if _, err := loadConfig(ctx); err != nil {
+				_, _ = fmt.Fprintf(ctx.Stderr, "config lint: %v\n", err)
+				return newExitError(1)
+			}
+
+			_, _ = fmt.Fprintln(ctx.Stdout, "configuration valid")
+			return nil
+		},
 	}
 
-	if _, err := loadConfig(ctx); err != nil {
-		_, _ = fmt.Fprintf(ctx.Stderr, "config lint: %v\n", err)
-		return 1
-	}
-
-	_, _ = fmt.Fprintln(ctx.Stdout, "configuration valid")
-	return 0
+	return cmd
 }
 
-func cmdConfigExport(ctx *Context, args []string) int {
-	fs := flag.NewFlagSet("config export", flag.ContinueOnError)
-	fs.SetOutput(ctx.Stderr)
-	typeName := fs.String("type", "", "Type identifier")
-	if err := fs.Parse(args); err != nil {
-		return 1
+func newConfigExportCommand() *cobra.Command {
+	var typeName string
+
+	cmd := &cobra.Command{
+		Use:   "export",
+		Short: "Export entity definition as JSON Schema",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, err := contextFromCommand(cmd)
+			if err != nil {
+				return err
+			}
+
+			if typeName == "" {
+				_, _ = fmt.Fprintln(ctx.Stderr, "config export requires --type")
+				return newExitError(1)
+			}
+
+			cfg, err := loadConfig(ctx)
+			if err != nil {
+				_, _ = fmt.Fprintf(ctx.Stderr, "config export: %v\n", err)
+				return newExitError(1)
+			}
+
+			typeDef, ok := cfg.Types[typeName]
+			if !ok {
+				_, _ = fmt.Fprintf(ctx.Stderr, "unknown type %s\n", typeName)
+				return newExitError(1)
+			}
+
+			schema := buildJSONSchema(typeDef)
+			if code := writeFormatted(ctx, schema); code != 0 {
+				return newExitError(code)
+			}
+			return nil
+		},
 	}
 
-	if *typeName == "" {
-		_, _ = fmt.Fprintln(ctx.Stderr, "config export requires --type")
-		return 1
-	}
+	cmd.Flags().StringVar(&typeName, "type", "", "Type identifier")
 
-	cfg, err := loadConfig(ctx)
-	if err != nil {
-		_, _ = fmt.Fprintf(ctx.Stderr, "config export: %v\n", err)
-		return 1
-	}
-
-	typeDef, ok := cfg.Types[*typeName]
-	if !ok {
-		_, _ = fmt.Fprintf(ctx.Stderr, "unknown type %s\n", *typeName)
-		return 1
-	}
-
-	schema := buildJSONSchema(typeDef)
-	return writeFormatted(ctx, schema)
+	return cmd
 }
 
 func buildJSONSchema(typeDef *config.TypeDefinition) map[string]any {

@@ -2,7 +2,6 @@ package cli
 
 import (
 	"bytes"
-	"flag"
 	"strings"
 	"testing"
 )
@@ -15,7 +14,7 @@ func TestRunPrintsUsageWithoutArgs(t *testing.T) {
 	if code == 0 {
 		t.Fatalf("expected non-zero exit without command")
 	}
-	if !strings.Contains(stdout.String(), "Usage: mw") {
+	if !strings.Contains(stdout.String(), "Usage:") {
 		t.Fatalf("expected usage text in stdout, got %s", stdout.String())
 	}
 }
@@ -41,32 +40,20 @@ func TestRunHelpFlag(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("expected --help to exit 0, got %d", code)
 	}
-	if !strings.Contains(stdout.String(), "Commands:") {
+	if !strings.Contains(stdout.String(), "Commands:") && !strings.Contains(stdout.String(), "Available Commands:") {
 		t.Fatalf("expected usage text for help flag")
 	}
 }
 
-func TestDefaultFormattingHelpers(t *testing.T) {
-	fs := flag.NewFlagSet("mw", flag.ContinueOnError)
-	boolFlag := fs.Bool("verbose", false, "bool flag")
-	stringFlag := fs.String("root", ".", "root dir")
-	_ = *boolFlag
-	_ = *stringFlag
+func TestRunRejectsSingleDashLongFlag(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
 
-	if shouldShowDefault(fs.Lookup("verbose")) {
-		t.Fatalf("expected bool false default to be hidden")
+	code := Run([]string{"-root", "path", "version"}, stdout, stderr)
+	if code == 0 {
+		t.Fatalf("expected single-dash long flag to fail")
 	}
-	if !shouldShowDefault(fs.Lookup("root")) {
-		t.Fatalf("expected string flag default to be shown")
-	}
-
-	// Force bool default true and re-check formatting.
-	fs.Bool("force", true, "force flag")
-
-	if formatDefault(fs.Lookup("force")) != "true" {
-		t.Fatalf("expected bool default to show bare true")
-	}
-	if formatDefault(fs.Lookup("root")) != "\".\"" {
-		t.Fatalf("expected quoted default for string flag")
+	if !strings.Contains(stderr.String(), "unknown shorthand") && !strings.Contains(stderr.String(), "unknown command") {
+		t.Fatalf("expected shorthand or parse error, got %s", stderr.String())
 	}
 }

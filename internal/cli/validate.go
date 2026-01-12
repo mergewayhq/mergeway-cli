@@ -1,43 +1,54 @@
 package cli
 
 import (
-	"flag"
 	"fmt"
 
 	"github.com/mergewayhq/mergeway-cli/internal/validation"
+	"github.com/spf13/cobra"
 )
 
-func cmdValidate(ctx *Context, args []string) int {
-	fs := flag.NewFlagSet("validate", flag.ContinueOnError)
-	fs.SetOutput(ctx.Stderr)
+func newValidateCommand() *cobra.Command {
 	phaseFlags := multiFlag{}
-	fs.Var(&phaseFlags, "phase", "Validation phase to run (format|schema|references), repeatable")
-	failFast := fs.Bool("fail-fast", ctx.FailFast, "Stop on first error")
-	if err := fs.Parse(args); err != nil {
-		return 1
+
+	cmd := &cobra.Command{
+		Use:   "validate",
+		Short: "Validate repository contents",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, err := contextFromCommand(cmd)
+			if err != nil {
+				return err
+			}
+
+			cfg, err := loadConfig(ctx)
+			if err != nil {
+				_, _ = fmt.Fprintf(ctx.Stderr, "validate: %v\n", err)
+				return newExitError(1)
+			}
+
+			opts := validation.Options{
+				FailFast: ctx.FailFast,
+				Phases:   phaseFlags.Values,
+			}
+
+			result, err := validation.Validate(ctx.Root, cfg, opts)
+			if err != nil {
+				_, _ = fmt.Fprintf(ctx.Stderr, "validate: %v\n", err)
+				return newExitError(1)
+			}
+
+			if len(result.Errors) == 0 {
+				_, _ = fmt.Fprintln(ctx.Stdout, "validation succeeded")
+				return nil
+			}
+
+			if code := writeFormatted(ctx, result.Errors); code != 0 {
+				return newExitError(code)
+			}
+			return nil
+		},
 	}
 
-	cfg, err := loadConfig(ctx)
-	if err != nil {
-		_, _ = fmt.Fprintf(ctx.Stderr, "validate: %v\n", err)
-		return 1
-	}
+	cmd.Flags().Var(&phaseFlags, "phase", "Validation phase to run (format|schema|references), repeatable")
 
-	opts := validation.Options{
-		FailFast: *failFast,
-		Phases:   phaseFlags.Values,
-	}
-
-	result, err := validation.Validate(ctx.Root, cfg, opts)
-	if err != nil {
-		_, _ = fmt.Fprintf(ctx.Stderr, "validate: %v\n", err)
-		return 1
-	}
-
-	if len(result.Errors) == 0 {
-		_, _ = fmt.Fprintln(ctx.Stdout, "validation succeeded")
-		return 0
-	}
-
-	return writeFormatted(ctx, result.Errors)
+	return cmd
 }

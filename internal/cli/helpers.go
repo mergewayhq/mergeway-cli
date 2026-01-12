@@ -168,6 +168,10 @@ func (m *multiFlag) String() string {
 	return strings.Join(phasesToStrings(m.Values), ",")
 }
 
+func (m *multiFlag) Type() string {
+	return "phase"
+}
+
 func (m *multiFlag) Set(value string) error {
 	if value == "" {
 		return nil

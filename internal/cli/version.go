@@ -1,18 +1,26 @@
 package cli
 
 import (
-	"flag"
-
 	"github.com/mergewayhq/mergeway-cli/internal/version"
+	"github.com/spf13/cobra"
 )
 
-func cmdVersion(ctx *Context, args []string) int {
-	fs := flag.NewFlagSet("version", flag.ContinueOnError)
-	fs.SetOutput(ctx.Stderr)
+func newVersionCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "version",
+		Short: "Display CLI build information",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, err := contextFromCommand(cmd)
+			if err != nil {
+				return err
+			}
 
-	if err := fs.Parse(args); err != nil {
-		return 1
+			if code := writeFormatted(ctx, version.Current()); code != 0 {
+				return newExitError(code)
+			}
+			return nil
+		},
 	}
 
-	return writeFormatted(ctx, version.Current())
+	return cmd
 }

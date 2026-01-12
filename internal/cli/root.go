@@ -2,11 +2,12 @@ package cli
 
 import (
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"path/filepath"
 	"strings"
+
+	"github.com/spf13/cobra"
 )
 
 type Context struct {
@@ -22,129 +23,120 @@ type Context struct {
 
 // Run executes the CLI. It returns an exit code.
 func Run(args []string, stdout, stderr io.Writer) int {
-	fs := flag.NewFlagSet("mw", flag.ContinueOnError)
-	fs.SetOutput(stderr)
-	fs.Usage = func() {}
+	cmd := newRootCommand(stdout, stderr)
+	cmd.SetArgs(args)
 
-	root := fs.String("root", ".", "Repository root containing config and data directories")
-	configPath := fs.String("config", "", "Path to configuration entry file")
-	format := fs.String("format", "yaml", "Output format (yaml|json)")
-	failFast := fs.Bool("fail-fast", false, "Stop validation on first error")
-	yes := fs.Bool("yes", false, "Auto-confirm prompts")
-	verbose := fs.Bool("verbose", false, "Enable verbose logging")
-
-	if err := fs.Parse(args); err != nil {
-		if errors.Is(err, flag.ErrHelp) {
-			printUsage(stdout, fs)
-			return 0
+	if err := cmd.Execute(); err != nil {
+		var exitErr exitError
+		if errors.As(err, &exitErr) {
+			return exitErr.Code()
 		}
+		_, _ = fmt.Fprintln(stderr, err.Error())
 		return 1
 	}
+	return 0
+}
 
-	remaining := fs.Args()
-	if len(remaining) == 0 {
-		printUsage(stdout, fs)
+type exitError struct {
+	code int
+}
+
+func (e exitError) Error() string {
+	return fmt.Sprintf("exit code %d", e.code)
+}
+
+func (e exitError) Code() int {
+	if e.code == 0 {
 		return 1
+	}
+	return e.code
+}
+
+func newExitError(code int) error {
+	return exitError{code: code}
+}
+
+func newRootCommand(stdout, stderr io.Writer) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:           "mw",
+		Short:         "Manage mergeway repositories",
+		SilenceUsage:  true,
+		SilenceErrors: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			_ = cmd.Help()
+			return newExitError(1)
+		},
+	}
+	cmd.SetOut(stdout)
+	cmd.SetErr(stderr)
+
+	flags := cmd.PersistentFlags()
+	flags.String("root", ".", "Repository root containing config and data directories")
+	flags.String("config", "", "Path to configuration entry file")
+	flags.String("format", "yaml", "Output format (yaml|json)")
+	flags.Bool("fail-fast", false, "Stop validation on first error")
+	flags.Bool("yes", false, "Auto-confirm prompts")
+	flags.Bool("verbose", false, "Enable verbose logging")
+
+	cmd.AddCommand(
+		newInitCommand(),
+		newEntityCommand(),
+		newListCommand(),
+		newGetCommand(),
+		newCreateCommand(),
+		newUpdateCommand(),
+		newDeleteCommand(),
+		newExportCommand(),
+		newValidateCommand(),
+		newFmtCommand(),
+		newConfigCommand(),
+		newVersionCommand(),
+		newGenERDCommand(),
+	)
+
+	return cmd
+}
+
+func contextFromCommand(cmd *cobra.Command) (*Context, error) {
+	root, err := cmd.Flags().GetString("root")
+	if err != nil {
+		return nil, err
+	}
+	configPath, err := cmd.Flags().GetString("config")
+	if err != nil {
+		return nil, err
+	}
+	format, err := cmd.Flags().GetString("format")
+	if err != nil {
+		return nil, err
+	}
+	failFast, err := cmd.Flags().GetBool("fail-fast")
+	if err != nil {
+		return nil, err
+	}
+	yes, err := cmd.Flags().GetBool("yes")
+	if err != nil {
+		return nil, err
+	}
+	verbose, err := cmd.Flags().GetBool("verbose")
+	if err != nil {
+		return nil, err
 	}
 
 	ctx := &Context{
-		Root:     *root,
-		Config:   *configPath,
-		Format:   strings.ToLower(*format),
-		FailFast: *failFast,
-		Yes:      *yes,
-		Verbose:  *verbose,
-		Stdout:   stdout,
-		Stderr:   stderr,
+		Root:     root,
+		Config:   configPath,
+		Format:   strings.ToLower(format),
+		FailFast: failFast,
+		Yes:      yes,
+		Verbose:  verbose,
+		Stdout:   cmd.OutOrStdout(),
+		Stderr:   cmd.ErrOrStderr(),
 	}
 
 	if ctx.Config == "" {
 		ctx.Config = filepath.Join(ctx.Root, "mergeway.yaml")
 	}
 
-	switch remaining[0] {
-	case "init":
-		return cmdInit(ctx, remaining[1:])
-	case "entity":
-		return cmdEntity(ctx, remaining[1:])
-	case "list":
-		return cmdList(ctx, remaining[1:])
-	case "get":
-		return cmdGet(ctx, remaining[1:])
-	case "create":
-		return cmdCreate(ctx, remaining[1:])
-	case "update":
-		return cmdUpdate(ctx, remaining[1:])
-	case "delete":
-		return cmdDelete(ctx, remaining[1:])
-	case "export":
-		return cmdExport(ctx, remaining[1:])
-	case "validate":
-		return cmdValidate(ctx, remaining[1:])
-	case "fmt":
-		return cmdFmt(ctx, remaining[1:])
-	case "config":
-		return cmdConfig(ctx, remaining[1:])
-	case "version":
-		return cmdVersion(ctx, remaining[1:])
-	case "gen-erd":
-		return cmdGenERD(ctx, remaining[1:])
-	case "help", "--help", "-h":
-		printUsage(stdout, fs)
-		return 0
-	default:
-		_, _ = fmt.Fprintf(stderr, "unknown command: %s\n", remaining[0])
-		printUsage(stderr, fs)
-		return 1
-	}
-}
-
-func printUsage(w io.Writer, fs *flag.FlagSet) {
-	_, _ = fmt.Fprintln(w, "Usage: mw [global flags] <command> [args]")
-	_, _ = fmt.Fprintln(w, "\nCommands:")
-	_, _ = fmt.Fprintln(w, "  init                      Scaffold repository structure")
-	_, _ = fmt.Fprintln(w, "  entity list               List known entities")
-	_, _ = fmt.Fprintln(w, "  entity show <name>        Show schema for an entity")
-	_, _ = fmt.Fprintln(w, "  list                      List object identifiers")
-	_, _ = fmt.Fprintln(w, "  get                       Get an object")
-	_, _ = fmt.Fprintln(w, "  create                    Create an object")
-	_, _ = fmt.Fprintln(w, "  update                    Update an object")
-	_, _ = fmt.Fprintln(w, "  delete                    Delete an object")
-	_, _ = fmt.Fprintln(w, "  export                    Export repository data")
-	_, _ = fmt.Fprintln(w, "  validate                  Validate repository contents")
-	_, _ = fmt.Fprintln(w, "  fmt                       Format database files")
-	_, _ = fmt.Fprintln(w, "  config lint               Validate configuration files")
-	_, _ = fmt.Fprintln(w, "  config export             Export entity definition as JSON Schema")
-	_, _ = fmt.Fprintln(w, "  version                   Display CLI build information")
-
-	_, _ = fmt.Fprintln(w, "\nGlobal Flags:")
-	fs.VisitAll(func(f *flag.Flag) {
-		flagName, usage := flag.UnquoteUsage(f)
-		label := fmt.Sprintf("--%s", f.Name)
-		if flagName != "" {
-			label = fmt.Sprintf("%s %s", label, flagName)
-		}
-		line := fmt.Sprintf("  %-26s %s", label, usage)
-		if shouldShowDefault(f) {
-			line = fmt.Sprintf("%s (default %s)", line, formatDefault(f))
-		}
-		_, _ = fmt.Fprintln(w, line)
-	})
-}
-
-func shouldShowDefault(f *flag.Flag) bool {
-	if f.DefValue == "" {
-		return false
-	}
-	if f.DefValue == "false" {
-		return false
-	}
-	return true
-}
-
-func formatDefault(f *flag.Flag) string {
-	if _, ok := f.Value.(interface{ IsBoolFlag() bool }); ok && f.DefValue == "true" {
-		return f.DefValue
-	}
-	return fmt.Sprintf("%q", f.DefValue)
+	return ctx, nil
 }

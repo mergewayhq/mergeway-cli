@@ -18,7 +18,7 @@ mw [global flags] delete --type <type> <id>
 
 The command prompts for confirmation unless you pass the global `--yes` flag.
 
-Place global flags (like `--yes` or `--root`) before the command name.
+Global flags (like `--yes` or `--root`) can appear before or after the command name.
 
 ## Example
 

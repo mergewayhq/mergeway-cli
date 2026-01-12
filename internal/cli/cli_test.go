@@ -28,6 +28,22 @@ func TestEntityList(t *testing.T) {
 	}
 }
 
+func TestPersistentFlagsAfterSubcommand(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"entity", "list", "--root", repo}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("exit code %d, stderr %s", code, stderr.String())
+	}
+
+	out := stdout.String()
+	if !strings.Contains(out, "Post") || !strings.Contains(out, "User") {
+		t.Fatalf("unexpected output: %s", out)
+	}
+}
+
 func TestGet(t *testing.T) {
 	repo := copyFixture(t)
 	stdout := &bytes.Buffer{}

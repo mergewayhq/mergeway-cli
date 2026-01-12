@@ -4,7 +4,7 @@ linkTitle: "CLI Reference"
 weight: 30
 ---
 
-Every command shares a set of global flags:
+Every command shares a set of global flags (use `--long-name`; single-dash long flags like `-root` are not supported). Global flags can appear before or after the command name.
 
 | Flag          | Description                                                            |
 | ------------- | ---------------------------------------------------------------------- |

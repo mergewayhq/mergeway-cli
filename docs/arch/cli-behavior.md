@@ -10,7 +10,7 @@ Capture the expected surface of the `mw` command-line tool used to manage the fi
 - `--config <path>`: override the configuration entry point (defaults to `<root>/mergeway.yaml`).
 - `--format <yaml|json>`: preferred payload format for command output (default `yaml`).
 - `--fail-fast`: when supplied to validation commands, stop on the first error instead of aggregating.
-- `--yes/-y`: auto-confirm prompts for destructive operations.
+- `--yes`: auto-confirm prompts for destructive operations.
 
 ## Command Groups
 

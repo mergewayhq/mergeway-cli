@@ -1,35 +1,41 @@
 package cli
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
+	"github.com/spf13/cobra"
 )
 
-func cmdInit(ctx *Context, args []string) int {
-	fs := flag.NewFlagSet("init", flag.ContinueOnError)
-	fs.SetOutput(ctx.Stderr)
+func newInitCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "init",
+		Short: "Scaffold repository structure",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, err := contextFromCommand(cmd)
+			if err != nil {
+				return err
+			}
 
-	if err := fs.Parse(args); err != nil {
-		return 1
+			if len(args) > 0 {
+				_, _ = fmt.Fprintln(ctx.Stderr, "init: no arguments are supported")
+				return newExitError(1)
+			}
+
+			configPath := ctx.Config
+			if err := ensureFile(configPath, defaultConfigTemplate()); err != nil {
+				_, _ = fmt.Fprintf(ctx.Stderr, "init: %v\n", err)
+				return newExitError(1)
+			}
+
+			_, _ = fmt.Fprintf(ctx.Stdout, "Initialized repository at %s\n", ctx.Root)
+			return nil
+		},
 	}
 
-	if fs.NArg() > 0 {
-		_, _ = fmt.Fprintln(ctx.Stderr, "init: no arguments are supported")
-		return 1
-	}
-
-	configPath := ctx.Config
-	if err := ensureFile(configPath, defaultConfigTemplate()); err != nil {
-		_, _ = fmt.Fprintf(ctx.Stderr, "init: %v\n", err)
-		return 1
-	}
-
-	_, _ = fmt.Fprintf(ctx.Stdout, "Initialized repository at %s\n", ctx.Root)
-	return 0
+	return cmd
 }
 
 func ensureFile(path, content string) error {

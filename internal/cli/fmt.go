@@ -2,7 +2,6 @@ package cli
 
 import (
 	"errors"
-	"flag"
 	"fmt"
 	"io/fs"
 	"os"
@@ -12,102 +11,124 @@ import (
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
 	"github.com/mergewayhq/mergeway-cli/internal/format"
+	"github.com/spf13/cobra"
 )
 
-func cmdFmt(ctx *Context, args []string) int {
-	fs := flag.NewFlagSet("fmt", flag.ContinueOnError)
-	fs.SetOutput(ctx.Stderr)
-	inPlace := fs.Bool("in-place", false, "Rewrite files in place")
-	lint := fs.Bool("lint", false, "Fail if formatting differs from the canonical form")
-	stdoutMode := fs.Bool("stdout", false, "Print formatted output to STDOUT instead of rewriting files")
-	if err := fs.Parse(args); err != nil {
-		return 1
-	}
+func newFmtCommand() *cobra.Command {
+	var inPlace bool
+	var lint bool
+	var stdoutMode bool
 
-	if *lint && *inPlace {
-		_, _ = fmt.Fprintln(ctx.Stderr, "fmt: --lint cannot be combined with --in-place")
-		return 1
-	}
-	if *lint && *stdoutMode {
-		_, _ = fmt.Fprintln(ctx.Stderr, "fmt: --lint cannot be combined with --stdout")
-		return 1
-	}
-	if *inPlace && *stdoutMode {
-		_, _ = fmt.Fprintln(ctx.Stderr, "fmt: --stdout cannot be combined with --in-place")
-		return 1
-	}
-
-	absRoot, err := filepath.Abs(ctx.Root)
-	if err != nil {
-		_, _ = fmt.Fprintf(ctx.Stderr, "fmt: resolve root: %v\n", err)
-		return 1
-	}
-
-	cfg, err := loadConfig(ctx)
-	if err != nil {
-		_, _ = fmt.Fprintf(ctx.Stderr, "fmt: %v\n", err)
-		return 1
-	}
-
-	tracked, err := collectConfiguredFiles(absRoot, cfg)
-	if err != nil {
-		_, _ = fmt.Fprintf(ctx.Stderr, "fmt: %v\n", err)
-		return 1
-	}
-
-	paths := fs.Args()
-	defaultTargets := len(paths) == 0
-	var targets []string
-	if defaultTargets {
-		targets = tracked.Slice()
-	} else {
-		targets, err = expandFmtTargets(absRoot, paths)
-		if err != nil {
-			_, _ = fmt.Fprintf(ctx.Stderr, "fmt: %v\n", err)
-			return 1
-		}
-		for _, path := range targets {
-			if !tracked.Has(path) {
-				_, _ = fmt.Fprintf(ctx.Stderr, "fmt: %s is not part of the configured data set\n", displayPath(absRoot, path))
-				return 1
+	cmd := &cobra.Command{
+		Use:   "fmt [paths...]",
+		Short: "Format database files",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, err := contextFromCommand(cmd)
+			if err != nil {
+				return err
 			}
-		}
-	}
 
-	if len(targets) == 0 {
-		if defaultTargets {
-			_, _ = fmt.Fprintln(ctx.Stderr, "fmt: configuration does not reference any data files; nothing to format")
-			return 0
-		}
-		_, _ = fmt.Fprintln(ctx.Stderr, "fmt: no files matched the provided paths")
-		return 1
-	}
+			if lint && inPlace {
+				_, _ = fmt.Fprintln(ctx.Stderr, "fmt: --lint cannot be combined with --in-place")
+				return newExitError(1)
+			}
+			if lint && stdoutMode {
+				_, _ = fmt.Fprintln(ctx.Stderr, "fmt: --lint cannot be combined with --stdout")
+				return newExitError(1)
+			}
+			if inPlace && stdoutMode {
+				_, _ = fmt.Fprintln(ctx.Stderr, "fmt: --stdout cannot be combined with --in-place")
+				return newExitError(1)
+			}
 
-	schemaCache := make(map[string]*format.Schema)
-	schemaFor := func(path string) *format.Schema {
-		typeDef := tracked.TypeFor(path)
-		if typeDef == nil {
+			absRoot, err := filepath.Abs(ctx.Root)
+			if err != nil {
+				_, _ = fmt.Fprintf(ctx.Stderr, "fmt: resolve root: %v\n", err)
+				return newExitError(1)
+			}
+
+			cfg, err := loadConfig(ctx)
+			if err != nil {
+				_, _ = fmt.Fprintf(ctx.Stderr, "fmt: %v\n", err)
+				return newExitError(1)
+			}
+
+			tracked, err := collectConfiguredFiles(absRoot, cfg)
+			if err != nil {
+				_, _ = fmt.Fprintf(ctx.Stderr, "fmt: %v\n", err)
+				return newExitError(1)
+			}
+
+			paths := args
+			defaultTargets := len(paths) == 0
+			var targets []string
+			if defaultTargets {
+				targets = tracked.Slice()
+			} else {
+				targets, err = expandFmtTargets(absRoot, paths)
+				if err != nil {
+					_, _ = fmt.Fprintf(ctx.Stderr, "fmt: %v\n", err)
+					return newExitError(1)
+				}
+				for _, path := range targets {
+					if !tracked.Has(path) {
+						_, _ = fmt.Fprintf(ctx.Stderr, "fmt: %s is not part of the configured data set\n", displayPath(absRoot, path))
+						return newExitError(1)
+					}
+				}
+			}
+
+			if len(targets) == 0 {
+				if defaultTargets {
+					_, _ = fmt.Fprintln(ctx.Stderr, "fmt: configuration does not reference any data files; nothing to format")
+					return nil
+				}
+				_, _ = fmt.Fprintln(ctx.Stderr, "fmt: no files matched the provided paths")
+				return newExitError(1)
+			}
+
+			schemaCache := make(map[string]*format.Schema)
+			schemaFor := func(path string) *format.Schema {
+				typeDef := tracked.TypeFor(path)
+				if typeDef == nil {
+					return nil
+				}
+				if cached, ok := schemaCache[typeDef.Name]; ok {
+					return cached
+				}
+				schema := buildFormatSchema(typeDef)
+				schemaCache[typeDef.Name] = schema
+				return schema
+			}
+
+			if lint {
+				if code := fmtLint(ctx, absRoot, targets, schemaFor); code != 0 {
+					return newExitError(code)
+				}
+				return nil
+			}
+			// Default to rewriting files so users can run `mw fmt` without extra flags.
+			if !stdoutMode && !inPlace {
+				inPlace = true
+			}
+			if inPlace {
+				if code := fmtWriteInPlace(ctx, absRoot, targets, schemaFor); code != 0 {
+					return newExitError(code)
+				}
+				return nil
+			}
+			if code := fmtWriteStdout(ctx, targets, schemaFor); code != 0 {
+				return newExitError(code)
+			}
 			return nil
-		}
-		if cached, ok := schemaCache[typeDef.Name]; ok {
-			return cached
-		}
-		schema := buildFormatSchema(typeDef)
-		schemaCache[typeDef.Name] = schema
-		return schema
+		},
 	}
 
-	if *lint {
-		return fmtLint(ctx, absRoot, targets, schemaFor)
-	}
-	// Default to rewriting files so users can run `mw fmt` without extra flags.
-	if !*stdoutMode && !*inPlace {
-		*inPlace = true
-	}
-	if *inPlace {
-		return fmtWriteInPlace(ctx, absRoot, targets, schemaFor)
-	}
-	return fmtWriteStdout(ctx, targets, schemaFor)
+	cmd.Flags().BoolVar(&inPlace, "in-place", false, "Rewrite files in place")
+	cmd.Flags().BoolVar(&lint, "lint", false, "Fail if formatting differs from the canonical form")
+	cmd.Flags().BoolVar(&stdoutMode, "stdout", false, "Print formatted output to STDOUT instead of rewriting files")
+
+	return cmd
 }
 
 type configuredFileSet struct {
