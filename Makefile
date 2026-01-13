@@ -40,9 +40,6 @@ ci: fmt-check lint test race coverage
 clean:
 	rm -rf bin dist coverage.out .cache
 
-release:
-	./scripts/build_binaries.sh
-
 docs-build:
 	$(MDBOOK) build $(DOCS_DIR)
 

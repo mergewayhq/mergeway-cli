@@ -26,3 +26,10 @@ repos:
         entry: go fmt ./...
         language: system
         pass_filenames: false
+  - repo: local
+    hooks:
+      - id: test-nix-flake
+        name: test-nix-flake
+        entry: nix build .
+        language: system
+        pass_filenames: false

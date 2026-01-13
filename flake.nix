@@ -17,7 +17,8 @@
           version = "0.1.0"; # Versioning can be improved later
           src = self;
 
-          vendorHash = "sha256-pO4KEW2S84NepKekk1VMd+fG6pV7/DlPEwZgqgroyD0=";
+          #vendorHash = nixpkgs.lib.fakeHash;
+          vendorHash = "sha256-XE99sI0UJhuALkjXJ2pI5UXCmr7OSktNujjIkNlARww=";
 
           ldflags =
             let
