@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli fmt"
 linkTitle: "fmt"
+description: "Format one or more data/config files using Mergeway's canonical ordering."
 ---
 
 > **Synopsis:** Format one or more data/config files using Mergeway’s canonical ordering.

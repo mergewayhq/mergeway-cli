@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli entity list"
 linkTitle: "entity list"
+description: "Show every entity Mergeway discovered from your configuration."
 ---
 
 > **Synopsis:** Show every entity Mergeway discovered from your configuration.

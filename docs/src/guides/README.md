@@ -1,6 +1,7 @@
 ---
 title: "Guides"
 linkTitle: "Guides"
+description: "Task-focused guides for common Mergeway workflows and integrations."
 weight: 30
 ---
 

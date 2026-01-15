@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli entity show"
 linkTitle: "entity show"
+description: "Print the normalized schema for a given entity."
 ---
 
 > **Synopsis:** Print the normalized schema for a given entity.

@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli version"
 linkTitle: "version"
+description: "Display the CLI build metadata (semantic version, commit, build date)."
 ---
 
 > **Synopsis:** Display the CLI build metadata (semantic version, commit, build date).

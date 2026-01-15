@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli delete"
 linkTitle: "delete"
+description: "Remove an object file from the workspace."
 ---
 
 > **Synopsis:** Remove an object file from the workspace.

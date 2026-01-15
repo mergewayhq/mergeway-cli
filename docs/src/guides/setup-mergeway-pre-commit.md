@@ -1,6 +1,7 @@
 ---
 title: "Enforce Mergeway Formatting with pre-commit"
 linkTitle: "Pre-commit integration"
+description: "Configure pre-commit to run mw fmt before each commit."
 weight: 30
 ---
 

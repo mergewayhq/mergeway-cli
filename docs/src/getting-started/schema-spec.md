@@ -1,10 +1,11 @@
 ---
 title: "Schema format"
 linkTitle: "Schema format"
+description: "Describe the Mergeway schema format and options for organizing schema files."
 weight: 30
 ---
 
-Schemas can live entirely inside `mergeway.yaml` or be split across additional include files (for example under an `entities/` folder) for readability. Likewise, object data may be defined inline or stored under `data/`. Pick the mix that matches your editing workflow—comments below highlight conventions for modular repositories without requiring them. See [Storage Layout](/cli/docs/arch/storage-layout/) for heuristics on choosing a structure.
+Schemas can live entirely inside `mergeway.yaml` or be split across additional include files (for example under an `entities/` folder) for readability. Likewise, object data may be defined inline or stored under `data/`. Pick the mix that matches your editing workflow—comments below highlight conventions for modular repositories without requiring them.
 
 ## Configuration Entry (`mergeway.yaml`)
 
@@ -196,4 +197,4 @@ name: Numeric Identifier
 - Group files in predictable folders (`data/posts/`, `data/users/`, etc.).
 - Run `mw validate` after every change to catch problems immediately.
 
-Need more context? Return to the [Concepts](/cli/docs/concepts/) page for the bigger picture.
+Need more context? Return to the [Basic Concepts](./README.md) page for the bigger picture.

@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli config export"
 linkTitle: "config export"
+description: "Emit a JSON Schema for one of your types."
 type: docs
 ---
 

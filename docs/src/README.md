@@ -1,6 +1,7 @@
 ---
 title: "Mergeway CLI"
 linkTitle: "CLI"
+description: "Overview of Mergeway CLI, what it does, and why it keeps schemas and data consistent."
 cascade:
   type: docs
 ---
@@ -32,9 +33,9 @@ Mergeway is a lightweight CLI that keeps metadata honest by treating schemas as 
 
 ## Where to Go Next
 
-1. [Install Mergeway](/cli/docs/installation/) (or build from source).
-2. Follow the [Getting Started guide](/cli/docs/getting-started/).
-3. Review the [Concepts](/cli/docs/concepts/) and [Schema Format](/cli/docs/schema-spec/) when you define entities.
-4. Browse through the [CLI Reference](/cli/reference/) for command syntax.
+1. [Install Mergeway](getting-started/installation.md) (or build from source).
+2. Follow the [Workspace set-up](getting-started/workspace-setup.md).
+3. Review the [Basic Concepts](getting-started/README.md) and [Schema Format](getting-started/schema-spec.md) when you define entities.
+4. Browse through the [CLI Reference](cli-reference/README.md) for command syntax.
 
 Updates land in the [Changelog](https://github.com/mergewayhq/mergeway-cli/releases). File GitHub issues for questions, bugs, or requests.

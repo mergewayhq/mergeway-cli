@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli list"
 linkTitle: "list"
+description: "List object identifiers for a given type, optionally filtered by a field."
 ---
 
 > **Synopsis:** List object identifiers for a given type, optionally filtered by a field.

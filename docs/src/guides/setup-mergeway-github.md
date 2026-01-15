@@ -1,6 +1,7 @@
 ---
 title: "Set up Mergeway with GitHub Actions"
 linkTitle: "Github Actions CI/CD"
+description: "Set up GitHub Actions and CODEOWNERS to keep Mergeway formatting and ownership consistent."
 weight: 30
 ---
 

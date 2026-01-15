@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli get"
 linkTitle: "get"
+description: "Print the fields of one object."
 ---
 
 > **Synopsis:** Print the fields of one object.

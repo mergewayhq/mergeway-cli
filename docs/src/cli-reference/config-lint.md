@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli config lint"
 linkTitle: "config lint"
+description: "Validate configuration files (including includes) without touching data."
 ---
 
 > **Synopsis:** Validate configuration files (including includes) without touching data.

@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli validate"
 linkTitle: "validate"
+description: "Check schemas, records, and references and report formatted errors."
 ---
 
 > **Synopsis:** Check schemas, records, and references, emitting formatted errors when something is wrong.

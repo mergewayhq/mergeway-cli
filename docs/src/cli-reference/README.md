@@ -1,6 +1,7 @@
 ---
 title: "CLI Reference"
 linkTitle: "CLI Reference"
+description: "Reference for Mergeway CLI commands, global flags, and usage."
 weight: 30
 ---
 
@@ -29,7 +30,8 @@ Every command shares a set of global flags (use `--long-name`; single-dash long 
 - [`config lint`](config-lint.md)
 - [`config export`](config-export.md)
 - [`gen-erd`](gen-erd.md)
-- [Schema Format](/cli/docs/schema-spec/)
+
+For more information on the schema, please consult the [Schema Format](../getting-started/schema-spec.md)
 
 ## Object operations
 
@@ -40,4 +42,4 @@ Every command shares a set of global flags (use `--long-name`; single-dash long 
 - [`delete`](delete.md)
 - [`export`](export.md)
 
-Need a refresher on terminology? See the [Concepts](/cli/docs/concepts/) page.
+Need a refresher on terminology? See the [Basic Concepts](../getting-started/README.md) page.

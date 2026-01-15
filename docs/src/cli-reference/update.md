@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli update"
 linkTitle: "update"
+description: "Modify an existing object by replacing it or merging in fields."
 ---
 
 > **Synopsis:** Modify an existing object. You can replace the object entirely or merge in a subset of fields.

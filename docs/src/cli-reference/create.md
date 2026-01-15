@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli create"
 linkTitle: "create"
+description: "Create a new object file that conforms to an entity definition."
 ---
 
 > **Synopsis:** Create a new object file that conforms to an entity definition.

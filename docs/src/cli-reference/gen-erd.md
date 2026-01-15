@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli gen-erd"
 linkTitle: "gen-erd"
+description: "Generate an entity relationship diagram of your data model."
 ---
 
 Generates an Entity Relationship Diagram (ERD) of your data model.

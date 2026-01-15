@@ -1,6 +1,7 @@
 ---
 title: "mergeway-cli export"
 linkTitle: "export"
+description: "Export repository objects into a single JSON or YAML document."
 ---
 
 > **Synopsis:** Export repository objects into a single JSON or YAML document.

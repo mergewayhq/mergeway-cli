@@ -1,6 +1,7 @@
 ---
 title: "Getting Started with Mergeway"
 linkTitle: "Getting Started"
+description: "Introduce Mergeway workspace concepts, building blocks, and validation flow for new users."
 weight: 10
 ---
 

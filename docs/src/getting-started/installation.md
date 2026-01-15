@@ -1,6 +1,7 @@
 ---
 title: "Install Mergeway CLI"
 linkTitle: "Installation"
+description: "Install the Mergeway CLI using a release download or Go install."
 weight: 10
 ---
 
@@ -39,4 +40,4 @@ Mergeway CLI v0.11.0 (commit abc1234)
 
 If the command is missing, confirm that the installation path is on your `PATH`.
 
-Move on to the [Getting Started](getting-started.md) guide once the binary is available.
+Move on to the [Getting Started](README.md) guide once the binary is available.
