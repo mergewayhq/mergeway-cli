@@ -5,7 +5,7 @@ entities:
   Tag:
     description: Controlled vocabulary for categorizing posts
     include:
-      - data/tags/*.yaml
+      - data/tags/product.yaml
     fields:
       id:
         type: string

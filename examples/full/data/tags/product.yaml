@@ -1,2 +1,6 @@
-id: tag-product
-label: Product Launch
+type: Tag
+items:
+  - id: tag-product
+    label: Product Launch
+  - id: tag-update
+    label: Product Update
