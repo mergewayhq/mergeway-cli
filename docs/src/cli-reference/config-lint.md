@@ -9,7 +9,7 @@ description: "Validate configuration files (including includes) without touching
 ## Usage
 
 ```bash
-mw [global flags] config lint
+mergeway-cli [global flags] config lint
 ```
 
 No additional flags.
@@ -19,7 +19,7 @@ No additional flags.
 Run the command from the workspace root (or pass `--root`):
 
 ```bash
-mw config lint
+mergeway-cli config lint
 ```
 
 Output:
@@ -34,5 +34,5 @@ Run this command whenever you edit `mergeway.yaml` or add new entity definitions
 
 ## Related Commands
 
-- [`mw config export`](config-export.md) — derive a JSON Schema for a type.
-- [`mw validate`](validate.md) — validate both schemas and data.
+- [`mergeway-cli config export`](config-export.md) — derive a JSON Schema for a type.
+- [`mergeway-cli validate`](validate.md) — validate both schemas and data.

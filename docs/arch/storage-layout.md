@@ -117,7 +117,7 @@ items:
 See `examples/` in this repository for a complete dataset. `examples/mergeway.yaml` wires together multiple types, while `examples/data/` contains YAML and JSON objects (including repeated fields and cross-type references). The example is exercised by automated tests and can be inspected with commands such as:
 
 ```bash
-mw --root examples list --type User
-mw --root examples get --type Post post-001 --format yaml
-mw --root examples validate
+mergeway-cli --root examples list --type User
+mergeway-cli --root examples get --type Post post-001 --format yaml
+mergeway-cli --root examples validate
 ```

@@ -7,17 +7,17 @@ weight: 20
 
 Goal: scaffold a workspace, define an entity, evolve the layout as requirements grow, and learn the core Mergeway commands end-to-end.
 
-> All commands assume the `mw` binary is on your `PATH`.
+> All commands assume the `mergeway-cli` binary is on your `PATH`.
 
 ## 1. Scaffold a Workspace with Inline Data
 
 ```bash
 mkdir farmers-market
 cd farmers-market
-mw init
+mergeway-cli init
 ```
 
-`mw init` creates a `mergeway.yaml` entry file. Replace its contents with an inline entity that also carries a few inline records:
+`mergeway-cli init` creates a `mergeway.yaml` entry file. Replace its contents with an inline entity that also carries a few inline records:
 
 ```yaml
 mergeway:
@@ -44,10 +44,10 @@ entities:
 Try a few commands:
 
 ```bash
-mw entity list
-mw entity show Category
-mw list --type Category
-mw validate
+mergeway-cli entity list
+mergeway-cli entity show Category
+mergeway-cli list --type Category
+mergeway-cli validate
 ```
 
 At this stage everything lives in a single file—perfect for tiny datasets.
@@ -93,9 +93,9 @@ entities:
 Re-run the commands to see the effect:
 
 ```bash
-mw list --type Category
-mw get --type Category beverages
-mw validate
+mergeway-cli list --type Category
+mergeway-cli get --type Category beverages
+mergeway-cli validate
 ```
 
 ## 3. Split Schema Definitions and Add JSON Data
@@ -177,13 +177,13 @@ entities:
 Explore the richer workspace:
 
 ```bash
-mw entity list
-mw entity show Product
-mw list --type Product
-mw validate
+mergeway-cli entity list
+mergeway-cli entity show Product
+mergeway-cli list --type Product
+mergeway-cli validate
 ```
 
-`mw validate` now reports a broken reference because the `household` category doesn't exist yet:
+`mergeway-cli validate` now reports a broken reference because the `household` category doesn't exist yet:
 
 ```
 phase: references
@@ -201,7 +201,7 @@ cat <<'YAML' >> data/categories/categories.yaml
   label: Household Goods
 YAML
 
-mw validate
+mergeway-cli validate
 ```
 
 With the additional category in place, validation succeeds and both entities are in sync.
@@ -211,7 +211,7 @@ With the additional category in place, validation succeeds and both entities are
 Collect the full dataset into a single snapshot:
 
 ```bash
-mw export --format json --output market-snapshot.json
+mergeway-cli export --format json --output market-snapshot.json
 cat market-snapshot.json
 ```
 
@@ -219,8 +219,8 @@ cat market-snapshot.json
 
 Once the basics feel comfortable, automate formatting and reviews so the workspace stays healthy:
 
-- [Set Up Mergeway with GitHub](../guides/setup-mergeway-github.md) to enforce `mw fmt --lint` in Actions and route reviews through CODEOWNERS.
-- [Enforce Mergeway Formatting with pre-commit](../guides/setup-mergeway-pre-commit.md) so contributors run `mw fmt` locally before every commit.
+- [Set Up Mergeway with GitHub](../guides/setup-mergeway-github.md) to enforce `mergeway-cli fmt --lint` in Actions and route reviews through CODEOWNERS.
+- [Enforce Mergeway Formatting with pre-commit](../guides/setup-mergeway-pre-commit.md) so contributors run `mergeway-cli fmt` locally before every commit.
 
 ## You're Done!
 

@@ -9,7 +9,7 @@ description: "Check schemas, records, and references and report formatted errors
 ## Usage
 
 ```bash
-mw [global flags] validate [--phase format|schema|references]... [--fail-fast]
+mergeway-cli [global flags] validate [--phase format|schema|references]... [--fail-fast]
 ```
 
 | Flag          | Description                                                                                                    |
@@ -26,7 +26,7 @@ Run the command from the workspace root (or add `--root` to point elsewhere).
 Validate the current workspace:
 
 ```bash
-mw validate
+mergeway-cli validate
 ```
 
 Add `--format json` when you need machine-readable output.
@@ -40,7 +40,7 @@ validation succeeded
 Run validation after introducing a breaking schema change:
 
 ```bash
-mw validate
+mergeway-cli validate
 ```
 
 Output when the `Post` schema requires an `author` but the record is missing it:
@@ -57,5 +57,5 @@ The command writes errors to standard output and still exits with status `0`, so
 
 ## Related Commands
 
-- [`mw config lint`](config-lint.md) — validate configuration without loading data.
-- [`mw list`](list.md) — locate the objects mentioned in validation errors.
+- [`mergeway-cli config lint`](config-lint.md) — validate configuration without loading data.
+- [`mergeway-cli list`](list.md) — locate the objects mentioned in validation errors.

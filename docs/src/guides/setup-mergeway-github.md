@@ -33,7 +33,7 @@ on:
     branches: [main]
 
 jobs:
-  mw-fmt:
+  mergeway-cli-fmt:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -48,14 +48,14 @@ jobs:
         run: go install github.com/mergewayhq/mergeway-cli@latest
 
       - name: Lint Mergeway formatting
-        run: mw fmt --lint
+        run: mergeway-cli fmt --lint
 ```
 
 This job fails fast whenever a record under `data/products/` or `data/categories/` is out of format, ensuring reviewers only see clean diffs. Adjust the `paths` filters if your workspace stores data outside YAML.
 
 ## 2. Explain the Failure Mode to Contributors
 
-`mw fmt --lint` prints each offending file, so GrainBox developers fix CI failures locally with `mw fmt --in-place`. Capture that reminder in your pull-request template or CONTRIBUTING guide so the workflow feels helpful rather than mysterious.
+`mergeway-cli fmt --lint` prints each offending file, so GrainBox developers fix CI failures locally with `mergeway-cli fmt --in-place`. Capture that reminder in your pull-request template or CONTRIBUTING guide so the workflow feels helpful rather than mysterious.
 
 ## 3. Assign Ownership with CODEOWNERS
 

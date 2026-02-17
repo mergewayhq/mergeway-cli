@@ -9,7 +9,7 @@ description: "Display the CLI build metadata (semantic version, commit, build da
 ## Usage
 
 ```bash
-mw [global flags] version
+mergeway-cli [global flags] version
 ```
 
 No additional flags.
@@ -19,7 +19,7 @@ This command does not touch workspace files; global flags like `--root` are igno
 ## Example
 
 ```bash
-mw --format json version
+mergeway-cli --format json version
 ```
 
 Output:
@@ -36,4 +36,4 @@ Values change with each build; use the command to confirm which binary produced 
 
 ## Related Commands
 
-- [`mw validate`](validate.md) — include the CLI version in validation artifacts for traceability.
+- [`mergeway-cli validate`](validate.md) — include the CLI version in validation artifacts for traceability.

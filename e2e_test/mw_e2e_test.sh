@@ -3,13 +3,13 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
 BIN_DIR="$ROOT_DIR/e2e_test/bin"
-MW_BIN="$BIN_DIR/mw"
+MW_BIN="$BIN_DIR/mergeway-cli"
 STATE_DIR="$ROOT_DIR/e2e_test/state"
 INPUT_DIR="$ROOT_DIR/e2e_test/state/input"
 
 mkdir -p "$BIN_DIR"
 
-echo "Building mw CLI..."
+echo "Building mergeway-cli CLI..."
 go build -o "$MW_BIN" "$ROOT_DIR"
 
 if [ -d "$STATE_DIR" ]; then

@@ -58,7 +58,7 @@ func newExitError(code int) error {
 
 func newRootCommand(stdout, stderr io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:           "mw",
+		Use:           "mergeway-cli",
 		Short:         "Manage mergeway repositories",
 		SilenceUsage:  true,
 		SilenceErrors: true,

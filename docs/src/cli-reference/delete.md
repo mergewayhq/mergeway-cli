@@ -9,7 +9,7 @@ description: "Remove an object file from the workspace."
 ## Usage
 
 ```bash
-mw [global flags] delete --type <type> <id>
+mergeway-cli [global flags] delete --type <type> <id>
 ```
 
 | Flag     | Description                                                    |
@@ -26,7 +26,7 @@ Global flags (like `--yes` or `--root`) can appear before or after the command n
 Run the command from the workspace root (or add `--root` to target another workspace). Delete a user without prompting:
 
 ```bash
-mw --yes delete --type User user-bob
+mergeway-cli --yes delete --type User user-bob
 ```
 
 Output:
@@ -37,5 +37,5 @@ User user-bob deleted
 
 ## Related Commands
 
-- [`mw list`](list.md) — confirm an object’s identifier before deleting.
-- [`mw create`](create.md) — recreate an object if you delete the wrong one.
+- [`mergeway-cli list`](list.md) — confirm an object’s identifier before deleting.
+- [`mergeway-cli create`](create.md) — recreate an object if you delete the wrong one.

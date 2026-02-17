@@ -9,7 +9,7 @@ description: "Print the fields of one object."
 ## Usage
 
 ```bash
-mw [global flags] get --type <type> <id>
+mergeway-cli [global flags] get --type <type> <id>
 ```
 
 | Flag     | Description                                                      |
@@ -26,7 +26,7 @@ Run the command from the workspace root. Use `--root` if you need to target anot
 Fetch the `post-001` record as YAML:
 
 ```bash
-mw --format yaml get --type Post post-001
+mergeway-cli --format yaml get --type Post post-001
 ```
 
 Output:
@@ -41,5 +41,5 @@ title: Launch Day
 
 ## Related Commands
 
-- [`mw list`](list.md) — discover identifiers before calling `get`.
-- [`mw update`](update.md) — change object fields.
+- [`mergeway-cli list`](list.md) — discover identifiers before calling `get`.
+- [`mergeway-cli update`](update.md) — change object fields.

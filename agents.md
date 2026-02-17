@@ -3,7 +3,7 @@
 ## Project Overview
 
 - **Language:** Go (module `github.com/mergewayhq/mergeway-cli`, currently built against Go 1.24.x)
-- **Purpose:** File-based database with CLI (`mw`) supporting CRUD, validation, and configuration export.
+- **Purpose:** File-based database with CLI (`mergeway-cli`) supporting CRUD, validation, and configuration export.
 - **Structure Highlights:**
   - `internal/config`: Modular configuration loader (`model.go`, `raw.go`, `load.go`, `normalize.go`).
   - `internal/data`: Modular store layer (`model.go`, `store_ops.go`, `load.go`, `fileio.go`, `util.go`).
@@ -34,7 +34,7 @@
 ## Testing Data & Examples
 
 - Example dataset under `examples/` validated via unit tests in `internal/data/examples_test.go` and `internal/validation/examples_test.go`.
-- `e2e_test/mw_e2e_test.sh` exercises CLI flows; keep it up-to-date with new features.
+- `e2e_test/mergeway-cli_e2e_test.sh` exercises CLI flows; keep it up-to-date with new features.
 
 ## Future Enhancements to Watch
 

@@ -9,7 +9,7 @@ description: "List object identifiers for a given type, optionally filtered by a
 ## Usage
 
 ```bash
-mw [global flags] list --type <type> [--filter key=value]
+mergeway-cli [global flags] list --type <type> [--filter key=value]
 ```
 
 | Flag       | Description                                                                                                                    |
@@ -24,7 +24,7 @@ Run the command from the workspace root. If you need to operate on another direc
 List all posts in the quickstart workspace:
 
 ```bash
-mw list --type Post
+mergeway-cli list --type Post
 ```
 
 Output:
@@ -36,7 +36,7 @@ post-001
 Filter by author:
 
 ```bash
-mw list --type Post --filter author=user-alice
+mergeway-cli list --type Post --filter author=user-alice
 ```
 
 Output:
@@ -47,5 +47,5 @@ post-001
 
 ## Related Commands
 
-- [`mw get`](get.md) — inspect a specific object.
-- [`mw create`](create.md) — add a new object when an ID is missing.
+- [`mergeway-cli get`](get.md) — inspect a specific object.
+- [`mergeway-cli create`](create.md) — add a new object when an ID is missing.

@@ -9,7 +9,7 @@ description: "Print the normalized schema for a given entity."
 ## Usage
 
 ```bash
-mw [global flags] entity show <entity>
+mergeway-cli [global flags] entity show <entity>
 ```
 
 No additional flags. Use `--format json` if you prefer JSON output, and add the global `--root` flag when working outside the workspace root.
@@ -19,7 +19,7 @@ No additional flags. Use `--format json` if you prefer JSON output, and add the 
 Show the `Post` entity in YAML form:
 
 ```bash
-mw --root examples/full --format yaml entity show Post
+mergeway-cli --root examples/full --format yaml entity show Post
 ```
 
 Output (abridged):
@@ -44,5 +44,5 @@ fields:
 
 ## Related Commands
 
-- [`mw entity list`](entity-list.md) — find available entities.
-- [`mw config export`](config-export.md) — generate a JSON Schema from an entity definition.
+- [`mergeway-cli entity list`](entity-list.md) — find available entities.
+- [`mergeway-cli config export`](config-export.md) — generate a JSON Schema from an entity definition.

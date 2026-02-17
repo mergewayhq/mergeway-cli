@@ -7,7 +7,7 @@ description: "Generate an entity relationship diagram of your data model."
 Generates an Entity Relationship Diagram (ERD) of your data model.
 
 ```bash
-mw gen-erd --path <output-file>
+mergeway-cli gen-erd --path <output-file>
 ```
 
 This command inspects your configuration and generates a visual representation of your entities and their relationships. It relies on [Graphviz](https://graphviz.org/) (specifically the `dot` command) to produce the output image.
@@ -23,13 +23,13 @@ This command inspects your configuration and generates a visual representation o
 Generate a PNG image of your schema:
 
 ```bash
-mw gen-erd --path schema.png
+mergeway-cli gen-erd --path schema.png
 ```
 
 Generate an SVG:
 
 ```bash
-mw gen-erd --path schema.svg
+mergeway-cli gen-erd --path schema.svg
 ```
 
 Example output, based on the [full example](https://github.com/mergewayhq/mergeway-cli/tree/main/examples/full):

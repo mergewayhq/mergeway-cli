@@ -75,7 +75,7 @@ Install the prerequisites manually:
 
 ### Building
 
-- `make build` produces `bin/mw` with version metadata injected via `-ldflags`
+- `make build` produces `bin/mergeway-cli` with version metadata injected via `-ldflags`
 - The build includes Git commit hash, semantic version, and build timestamp
 
 ### Documentation
@@ -98,7 +98,7 @@ Version information is managed in `internal/version/version.go`:
 - The `Number` variable contains the semantic version (e.g., `x.y.z-dev`) for the flake build
 - Update this variable before cutting a release
 - Build tooling injects Git commit hash and build timestamp via `-ldflags`
-- Run `mw version` to see the current version, commit, and build date
+- Run `mergeway-cli version` to see the current version, commit, and build date
 
 ## Publishing
 

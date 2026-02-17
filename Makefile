@@ -14,7 +14,7 @@ GOFILES := $(shell find . -type f -name '*.go' -not -path './.git/*' -not -path 
 .PHONY: build fmt fmt-check lint test race coverage ci clean release docs-build docs-serve
 
 build:
-	$(GORUN) build -ldflags "$(LDFLAGS)" -o bin/mw .
+	$(GORUN) build -ldflags "$(LDFLAGS)" -o bin/mergeway-cli .
 
 fmt:
 	gofmt -w $(GOFILES)

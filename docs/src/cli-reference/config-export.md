@@ -10,7 +10,7 @@ type: docs
 ## Usage
 
 ```bash
-mw [global flags] config export --type <type>
+mergeway-cli [global flags] config export --type <type>
 ```
 
 | Flag     | Description                          |
@@ -22,7 +22,7 @@ mw [global flags] config export --type <type>
 Run the command from the workspace root (or pass `--root`). Export the `Post` type as JSON Schema:
 
 ```bash
-mw --root examples --format json config export --type Post
+mergeway-cli --root examples --format json config export --type Post
 ```
 
 Output (abridged):
@@ -46,9 +46,9 @@ Output (abridged):
 
 Fields that reference other types include the `x-reference-type` hint.
 
-Validate your workspace (`mw config lint` or `mw validate`) after editing type files to ensure the exported schema stays in sync.
+Validate your workspace (`mergeway-cli config lint` or `mergeway-cli validate`) after editing type files to ensure the exported schema stays in sync.
 
 ## Related Commands
 
-- [`mw entity show`](entity-show.md) — view the full Mergeway representation of an entity.
-- [`mw validate`](validate.md) — ensure data conforms to the schema you just exported.
+- [`mergeway-cli entity show`](entity-show.md) — view the full Mergeway representation of an entity.
+- [`mergeway-cli validate`](validate.md) — ensure data conforms to the schema you just exported.

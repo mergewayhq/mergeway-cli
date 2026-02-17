@@ -134,7 +134,7 @@ entities:
         age: 42
 ```
 
-Inline records are loaded alongside file-based data. If a record with the same identifier exists both inline and on disk, the file wins. Inline records are read-only at runtime—`mw data update` and `mw data delete` target files only.
+Inline records are loaded alongside file-based data. If a record with the same identifier exists both inline and on disk, the file wins. Inline records are read-only at runtime—`mergeway-cli data update` and `mergeway-cli data delete` target files only.
 
 ### Field Shorthand
 
@@ -161,7 +161,7 @@ When `json_schema` is present, omit the `fields` map. Mergeway parses the JSON S
 - `type: array` sets `repeated: true` and uses the `items` schema to determine the element type.
 - `enum`, `const`, or `oneOf` blocks translate into Mergeway enums (string values only).
 - `$ref` segments are resolved within the same JSON Schema file (e.g., `#/$defs/...`).
-- Custom references to other entities use the same `x-reference-type` property emitted by `mw config export`.
+- Custom references to other entities use the same `x-reference-type` property emitted by `mergeway-cli config export`.
 
 See `examples/json-schema` for a runnable workspace that demonstrates this flow end-to-end.
 
@@ -195,6 +195,6 @@ name: Numeric Identifier
 
 - Prefer references (`type: User`) over duplicating identifiers.
 - Group files in predictable folders (`data/posts/`, `data/users/`, etc.).
-- Run `mw validate` after every change to catch problems immediately.
+- Run `mergeway-cli validate` after every change to catch problems immediately.
 
 Need more context? Return to the [Basic Concepts](./README.md) page for the bigger picture.

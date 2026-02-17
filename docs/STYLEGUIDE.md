@@ -25,17 +25,17 @@ This guide distills the authoring standards from `docs-bck/good-documentation.md
   > **Example – Minimal setup**
   >
   > ```bash
-  > mw init
+  > mergeway-cli init
   > ```
   >
   > **Example – Advanced configuration**
   >
   > ```bash
-  > mw validate --output table
+  > mergeway-cli validate --output table
   > ```
   ````
 
-- Inline commands with backticks (`mw validate`) and link to the corresponding reference entry when it helps navigation.
+- Inline commands with backticks (`mergeway-cli validate`) and link to the corresponding reference entry when it helps navigation.
 
 ## 4. Images & Diagrams
 

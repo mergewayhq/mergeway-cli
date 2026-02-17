@@ -64,7 +64,7 @@ Use `actions/setup-go` (or equivalent) pinned to Go 1.25.x and enable module dow
 ## Release Artifacts
 
 - Build static binaries for Linux (`amd64`, optionally `arm64`) and macOS (`amd64`, `arm64`) using environment matrices (`GOOS`, `GOARCH`).
-- Output binaries as `dist/mw_<os>_<arch>`; strip debug symbols for release builds.
+- Output binaries as `dist/mergeway-cli_<os>_<arch>`; strip debug symbols for release builds.
 - Windows support can be added later when requirements expand.
 
 ## Dependency Management

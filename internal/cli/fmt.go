@@ -107,7 +107,7 @@ func newFmtCommand() *cobra.Command {
 				}
 				return nil
 			}
-			// Default to rewriting files so users can run `mw fmt` without extra flags.
+			// Default to rewriting files so users can run `mergeway-cli fmt` without extra flags.
 			if !stdoutMode && !inPlace {
 				inPlace = true
 			}
@@ -373,7 +373,7 @@ func fmtLint(ctx *Context, root string, paths []string, schemaFor func(string) *
 
 func writeAtomic(path string, data []byte) error {
 	dir := filepath.Dir(path)
-	tmp, err := os.CreateTemp(dir, ".mwfmt-*")
+	tmp, err := os.CreateTemp(dir, ".mergeway-cli-fmt-*")
 	if err != nil {
 		return err
 	}

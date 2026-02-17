@@ -9,7 +9,7 @@ description: "Create a new object file that conforms to an entity definition."
 ## Usage
 
 ```bash
-mw [global flags] create --type <type> [--file path] [--id value]
+mergeway-cli [global flags] create --type <type> [--file path] [--id value]
 ```
 
 | Flag     | Description                                                                 |
@@ -27,7 +27,7 @@ cat <<'PAYLOAD' > user.yaml
 name: Bob Example
 PAYLOAD
 
-mw create --type User --file user.yaml --id user-bob
+mergeway-cli create --type User --file user.yaml --id user-bob
 ```
 
 Output:
@@ -36,9 +36,9 @@ Output:
 User user-bob created
 ```
 
-The command writes `data/users/user-bob.yaml` with the provided fields. Remove the temporary `user.yaml` file afterward and run `mw validate` to confirm the new object passes checks.
+The command writes `data/users/user-bob.yaml` with the provided fields. Remove the temporary `user.yaml` file afterward and run `mergeway-cli validate` to confirm the new object passes checks.
 
 ## Related Commands
 
-- [`mw update`](update.md) — modify an existing object.
-- [`mw delete`](delete.md) — remove an object.
+- [`mergeway-cli update`](update.md) — modify an existing object.
+- [`mergeway-cli delete`](delete.md) — remove an object.

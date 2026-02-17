@@ -1,17 +1,17 @@
 ---
 title: "Enforce Mergeway Formatting with pre-commit"
 linkTitle: "Pre-commit integration"
-description: "Configure pre-commit to run mw fmt before each commit."
+description: "Configure pre-commit to run mergeway-cli fmt before each commit."
 weight: 30
 ---
 
-Goal: run `mw fmt` automatically before every commit so contributors push consistently formatted GrainBox Market data.
+Goal: run `mergeway-cli fmt` automatically before every commit so contributors push consistently formatted GrainBox Market data.
 
 We will keep using the fictional GrainBox Market repository from the GitHub how-to: schemas live in `mergeway.yaml`, product data sits under `data/products/`, and category lookups live in `data/categories/`.
 
 ## Prerequisites
 
-- The Mergeway CLI (`mw`) is already installed on developer machines and in your `PATH`.
+- The Mergeway CLI (`mergeway-cli`) is already installed on developer machines and in your `PATH`.
 - Python 3.8+ is available (pre-commit ships via `pipx`, `pip`, or Homebrew).
 - Your repo includes the Mergeway workspace you want to protect.
 
@@ -31,7 +31,7 @@ Developers only need to do this once per workstation.
 
 ## 2. Configure the Hook
 
-Add a `.pre-commit-config.yaml` file in the repo root (or extend your existing config) with a local hook that invokes `mw fmt`:
+Add a `.pre-commit-config.yaml` file in the repo root (or extend your existing config) with a local hook that invokes `mergeway-cli fmt`:
 
 ```yaml
 repos:
@@ -39,7 +39,7 @@ repos:
     hooks:
       - id: mergeway-fmt
         name: mergeway fmt
-        entry: mw fmt
+        entry: mergeway-cli fmt
         language: system
         pass_filenames: false
         files: ^data/(products|categories)/.*\.(ya?ml|json)$
@@ -47,7 +47,7 @@ repos:
 
 Why these settings?
 
-- `entry: mw fmt` rewrites any out-of-format records before the commit proceeds (it defaults to in-place mode).
+- `entry: mergeway-cli fmt` rewrites any out-of-format records before the commit proceeds (it defaults to in-place mode).
 - `pass_filenames: false` lets Mergeway discover files from `mergeway.yaml` rather than only the files staged by Git—useful when your workspace spans multiple folders.
 - `files` narrows execution to the GrainBox data directories so unrelated commits (docs, code) skip the hook. Adjust the regex for your layout or remove the key to run on everything.
 
@@ -78,6 +78,6 @@ pre-commit run mergeway-fmt --all-files
 ```
 
 - If the repo already follows Mergeway’s canonical layout, the command prints `mergeway-fmt..................................Passed`.
-- If output shows `Failed`, inspect the listed files, rerun `mw fmt <file>` manually if needed, then stage the changes.
+- If output shows `Failed`, inspect the listed files, rerun `mergeway-cli fmt <file>` manually if needed, then stage the changes.
 
 Developers now get immediate feedback before commits ever leave their machines, and CI stays clean because repositories reach GitHub with consistent Mergeway formatting.

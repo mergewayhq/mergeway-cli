@@ -9,7 +9,7 @@ description: "Show every entity Mergeway discovered from your configuration."
 ## Usage
 
 ```bash
-mw [global flags] entity list
+mergeway-cli [global flags] entity list
 ```
 
 No command-specific flags. Add the global `--root` flag if you need to inspect another workspace.
@@ -19,7 +19,7 @@ No command-specific flags. Add the global `--root` flag if you need to inspect a
 List entities for the `examples/` workspace bundled with the repository:
 
 ```bash
-mw --root examples/full entity list
+mergeway-cli --root examples/full entity list
 ```
 
 Output:
@@ -35,5 +35,5 @@ Entities are listed alphabetically.
 
 ## Related Commands
 
-- [`mw entity show`](entity-show.md) — inspect an individual schema definition.
-- [`mw config lint`](config-lint.md) — verify the configuration if an entity is missing.
+- [`mergeway-cli entity show`](entity-show.md) — inspect an individual schema definition.
+- [`mergeway-cli config lint`](config-lint.md) — verify the configuration if an entity is missing.

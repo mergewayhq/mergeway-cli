@@ -5,15 +5,15 @@ description: "Install the Mergeway CLI using a release download or Go install."
 weight: 10
 ---
 
-Pick the method that fits your setup. Each installs a single binary named `mw`.
+Pick the method that fits your setup. Each installs a single binary named `mergeway-cli`.
 
 ## Option 1 – Download a Release (macOS, Linux)
 
 ```bash
-curl -L https://github.com/mergewayhq/mergeway-cli/releases/download/v0.11.0/mw-
+curl -L https://github.com/mergewayhq/mergeway-cli/releases/download/v0.11.0/mergeway-cli-
 $(uname | tr '[:upper:]' '[:lower:]')-amd64.tar.gz \
   | tar -xz
-sudo mv mw /usr/local/bin/
+sudo mv mergeway-cli /usr/local/bin/
 ```
 
 Check the published SHA-256 checksum before moving the binary if you operate in a locked-down environment.
@@ -29,7 +29,7 @@ This drops the binary in `$GOPATH/bin`. Prefer tagged versions in production.
 ## Verify
 
 ```bash
-mw --version
+mergeway-cli --version
 ```
 
 You should see something similar to:

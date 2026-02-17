@@ -11,7 +11,7 @@ description: "Modify an existing object by replacing it or merging in fields."
 ````
 
 bash
-mw [global flags] update --type <type> --id <id> [--file path] [--merge]
+mergeway-cli [global flags] update --type <type> --id <id> [--file path] [--merge]
 ```| Flag | Description |
 | --- | --- |
 | `--file` | Optional path to a YAML/JSON payload (defaults to STDIN). |
@@ -28,7 +28,7 @@ cat <<'PAYLOAD' > post-update.yaml
 title: Launch Day (Updated)
 PAYLOAD
 
-mw update --type Post --id post-001 --file post-update.yaml --merge
+mergeway-cli update --type Post --id post-001 --file post-update.yaml --merge
 ````
 
 ```
@@ -37,12 +37,12 @@ Output:
 Post post-001 updated
 ```
 
-Run `mw validate` after significant updates to confirm references still resolve.
+Run `mergeway-cli validate` after significant updates to confirm references still resolve.
 Without `--merge`, the payload replaces the entire object.
 
 Delete the temporary payload file once you are done with the update.
 
 ## Related Commands
 
-- [`mw create`](create.md) — add new objects.
-- [`mw delete`](delete.md) — remove objects that are no longer needed.
+- [`mergeway-cli create`](create.md) — add new objects.
+- [`mergeway-cli delete`](delete.md) — remove objects that are no longer needed.
