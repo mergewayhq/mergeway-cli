@@ -98,6 +98,21 @@ Inline records declared under `data` are optional and most useful for tiny looku
 - `default`: optional default value filled in by tooling.
 - `properties`: nested field definitions used when `type: object`. When combined with `repeated: true`, each array element follows the nested definition.
 
+Nested fields are declared by setting `type: object` and providing `properties` for the nested keys:
+
+```yaml
+fields:
+  metadata:
+    type: object
+    properties:
+      created_at:
+        type: string
+        format: date-time
+      creator:
+        type: string
+        description: Person or service that created the record
+```
+
 ### Validation Extensions
 
 Extra validation knobs let future tooling derive JSON Schema while preserving richer semantics:

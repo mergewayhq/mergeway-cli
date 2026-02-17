@@ -1,0 +1,23 @@
+mergeway:
+  version: 1
+
+entities:
+  Item:
+    description: Example item with metadata
+    identifier: id
+    include:
+      - data/items/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      # Nested metadata object
+      metadata:
+        type: object
+        properties:
+          created_at:
+            type: string
+            format: date-time
+          creator:
+            type: string
+            description: Person or service that created the record
