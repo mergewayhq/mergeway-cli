@@ -1,6 +1,6 @@
 ---
 title: "Getting Started with Mergeway CLI Using the Example Repository"
-linkTitle: "Example Repository Tutorial"
+linkTitle: "Example Walkthrough"
 description: "Use the example repository to get started with Mergeway CLI"
 weight: 30
 ---
