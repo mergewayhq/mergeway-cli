@@ -1,0 +1,385 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Schema Format - Mergeway Documentation</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="Developer and operator documentation for the Mergeway CLI.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Mergeway Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p>Schemas can live entirely inside <code>mergeway.yaml</code> or be split across additional include files (for example under an <code>entities/</code> folder) for readability. Likewise, object data may be defined inline or stored under <code>data/</code>. Pick the mix that matches your editing workflow—comments below highlight conventions for modular repositories without requiring them.</p>
+<h2 id="configuration-entry-mergewayyaml"><a class="header" href="#configuration-entry-mergewayyaml">Configuration Entry (<code>mergeway.yaml</code>)</a></h2>
+<p>The workspace entry file declares the schema version and the files to load:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+include:
+  - entities/*.yaml
+</code></pre>
+<ul>
+<li><code>mergeway.version</code> tracks breaking changes in the configuration format (keep it at <code>1</code>).</li>
+<li><code>include</code> is a list of glob patterns. Each matching file is merged into the configuration. Patterns need to resolve to at least one file; otherwise Mergeway reports an error.</li>
+</ul>
+<h2 id="schema-files-optional-includes"><a class="header" href="#schema-files-optional-includes">Schema Files (optional includes)</a></h2>
+<p>A schema file declares one or more entity definitions. Store them in whichever folder makes sense for your workflow (many teams use <code>entities/</code>); the location has no semantic impact. The example below defines a <code>Post</code> entity:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  Post:
+    description: Blog posts surfaced on the marketing site
+    identifier: id
+    include:
+      - data/posts/*.yaml
+    fields:
+      id: string
+      title:
+        type: string
+        required: true
+        description: Human readable title
+      body: string
+      author:
+        type: User
+        required: true
+    data:
+      - id: post-inline
+        title: Inline Example
+        author: user-alice
+        body: Inline data lives in the schema file.
+</code></pre>
+<p>For advanced scenarios you can expand <code>identifier</code> into a mapping:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  Post:
+    description: Blog posts surfaced on the marketing site
+    identifier:
+      field: id
+      generated: true
+    include:
+      - data/posts/*.yaml
+    fields:
+      # ...
+</code></pre>
+<p><code>generated: true</code> is an advisory hint for downstream automation (code generators, UI scaffolding). The CLI still expects inline identifiers or an explicit <code>--id</code> flag when creating objects.</p>
+<p>When several objects live in one file, provide a JSONPath selector to extract them:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  User:
+    description: Directory of account holders sourced from JSON
+    identifier: id
+    include:
+      - path: data/users.json
+        selector: "$.users[*]"
+    fields:
+      # ...
+</code></pre>
+<p>Strings remain a shorthand for <code>path</code> with no <code>selector</code>; Mergeway then reads the entire file as a single object (or uses the <code>items:</code> array if present).</p>
+<h3 id="required-sections"><a class="header" href="#required-sections">Required Sections</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>identifier</code></td><td>Name of the identifier field inside each record (needs to be unique per entity). Provide either a string (the field name) or a mapping with <code>field</code>, optional <code>generated</code>, and <code>pattern</code>. The identifier value itself can be a string, integer, or number. The <code>generated</code> flag is advisory for tooling—the CLI still expects identifiers to be supplied (inline or via <code>--id</code>).</td></tr>
+<tr><td><code>include</code></td><td>List of data sources. Each entry can be a glob string (shorthand) or a mapping with <code>path</code> and optional <code>selector</code> property. Omit only when you rely exclusively on inline <code>data</code>. Without a selector, Mergeway treats the whole file as a single object.</td></tr>
+<tr><td><code>fields</code></td><td>Map of field definitions. Use either the shorthand <code>field: type</code> (defaults to optional) or the expanded mapping for advanced options. Provide either <code>fields</code> or <code>json_schema</code> for each entity.</td></tr>
+<tr><td><code>json_schema</code></td><td>Path to a JSON Schema (draft 2020-12) file relative to the schema that declares the entity. When present, Mergeway derives field definitions from the JSON Schema and you can omit the <code>fields</code> block.</td></tr>
+<tr><td><code>data</code></td><td>Optional array of inline records. Each entry needs to contain the identifier field and follows the same schema rules as external data files.</td></tr>
+</tbody></table>
+</div>
+<p>Add <code>description</code> anywhere you need extra context. Entities accept it alongside <code>identifier</code>, and each field definition supports its own <code>description</code> value.</p>
+<h3 id="inline-data"><a class="header" href="#inline-data">Inline Data</a></h3>
+<p>Inline data is helpful for tiny lookup tables or bootstrapping a demo without creating additional files. Define records directly inside the entity specification:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  Person:
+    description: Lightweight profile objects
+    identifier: id
+    include:
+      - data/people/*.yaml
+    fields:
+      id: string
+      name:
+        type: string
+        required: true
+        description: Preferred display name
+      age: integer
+    data:
+      - id: person-1
+        name: Alice
+        age: 30
+      - id: person-2
+        name: Bob
+        age: 42
+</code></pre>
+<p>Inline records are loaded alongside file-based data. If a record with the same identifier exists both inline and on disk, the file wins. Inline records are read-only at runtime—<code>mergeway-cli data update</code> and <code>mergeway-cli data delete</code> target files only.</p>
+<h3 id="field-shorthand"><a class="header" href="#field-shorthand">Field Shorthand</a></h3>
+<p>When a field only needs a type, map entries can use the compact <code>field: type</code> syntax. These fields default to <code>required: false</code> and behave identically to the expanded form otherwise. Switch to the full mapping whenever you need attributes like <code>required</code>, <code>repeated</code>, or <code>format</code>.</p>
+<h3 id="field-attributes"><a class="header" href="#field-attributes">Field Attributes</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Attribute</th><th>Example</th><th>Notes</th></tr></thead><tbody>
+<tr><td><code>type</code></td><td><code>string</code>, <code>number</code>, <code>boolean</code>, <code>list[string]</code>, <code>User</code></td><td>Lists are written as <code>list[type]</code>. A plain string (e.g., <code>User</code>) references another type.</td></tr>
+<tr><td><code>required</code></td><td><code>true</code> / <code>false</code></td><td>Required fields appear in every record.</td></tr>
+<tr><td><code>repeated</code></td><td><code>true</code> / <code>false</code></td><td>Indicates an array field.</td></tr>
+<tr><td><code>description</code></td><td><code>Service owner team</code></td><td>Optional but recommended.</td></tr>
+<tr><td><code>enum</code></td><td><code>[draft, active, retired]</code></td><td>Allowed values.</td></tr>
+<tr><td><code>default</code></td><td>Any scalar</td><td>Value injected when the field is missing.</td></tr>
+</tbody></table>
+</div>
+<h3 id="json-schema-entities"><a class="header" href="#json-schema-entities">JSON Schema Entities</a></h3>
+<p>For larger teams it can be convenient to author schemas once and consume them in multiple places. Entities now support a <code>json_schema</code> property that points to an on-disk JSON Schema document (draft 2020-12). The path is resolved relative to the file that declares the entity and needs to live inside the repository—external <code>$ref</code> documents and network lookups are rejected.</p>
+<p>When <code>json_schema</code> is present, omit the <code>fields</code> map. Mergeway parses the JSON Schema and converts to its native field definitions:</p>
+<ul>
+<li><code>type: object</code> becomes nested field groups, preserving <code>required</code> entries for each level.</li>
+<li><code>type: array</code> sets <code>repeated: true</code> and uses the <code>items</code> schema to determine the element type.</li>
+<li><code>enum</code>, <code>const</code>, or <code>oneOf</code> blocks translate into Mergeway enums (string values only).</li>
+<li><code>$ref</code> segments are resolved within the same JSON Schema file (e.g., <code>#/$defs/...</code>).</li>
+<li>Custom references to other entities use the same <code>x-reference-type</code> property emitted by <code>mergeway-cli config export</code>.</li>
+</ul>
+<p>See <code>examples/json-schema</code> for a runnable workspace that demonstrates this flow end-to-end.</p>
+<p>Keep schema files small and focused—one entity per file is the easiest to maintain.</p>
+<h2 id="data-files"><a class="header" href="#data-files">Data Files</a></h2>
+<p>Each data file provides the fields required by its entity definition. Declaring a <code>type</code> at the top is optional—the CLI infers it from the entity that referenced the file (through <code>include</code>/<code>selector</code>) and only errors when a conflicting <code>type</code> value is present. Keeping it in the file can still be helpful for humans who open an arbitrary YAML document.</p>
+<pre><code class="language-yaml">type: Post # optional; falls back to the entity that included this file
+id: post-001
+title: Launch Day
+author: user-alice
+body: |
+  We are excited to announce the product launch.
+</code></pre>
+<p>You can store one object per file (as above) or provide an <code>items:</code> array to keep several objects together. Mergeway removes any top-level <code>type</code> key before validating the record, so referencing the same file from multiple entities requires the selector approach described below.</p>
+<p>JSONPath selectors let you extract objects from nested structures—handy when you need to read a subset of a larger document. For example, <code>selector: "$.users[*]"</code> walks through the <code>users</code> array in a JSON file and emits one record per element. Mergeway validates that the selector returns objects; any other shape triggers a format error.</p>
+<p>Identifier fields accept numeric payloads as well. For example, the following record is valid when the schema marks <code>id</code> as an <code>integer</code>:</p>
+<pre><code class="language-yaml">id: 42
+name: Numeric Identifier
+</code></pre>
+<h2 id="good-practices"><a class="header" href="#good-practices">Good Practices</a></h2>
+<ul>
+<li>Prefer references (<code>type: User</code>) over duplicating identifiers.</li>
+<li>Group files in predictable folders (<code>data/posts/</code>, <code>data/users/</code>, etc.).</li>
+<li>Run <code>mergeway-cli validate</code> after every change to catch problems immediately.</li>
+</ul>
+<p>Need more context? Return to the <a href="./README.html">Basic Concepts</a> page for the bigger picture.</p>
+<footer class="gitinfo-footer" style="font-size:0.8em;padding:4px;margin:0 0 2em 0;text-align:center;display:block;"><br><br>Generated at 2026-02-18 21:55:12 (commit: <a href="https://github.com/mergewayhq/mergeway-cli/commit/a19757a48b8ac937e7cbbff27853aaff63d27bd1">a19757a</a>)</footer>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../getting-started/workspace-setup.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../guides/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../getting-started/workspace-setup.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../guides/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>
