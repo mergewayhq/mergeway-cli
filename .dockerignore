@@ -1,0 +1,12 @@
+.git
+.github
+.cache
+.devenv
+.direnv
+bin
+coverage.out
+coverage.html
+dist
+result
+scratch
+docs/book
