@@ -1,11 +1,11 @@
 ---
 title: "Install Mergeway CLI"
 linkTitle: "Installation"
-description: "Install the Mergeway CLI using a release download or Go install."
+description: "Install the Mergeway CLI using a release download, Docker, Go install, or Nix."
 weight: 10
 ---
 
-Pick the method that fits your setup. Each method installs a single binary named `mergeway‑cli`.
+Pick the method that fits your setup. You can install a local `mergeway-cli` binary or run the public container image directly.
 
 ## Option 1 – Download a Release (macOS, Linux)
 
@@ -19,7 +19,15 @@ sudo mv mergeway-cli /usr/local/bin/
 
 Check the published SHA‑256 checksum before moving the binary if you operate in a locked‑down environment.
 
-## Option 2 – Go Install (for contributors)
+## Option 2 – Docker
+
+Use the public GitHub Container Registry image to run the CLI without installing the binary locally:
+
+```bash
+docker run ghcr.io/mergewayhq/mergeway-cli version
+```
+
+## Option 3 – Go Install (for contributors)
 
 If you have Go installed you can build the CLI directly from the repository using `go install`:
 
@@ -29,7 +37,7 @@ go install github.com/mergewayhq/mergeway-cli@latest
 
 This drops the binary in `$GOPATH/bin` (often `~/go/bin`). Prefer tagged versions in production.
 
-## Option 3 – Nix / Flake Install
+## Option 4 – Nix / Flake Install
 
 The repository defines a [Nix flake](https://nixos.wiki/wiki/Flakes) that packages the CLI. Using the Nix package manager you can install, run or develop the CLI without managing Go toolchains manually:
 
@@ -71,7 +79,7 @@ This method uses the `flake.nix` file to produce reproducible builds.
 
 For contributors, the flake exposes a development shell that provides Go 1.24.x, linters and documentation tooling. Run `nix develop` (or the provided `devenv shell`) from the project root to enter a shell with all dependencies and pre‑commit hooks installed.
 
-## Option 4 – Build from Source
+## Option 5 – Build from Source
 
 You can also build the CLI manually from source. Clone the repository and build using the provided `Makefile`:
 
@@ -101,4 +109,3 @@ Mergeway CLI v0.11.0 (commit abc1234)
 If the command is missing, confirm that the installation path is on your `PATH`.
 
 Move on to the [Getting Started](README.md) guide once the binary is available.
-

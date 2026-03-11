@@ -29,6 +29,14 @@ go install github.com/mergewayhq/mergeway-cli@latest
 
 Ensure your `GOBIN` (or `GOPATH/bin`) is on `PATH`, then confirm with `mergeway-cli version`.
 
+### Using Docker
+
+```bash
+docker run ghcr.io/mergewayhq/mergeway-cli version
+```
+
+Use the public GitHub Container Registry image to run the CLI without installing the binary locally.
+
 ### Using Nix
 
 You can install the CLI using Nix:
