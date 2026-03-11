@@ -6,7 +6,9 @@ before:
     - go generate ./...
 
 builds:
-  - env:
+  - id: cli
+    binary: mergeway-cli
+    env:
       - CGO_ENABLED=0
     main: .
     goos:
@@ -21,6 +23,28 @@ builds:
       - -X github.com/mergewayhq/mergeway-cli/internal/version.Number={{.Version}}
       - -X github.com/mergewayhq/mergeway-cli/internal/version.Commit={{.Commit}}
       - -X github.com/mergewayhq/mergeway-cli/internal/version.BuildDate={{.Date}}
+
+dockers_v2:
+  - id: container
+    dockerfile: Dockerfile.goreleaser
+    ids:
+      - cli
+    images:
+      - ghcr.io/mergewayhq/mergeway-cli
+    tags:
+      - "{{ .Version }}"
+      - "{{ if not .Prerelease }}latest{{ end }}"
+    labels:
+      org.opencontainers.image.created: "{{ .Date }}"
+      org.opencontainers.image.description: "Command-line toolkit for file-backed metadata repositories."
+      org.opencontainers.image.name: "{{ .ProjectName }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.source: "{{ .GitURL }}"
+      org.opencontainers.image.title: "{{ .ProjectName }}"
+      org.opencontainers.image.version: "{{ .Version }}"
+    platforms:
+      - linux/amd64
+      - linux/arm64
 
 archives:
   - format: tar.gz

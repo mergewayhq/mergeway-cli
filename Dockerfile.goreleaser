@@ -1,0 +1,7 @@
+FROM scratch
+
+ARG TARGETPLATFORM
+
+COPY $TARGETPLATFORM/mergeway-cli /mergeway-cli
+
+ENTRYPOINT ["/mergeway-cli"]
