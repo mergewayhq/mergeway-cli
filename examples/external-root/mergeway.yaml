@@ -1,0 +1,34 @@
+mergeway:
+  version: 1
+
+entities:
+  Product:
+    description: Products that reference suppliers from the same external data set
+    identifier: id
+    include:
+      - ../external-root-data-dir/data/products/*.yaml
+    fields:
+      id: string
+      name:
+        type: string
+        required: true
+      supplier:
+        type: Supplier
+        required: true
+      price:
+        type: number
+        required: true
+
+  Supplier:
+    description: Vendors loaded from a directory outside the workspace root
+    identifier: id
+    include:
+      - ../external-root-data-dir/data/suppliers/*.yaml
+    fields:
+      id: string
+      name:
+        type: string
+        required: true
+      region:
+        type: string
+        required: true
