@@ -6,9 +6,9 @@ cascade:
   type: docs
 ---
 
-# Mergeway Overview
-
-Mergeway is a lightweight CLI that keeps metadata honest by treating schemas as code. Instead of juggling spreadsheets or custom scripts, you describe entities in YAML/JSON, run a quick validation, and catch broken references before they reach production.
+[Mergeway](https://mergewayhq.github.io)'s goal is to make metadata a commodity putting it in the open and treating it as code.
+Instead of juggling spreadsheets or custom scripts, you describe entities in YAML/JSON, run a quick validation, and catch broken references before they reach production.
+By storing metadata as code, changes become a simple patch.
 
 ## What the CLI Does
 
@@ -39,3 +39,5 @@ Mergeway is a lightweight CLI that keeps metadata honest by treating schemas as 
 4. Browse through the [CLI Reference](cli-reference/README.md) for command syntax.
 
 Updates land in the [Changelog](https://github.com/mergewayhq/mergeway-cli/releases). File GitHub issues for questions, bugs, or requests.
+
+For a more general introduction to Mergeway, [visit the homepage](https://mergewayhq.github.io)

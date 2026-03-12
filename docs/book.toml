@@ -3,19 +3,20 @@ title = "Mergeway Documentation"
 description = "Developer and operator documentation for the Mergeway CLI."
 authors = ["Mergeway Team"]
 language = "en"
-multilingual = false
 src = "src"
+
+[build]
+create-missing = false
 
 [output.html]
 default-theme = "light"
+git-repository-url = "https://github.com/mergewayhq/mergeway-cli"
+git-repository-icon = "fab-github"
 site-url = "/"
 
-[preprocessor.gitinfo]
+[output.html.search]
 enable = true
-hyperlink = true
 
 [preprocessor.yml-header]
 enable = true
 
-[preprocessor.gitinfo.message]
-footer = "<br><br>Generated at {{date}} (commit: {{hash}})"
