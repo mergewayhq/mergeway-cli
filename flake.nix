@@ -14,7 +14,7 @@
       {
         packages.default = pkgs.buildGoModule {
           pname = "mergeway-cli";
-          version = "0.1.0"; # Versioning can be improved later
+          version = "0.3.0"; # Versioning can be improved later
           src = self;
 
           #vendorHash = nixpkgs.lib.fakeHash;
@@ -41,7 +41,7 @@
 
           meta = with pkgs.lib; {
             description = "The official CLI for Mergeway";
-            homepage = "https://github.com/mergewayhq/mergeway-cli";
+            homepage = "https://mergewayhq.github.io";
             license = licenses.mit;
             mainProgram = "mergeway-cli";
           };

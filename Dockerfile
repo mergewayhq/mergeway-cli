@@ -4,7 +4,7 @@ FROM golang:1.24-alpine AS builder
 
 WORKDIR /src
 
-ARG VERSION=0.1.1-dev
+ARG VERSION=0.3.0-dev
 ARG COMMIT=unknown
 ARG BUILD_DATE=unknown
 
