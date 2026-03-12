@@ -46,6 +46,8 @@ Output (abridged):
 
 Fields that reference other types include the `x-reference-type` hint.
 
+Reference unions such as `User | Team` are not exportable as JSON Schema. They are supported only in native Mergeway `fields:` definitions, so `mergeway-cli config export` returns an error for those entities.
+
 Validate your workspace (`mergeway-cli config lint` or `mergeway-cli validate`) after editing type files to ensure the exported schema stays in sync.
 
 ## Related Commands

@@ -167,6 +167,49 @@ func TestConfigExport(t *testing.T) {
 	}
 }
 
+func TestConfigExportRejectsReferenceUnion(t *testing.T) {
+	repo := t.TempDir()
+	cfg := []byte(`mergeway:
+  version: 1
+
+entities:
+  User:
+    identifier: id
+    data:
+      - id: user-1
+    fields:
+      id: string
+  Team:
+    identifier: id
+    data:
+      - id: team-1
+    fields:
+      id: string
+  Activity:
+    identifier: id
+    data:
+      - id: activity-1
+        owner: user-1
+    fields:
+      id: string
+      owner:
+        type: User | Team
+`)
+	if err := os.WriteFile(filepath.Join(repo, "mergeway.yaml"), cfg, 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "config", "export", "--type", "Activity"}, stdout, stderr)
+	if code == 0 {
+		t.Fatalf("expected export to fail")
+	}
+	if !strings.Contains(stderr.String(), "cannot be exported as JSON Schema") {
+		t.Fatalf("expected union export error, got %s", stderr.String())
+	}
+}
+
 func TestExportToStdout(t *testing.T) {
 	repo := copyFixture(t)
 	stdout := &bytes.Buffer{}

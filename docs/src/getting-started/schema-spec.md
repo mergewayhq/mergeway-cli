@@ -163,7 +163,7 @@ When a field only needs a type, map entries can use the compact `field: type` sy
 
 | Attribute     | Example                                               | Notes                                                                                     |
 | ------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `type`        | `string`, `number`, `boolean`, `list[string]`, `User` | Lists are written as `list[type]`. A plain string (e.g., `User`) references another type. |
+| `type`        | `string`, `number`, `boolean`, `list[string]`, `User`, `User | Team` | Lists are written as `list[type]`. A plain string (for example `User`) references another type. Reference fields can also target multiple entity types with `EntityA | EntityB`. |
 | `required`    | `true` / `false`                                      | Required fields appear in every record.                                                    |
 | `repeated`    | `true` / `false`                                      | Indicates an array field.                                                                 |
 | `description` | `Service owner team`                                  | Optional but recommended.                                                                 |
@@ -181,6 +181,7 @@ When `json_schema` is present, omit the `fields` map. Mergeway parses the JSON S
 - `enum`, `const`, or `oneOf` blocks translate into Mergeway enums (string values only).
 - `$ref` segments are resolved within the same JSON Schema file (e.g., `#/$defs/...`).
 - Custom references to other entities use the same `x-reference-type` property emitted by `mergeway-cli config export`.
+- Reference unions such as `User | Team` are only supported in native `fields:` definitions. They are not supported in `json_schema` entities.
 
 See `examples/json-schema` for a runnable workspace that demonstrates this flow end-to-end.
 
@@ -213,7 +214,10 @@ name: Numeric Identifier
 ## Good Practices
 
 - Prefer references (`type: User`) over duplicating identifiers.
+- Use reference unions sparingly. `type: User | Team` is valid, but validation requires each referenced identifier to resolve in exactly one target set. If the same identifier exists in both sets, validation fails as ambiguous.
 - Group files in predictable folders (`data/posts/`, `data/users/`, etc.).
 - Run `mergeway-cli validate` after every change to catch problems immediately.
+
+See `examples/reference-union` for a minimal runnable workspace that demonstrates `User | Team`.
 
 Need more context? Return to the [Basic Concepts](./README.md) page for the bigger picture.

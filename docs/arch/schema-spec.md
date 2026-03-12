@@ -90,7 +90,7 @@ Inline records declared under `data` are optional and most useful for tiny looku
 
 ### Field Specification
 
-- `type`: primitive (`string`, `integer`, `number`, `boolean`), `object`, `enum`, or another defined type name to indicate a reference.
+- `type`: primitive (`string`, `integer`, `number`, `boolean`), `object`, `enum`, another defined type name to indicate a reference, or a reference-only union such as `User | Team`.
 - `required`: defaults to `false`; set to `true` for mandatory fields.
 - `repeated`: when `true`, the field stores an array of values described by the rest of the field definition.
 - `format`: optional semantic hint (URI, email, date-time, etc.); aligns with JSON Schema semantics.
@@ -119,6 +119,7 @@ Extra validation knobs let future tooling derive JSON Schema while preserving ri
 
 - `unique`: ensure a field’s value is unique across all objects of this type. Only applicable to non-repeated fields.
 - When `type` equals another defined type name, the field stores the referenced type’s identifier (similar to a foreign key). For repeated fields this models one-to-many links implicitly.
+- Reference fields may also use `EntityA | EntityB` to allow identifiers from exactly one of several entity types. If the identifier exists in more than one referenced set, referential validation fails with an ambiguity error.
 
 ## File Association
 
@@ -148,13 +149,13 @@ items:
 
 - The configuration should contain enough detail to emit JSON Schema for downstream tooling.
 - Repeated fields map to JSON Schema arrays with `items` derived from the base field definition.
-- Fields whose `type` is another defined type map to foreign-key style validations and can translate to JSON Schema annotations or custom keywords.
+- Fields whose `type` is another defined type map to foreign-key style validations and can translate to JSON Schema annotations or custom keywords. Reference unions are intentionally excluded from JSON Schema import/export support.
 - Keep the configuration expressive but deterministic so transformation tooling can remain stable.
 
 ## Validation Hooks
 
 - Format validation uses `type`, `format`, and `enum` metadata.
 - Schema validation leverages `required`, `repeated`, `properties`, and `unique`.
-- Referential integrity ensures that fields whose `type` matches another defined type reference existing identifiers.
+- Referential integrity ensures that fields whose `type` matches another defined type reference existing identifiers. For reference unions, a value must resolve in exactly one referenced type set.
 
 This specification provides the foundation for building linting, code generation, and future schema evolution features while remaining human-editable.

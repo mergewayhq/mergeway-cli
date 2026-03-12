@@ -168,6 +168,9 @@ func buildFieldDefinitionFromSchema(name string, schema map[string]any, document
 	}
 
 	if refType != "" {
+		if strings.Contains(refType, "|") {
+			return nil, fmt.Errorf("config: field %s in json_schema %s uses unsupported x-reference-type %q: reference unions are only supported in fields definitions", context, displayPath, refType)
+		}
 		field.Type = refType
 		return field, nil
 	}

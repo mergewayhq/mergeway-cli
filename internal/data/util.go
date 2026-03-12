@@ -25,21 +25,6 @@ func ensureDir(path string) error {
 	return nil
 }
 
-func requiredString(fields map[string]any, key string) (string, error) {
-	if fields == nil {
-		return "", fmt.Errorf("missing field %q", key)
-	}
-	value, ok := fields[key]
-	if !ok {
-		return "", fmt.Errorf("missing field %q", key)
-	}
-	str, ok := scalar.AsString(value)
-	if !ok {
-		return "", fmt.Errorf("field %q must be a non-empty string or number", key)
-	}
-	return str, nil
-}
-
 func getString(m map[string]any, key string) (string, bool) {
 	if m == nil {
 		return "", false

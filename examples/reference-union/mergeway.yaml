@@ -1,0 +1,36 @@
+mergeway:
+  version: 1
+
+entities:
+  User:
+    identifier: id
+    fields:
+      id: string
+      name: string
+    data:
+      - id: user-alice
+        name: Alice Example
+
+  Team:
+    identifier: id
+    fields:
+      id: string
+      name: string
+    data:
+      - id: team-core
+        name: Core Team
+
+  Activity:
+    identifier: id
+    fields:
+      id: string
+      title: string
+      owner:
+        type: User | Team
+    data:
+      - id: activity-1
+        title: Kickoff
+        owner: user-alice
+      - id: activity-2
+        title: Planning
+        owner: team-core

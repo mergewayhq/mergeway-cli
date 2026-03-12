@@ -219,14 +219,18 @@ func validateFieldReference(typeName string, field *FieldDefinition, types map[s
 		return nil
 	}
 
-	if _, ok := primitiveTypes[field.Type]; !ok {
-		if !isValidTypeName(field.Type) {
-			return fmt.Errorf("config: field %s.%s references invalid type name %q", typeName, field.Name, field.Type)
+	refTypes, err := parseReferenceTypes(field.Type)
+	if err != nil {
+		return fmt.Errorf("config: field %s.%s %w", typeName, field.Name, err)
+	}
+	field.ReferenceTypes = nil
+	if len(refTypes) > 0 {
+		for _, refType := range refTypes {
+			if _, ok := types[refType]; !ok {
+				return fmt.Errorf("config: field %s.%s references unknown type %q", typeName, field.Name, refType)
+			}
 		}
-
-		if _, ok := types[field.Type]; !ok {
-			return fmt.Errorf("config: field %s.%s references unknown type %q", typeName, field.Name, field.Type)
-		}
+		field.ReferenceTypes = append(field.ReferenceTypes[:0], refTypes...)
 	}
 
 	for _, child := range field.Properties {
@@ -258,6 +262,51 @@ func cloneInlineMap(src map[string]any) map[string]any {
 		dst[k] = cloneInlineValue(v)
 	}
 	return dst
+}
+
+func parseReferenceTypes(typeName string) ([]string, error) {
+	typeName = strings.TrimSpace(typeName)
+	if typeName == "" {
+		return nil, fmt.Errorf("references invalid type name %q", typeName)
+	}
+
+	if _, ok := primitiveTypes[typeName]; ok {
+		return nil, nil
+	}
+
+	if strings.Contains(typeName, "|") {
+		parts := strings.Split(typeName, "|")
+		if len(parts) < 2 {
+			return nil, fmt.Errorf("uses invalid reference union %q", typeName)
+		}
+
+		refTypes := make([]string, 0, len(parts))
+		seen := make(map[string]struct{}, len(parts))
+		for _, rawPart := range parts {
+			part := strings.TrimSpace(rawPart)
+			if part == "" {
+				return nil, fmt.Errorf("uses invalid reference union %q", typeName)
+			}
+			if _, ok := primitiveTypes[part]; ok {
+				return nil, fmt.Errorf("uses invalid reference union %q: unions are only supported for references", typeName)
+			}
+			if !isValidTypeName(part) {
+				return nil, fmt.Errorf("references invalid type name %q", part)
+			}
+			if _, ok := seen[part]; ok {
+				return nil, fmt.Errorf("uses invalid reference union %q: duplicate member %q", typeName, part)
+			}
+			seen[part] = struct{}{}
+			refTypes = append(refTypes, part)
+		}
+		return refTypes, nil
+	}
+
+	if !isValidTypeName(typeName) {
+		return nil, fmt.Errorf("references invalid type name %q", typeName)
+	}
+
+	return []string{typeName}, nil
 }
 
 func cloneInlineValue(value any) any {

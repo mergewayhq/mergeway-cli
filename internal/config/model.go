@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"sort"
+	"strings"
 )
 
 // Config captures the normalized database configuration.
@@ -72,18 +73,40 @@ func (d IdentifierDefinition) IsPath() bool {
 
 // FieldDefinition holds schema information for a field.
 type FieldDefinition struct {
-	Name          string
-	Type          string
-	Required      bool
-	Repeated      bool
-	Format        string
-	Enum          []string
-	Default       any
-	Properties    map[string]*FieldDefinition
-	Unique        bool
-	Pattern       string
-	Description   string
-	PropertyOrder []string
+	Name           string
+	Type           string
+	ReferenceTypes []string
+	Required       bool
+	Repeated       bool
+	Format         string
+	Enum           []string
+	Default        any
+	Properties     map[string]*FieldDefinition
+	Unique         bool
+	Pattern        string
+	Description    string
+	PropertyOrder  []string
+}
+
+// IsReference returns true when the field stores an identifier for one or more entity types.
+func (d *FieldDefinition) IsReference() bool {
+	return d != nil && len(d.ReferenceTypes) > 0
+}
+
+// HasReferenceUnion returns true when the field can reference more than one entity type.
+func (d *FieldDefinition) HasReferenceUnion() bool {
+	return d != nil && len(d.ReferenceTypes) > 1
+}
+
+// ReferenceLabel returns the canonical textual representation of the field's reference targets.
+func (d *FieldDefinition) ReferenceLabel() string {
+	if d == nil {
+		return ""
+	}
+	if len(d.ReferenceTypes) == 0 {
+		return d.Type
+	}
+	return strings.Join(d.ReferenceTypes, " | ")
 }
 
 // String returns a string representation for debugging purposes.

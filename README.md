@@ -100,6 +100,8 @@ mergeway-cli --root examples/full validate
 
 Curious about JSON Schema-backed entities? `examples/json-schema` demonstrates how an entity can derive its field definitions from an external JSON Schema file.
 
+Want to see a reference union? `examples/reference-union` shows a minimal workspace where a field uses `User | Team`.
+
 For a deeper command reference, check [`docs/src/cli-reference/README.md`](docs/src/cli-reference/README.md).
 
 ## Hacking on the CLI

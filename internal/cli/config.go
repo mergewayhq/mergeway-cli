@@ -81,7 +81,11 @@ func newConfigExportCommand() *cobra.Command {
 				return newExitError(1)
 			}
 
-			schema := buildJSONSchema(typeDef)
+			schema, err := buildJSONSchema(typeDef)
+			if err != nil {
+				_, _ = fmt.Fprintf(ctx.Stderr, "config export: %v\n", err)
+				return newExitError(1)
+			}
 			if code := writeFormatted(ctx, schema); code != 0 {
 				return newExitError(code)
 			}
@@ -94,7 +98,7 @@ func newConfigExportCommand() *cobra.Command {
 	return cmd
 }
 
-func buildJSONSchema(typeDef *config.TypeDefinition) map[string]any {
+func buildJSONSchema(typeDef *config.TypeDefinition) (map[string]any, error) {
 	properties := make(map[string]any)
 	required := make([]string, 0)
 
@@ -104,7 +108,11 @@ func buildJSONSchema(typeDef *config.TypeDefinition) map[string]any {
 		if field == nil {
 			continue
 		}
-		properties[name], required = appendFieldSchema(properties[name], required, name, field)
+		var err error
+		properties[name], required, err = appendFieldSchema(properties[name], required, name, field)
+		if err != nil {
+			return nil, err
+		}
 		seen[name] = struct{}{}
 	}
 
@@ -112,7 +120,11 @@ func buildJSONSchema(typeDef *config.TypeDefinition) map[string]any {
 		if _, ok := seen[name]; ok {
 			continue
 		}
-		properties[name], required = appendFieldSchema(properties[name], required, name, field)
+		var err error
+		properties[name], required, err = appendFieldSchema(properties[name], required, name, field)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	schema := map[string]any{
@@ -126,12 +138,12 @@ func buildJSONSchema(typeDef *config.TypeDefinition) map[string]any {
 	if len(required) > 0 {
 		schema["required"] = required
 	}
-	return schema
+	return schema, nil
 }
 
-func appendFieldSchema(existing any, required []string, name string, field *config.FieldDefinition) (map[string]any, []string) {
+func appendFieldSchema(existing any, required []string, name string, field *config.FieldDefinition) (map[string]any, []string, error) {
 	if field == nil {
-		return map[string]any{}, required
+		return map[string]any{}, required, nil
 	}
 
 	prop := map[string]any{}
@@ -149,10 +161,17 @@ func appendFieldSchema(existing any, required []string, name string, field *conf
 			Fields:     field.Properties,
 			FieldOrder: field.PropertyOrder,
 		}
-		prop = buildJSONSchema(sub)
+		var err error
+		prop, err = buildJSONSchema(sub)
+		if err != nil {
+			return nil, required, err
+		}
 	default:
+		if field.HasReferenceUnion() {
+			return nil, required, fmt.Errorf("field %q uses reference union %q, which cannot be exported as JSON Schema", name, field.ReferenceLabel())
+		}
 		prop["type"] = "string"
-		prop["x-reference-type"] = field.Type
+		prop["x-reference-type"] = field.ReferenceLabel()
 	}
 
 	if field.Repeated {
@@ -169,5 +188,5 @@ func appendFieldSchema(existing any, required []string, name string, field *conf
 	if field.Required {
 		required = append(required, name)
 	}
-	return prop, required
+	return prop, required, nil
 }

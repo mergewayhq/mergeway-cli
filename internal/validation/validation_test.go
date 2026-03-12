@@ -1,7 +1,9 @@
 package validation
 
 import (
+	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -96,6 +98,70 @@ func TestValidateReferenceError(t *testing.T) {
 	}
 	if !found {
 		t.Fatalf("expected reference phase errors, got %v", res.Errors)
+	}
+}
+
+func TestValidateReferenceUnion(t *testing.T) {
+	root := writeReferenceUnionRepo(t, "user-1", "team-1", "user-1")
+	cfg := loadConfig(t, root)
+
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+
+	if len(res.Errors) != 0 {
+		t.Fatalf("expected no errors, got %v", res.Errors)
+	}
+
+	owner := cfg.Types["Activity"].Fields["owner"]
+	if owner == nil {
+		t.Fatalf("expected owner field")
+		return
+	}
+	refTypes := owner.ReferenceTypes
+	if !reflect.DeepEqual(refTypes, []string{"User", "Team"}) {
+		t.Fatalf("expected parsed reference types, got %v", refTypes)
+	}
+}
+
+func TestValidateReferenceUnionMissing(t *testing.T) {
+	root := writeReferenceUnionRepo(t, "user-1", "team-1", "missing-owner")
+	cfg := loadConfig(t, root)
+
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+
+	if len(res.Errors) != 1 {
+		t.Fatalf("expected 1 error, got %v", res.Errors)
+	}
+	if res.Errors[0].Phase != PhaseReferences {
+		t.Fatalf("expected reference error, got %s", res.Errors[0].Phase)
+	}
+	if !strings.Contains(res.Errors[0].Message, "references missing User | Team") {
+		t.Fatalf("expected missing union reference error, got %v", res.Errors[0])
+	}
+}
+
+func TestValidateReferenceUnionAmbiguous(t *testing.T) {
+	root := writeReferenceUnionRepo(t, "shared-id", "shared-id", "shared-id")
+	cfg := loadConfig(t, root)
+
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+
+	if len(res.Errors) != 1 {
+		t.Fatalf("expected 1 error, got %v", res.Errors)
+	}
+	if res.Errors[0].Phase != PhaseReferences {
+		t.Fatalf("expected reference error, got %s", res.Errors[0].Phase)
+	}
+	if !strings.Contains(res.Errors[0].Message, "ambiguous across User | Team") {
+		t.Fatalf("expected ambiguous union reference error, got %v", res.Errors[0])
 	}
 }
 
@@ -266,4 +332,60 @@ func collectPhases(errs []Error) map[Phase]struct{} {
 		set[e.Phase] = struct{}{}
 	}
 	return set
+}
+
+func writeReferenceUnionRepo(t *testing.T, userID, teamID, ownerID string) string {
+	t.Helper()
+
+	root := t.TempDir()
+	cfgContent := []byte(`mergeway:
+  version: 1
+
+entities:
+  User:
+    identifier: id
+    include:
+      - data/users/*.yaml
+    fields:
+      id: string
+  Team:
+    identifier: id
+    include:
+      - data/teams/*.yaml
+    fields:
+      id: string
+  Activity:
+    identifier: id
+    include:
+      - data/activities/*.yaml
+    fields:
+      id: string
+      owner:
+        type: User | Team
+`)
+	if err := os.WriteFile(filepath.Join(root, "mergeway.yaml"), cfgContent, 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	for _, dir := range []string{
+		filepath.Join(root, "data", "users"),
+		filepath.Join(root, "data", "teams"),
+		filepath.Join(root, "data", "activities"),
+	} {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			t.Fatalf("mkdir %s: %v", dir, err)
+		}
+	}
+
+	if err := os.WriteFile(filepath.Join(root, "data", "users", "user.yaml"), []byte("id: "+userID+"\n"), 0o644); err != nil {
+		t.Fatalf("write user: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "data", "teams", "team.yaml"), []byte("id: "+teamID+"\n"), 0o644); err != nil {
+		t.Fatalf("write team: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "data", "activities", "activity.yaml"), []byte("id: activity-1\nowner: "+ownerID+"\n"), 0o644); err != nil {
+		t.Fatalf("write activity: %v", err)
+	}
+
+	return root
 }

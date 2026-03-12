@@ -2,6 +2,7 @@ package validation
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
 )
@@ -21,7 +22,7 @@ func validateReferences(all map[string]*typeObjects, index *schemaIndex, cfg *co
 			}
 
 			for fieldName, field := range typeDef.Fields {
-				if isPrimitive(field.Type) || field.Type == "object" || field.Type == "enum" {
+				if field == nil || !field.IsReference() {
 					continue
 				}
 
@@ -30,15 +31,25 @@ func validateReferences(all map[string]*typeObjects, index *schemaIndex, cfg *co
 					continue
 				}
 
-				targetTypeIndex := index.byType[field.Type]
 				for _, refID := range targets {
-					if targetTypeIndex == nil || targetTypeIndex[refID] == nil {
+					matches := resolveReferenceTypes(index, field.ReferenceTypes, refID)
+					if len(matches) == 0 {
 						errs = append(errs, Error{
 							Phase:   PhaseReferences,
 							Type:    obj.typeDef.Name,
 							ID:      obj.id,
 							File:    objectLocation(obj),
-							Message: fmt.Sprintf("field %q references missing %s %q", fieldName, field.Type, refID),
+							Message: fmt.Sprintf("field %q references missing %s %q", fieldName, field.ReferenceLabel(), refID),
+						})
+						continue
+					}
+					if len(matches) > 1 {
+						errs = append(errs, Error{
+							Phase:   PhaseReferences,
+							Type:    obj.typeDef.Name,
+							ID:      obj.id,
+							File:    objectLocation(obj),
+							Message: fmt.Sprintf("field %q reference %q is ambiguous across %s", fieldName, refID, joinReferenceTypes(matches)),
 						})
 					}
 				}
@@ -49,10 +60,18 @@ func validateReferences(all map[string]*typeObjects, index *schemaIndex, cfg *co
 	return errs
 }
 
-func isPrimitive(t string) bool {
-	switch t {
-	case "string", "integer", "number", "boolean":
-		return true
+func resolveReferenceTypes(index *schemaIndex, refTypes []string, refID string) []string {
+	var matches []string
+	for _, refType := range refTypes {
+		targetTypeIndex := index.byType[refType]
+		if targetTypeIndex == nil || targetTypeIndex[refID] == nil {
+			continue
+		}
+		matches = append(matches, refType)
 	}
-	return false
+	return matches
+}
+
+func joinReferenceTypes(refTypes []string) string {
+	return strings.Join(refTypes, " | ")
 }

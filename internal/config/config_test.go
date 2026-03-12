@@ -118,6 +118,111 @@ func TestLoadUnknownReference(t *testing.T) {
 	}
 }
 
+func TestLoadReferenceUnion(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  User:
+    identifier: id
+    data:
+      - id: user-1
+    fields:
+      id: string
+  Team:
+    identifier: id
+    data:
+      - id: team-1
+    fields:
+      id: string
+  Activity:
+    identifier: id
+    data:
+      - id: activity-1
+        owner: user-1
+    fields:
+      id: string
+      owner:
+        type: User | Team
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load returned error: %v", err)
+	}
+
+	owner := cfg.Types["Activity"].Fields["owner"]
+	if owner == nil {
+		t.Fatalf("expected owner field")
+		return
+	}
+	ownerType := owner.Type
+	if ownerType != "User | Team" {
+		t.Fatalf("expected raw union type to be preserved, got %q", ownerType)
+	}
+	refTypes := owner.ReferenceTypes
+	if !reflect.DeepEqual(refTypes, []string{"User", "Team"}) {
+		t.Fatalf("expected parsed reference targets, got %v", refTypes)
+	}
+	if !owner.IsReference() || !owner.HasReferenceUnion() {
+		t.Fatalf("expected owner to be treated as a reference union")
+	}
+}
+
+func TestLoadRejectsInvalidReferenceUnion(t *testing.T) {
+	tests := []struct {
+		name        string
+		fieldType   string
+		wantMessage string
+	}{
+		{name: "trailing separator", fieldType: "User | ", wantMessage: "invalid reference union"},
+		{name: "duplicate member", fieldType: "User | User", wantMessage: "duplicate member"},
+		{name: "primitive union", fieldType: "string | number", wantMessage: "unions are only supported for references"},
+		{name: "unknown type", fieldType: "User | Missing", wantMessage: "references unknown type"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "mergeway.yaml")
+			content := []byte(`mergeway:
+  version: 1
+
+entities:
+  User:
+    identifier: id
+    data:
+      - id: user-1
+    fields:
+      id: string
+  Activity:
+    identifier: id
+    data:
+      - id: activity-1
+        owner: user-1
+    fields:
+      id: string
+      owner:
+        type: ` + tc.fieldType + `
+`)
+			if err := os.WriteFile(path, content, 0o644); err != nil {
+				t.Fatalf("failed to write config: %v", err)
+			}
+
+			_, err := Load(path)
+			if err == nil {
+				t.Fatalf("expected error")
+			}
+			if got := err.Error(); !strings.Contains(got, tc.wantMessage) {
+				t.Fatalf("expected error containing %q, got %q", tc.wantMessage, got)
+			}
+		})
+	}
+}
+
 func TestLoadShorthandFieldDefinitions(t *testing.T) {
 	path := filepath.Join("testdata", "shorthand", "mergeway.yaml")
 	cfg, err := Load(path)
@@ -424,5 +529,63 @@ func TestLoadJSONSchemaMissingDefinition(t *testing.T) {
 	}
 	if got := err.Error(); !strings.Contains(got, "must define fields or json_schema") {
 		t.Fatalf("expected missing schema error, got %q", got)
+	}
+}
+
+func TestLoadRejectsJSONSchemaReferenceUnion(t *testing.T) {
+	root := t.TempDir()
+	schemaDir := filepath.Join(root, "schemas")
+	if err := os.MkdirAll(schemaDir, 0o755); err != nil {
+		t.Fatalf("mkdir schema dir: %v", err)
+	}
+
+	cfgPath := filepath.Join(root, "mergeway.yaml")
+	cfgContent := []byte(`mergeway:
+  version: 1
+
+entities:
+  User:
+    identifier: id
+    data:
+      - id: user-1
+    fields:
+      id: string
+  Team:
+    identifier: id
+    data:
+      - id: team-1
+    fields:
+      id: string
+  Activity:
+    identifier: id
+    include:
+      - data/activities/*.yaml
+    json_schema: schemas/activity.json
+`)
+	if err := os.WriteFile(cfgPath, cfgContent, 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	schemaContent := []byte(`{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "owner": {
+      "type": "string",
+      "x-reference-type": "User | Team"
+    }
+  },
+  "required": ["id", "owner"]
+}`)
+	if err := os.WriteFile(filepath.Join(schemaDir, "activity.json"), schemaContent, 0o644); err != nil {
+		t.Fatalf("write schema: %v", err)
+	}
+
+	_, err := Load(cfgPath)
+	if err == nil {
+		t.Fatalf("expected error")
+	}
+	if got := err.Error(); !strings.Contains(got, "reference unions are only supported in fields definitions") {
+		t.Fatalf("expected json schema union rejection, got %q", got)
 	}
 }
