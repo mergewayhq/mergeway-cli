@@ -1,0 +1,12 @@
+mergeway:
+  version: 1
+
+entities:
+  Note:
+    identifier: $path
+    include:
+      - data/notes/*.yaml
+    fields:
+      title:
+        type: string
+        required: true

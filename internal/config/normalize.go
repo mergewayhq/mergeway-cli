@@ -71,8 +71,12 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		return nil, fmt.Errorf("config: type %q missing identifier in %s", rawType.Name, rawType.Source)
 	}
 
-	if !isValidIdentifier(spec.Identifier.Field) {
+	if !isValidIdentifierField(spec.Identifier.Field) {
 		return nil, fmt.Errorf("config: type %q has invalid identifier field %q", rawType.Name, spec.Identifier.Field)
+	}
+
+	if spec.Identifier.Field == PathIdentifierField && len(spec.Data) > 0 {
+		return nil, fmt.Errorf("config: type %q cannot use identifier %q with inline data", rawType.Name, PathIdentifierField)
 	}
 
 	if len(spec.Include) == 0 && len(spec.Data) == 0 {
@@ -313,6 +317,10 @@ func isValidIdentifier(value string) bool {
 		return false
 	}
 	return true
+}
+
+func isValidIdentifierField(value string) bool {
+	return value == PathIdentifierField || isValidIdentifier(value)
 }
 
 func isValidTypeName(value string) bool {

@@ -20,7 +20,7 @@ By storing metadata as code, changes become a simple patch.
 
 - **Workspace scaffolding**: `mergeway-cli init` writes a starter `mergeway.yaml` into your working directory so you can begin defining entities immediately.
 - **Dual schema sources**: Author entity fields inline in YAML or reference existing JSON Schema documents (`json_schema`) so teams can reuse specs.
-- **Object lifecycle commands**: `list`, `get`, `create`, `update`, and `delete` operate on local YAML/JSON files, respecting identifier fields defined in schemas and inline data.
+- **Object lifecycle commands**: `list`, `get`, `create`, `update`, and `delete` operate on local YAML/JSON files, respecting schema-defined identifiers whether they come from record fields or the special `$path` file-path mode.
 - **Deterministic formatting**: `mergeway-cli fmt` emits canonical structure and rewrites files in place (use `--stdout` to preview changes) to keep diffs clean.
 - **Layered validation**: Format, schema, and reference phases catch structural, typing, and cross-entity errors before they land in main.
 - **Schema introspection**: `mergeway-cli entity show` and `mergeway-cli config export` surface normalized schemas or derived JSON Schema for documentation and automation.

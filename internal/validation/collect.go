@@ -64,11 +64,22 @@ func loadTypeObjects(root string, typeDef *config.TypeDefinition) ([]*rawObject,
 			continue
 		}
 
+		if parsed.Multi && typeDef.Identifier.IsPath() {
+			errs = append(errs, Error{
+				Phase:   PhaseSchema,
+				Type:    typeDef.Name,
+				File:    relPath(root, match.path),
+				Message: fmt.Sprintf("identifier %q cannot be used with files containing multiple objects", config.PathIdentifierField),
+			})
+			continue
+		}
+
 		if parsed.Multi {
 			for idx, item := range parsed.Items {
 				records = append(records, &rawObject{
 					typeDef: typeDef,
 					file:    relPath(root, match.path),
+					source:  relPath(root, match.path),
 					index:   idx,
 					data:    item,
 				})
@@ -79,6 +90,7 @@ func loadTypeObjects(root string, typeDef *config.TypeDefinition) ([]*rawObject,
 		records = append(records, &rawObject{
 			typeDef: typeDef,
 			file:    relPath(root, match.path),
+			source:  relPath(root, match.path),
 			index:   -1,
 			data:    parsed.Single,
 		})
@@ -94,8 +106,10 @@ func loadTypeObjects(root string, typeDef *config.TypeDefinition) ([]*rawObject,
 		records = append(records, &rawObject{
 			typeDef: typeDef,
 			file:    label,
+			source:  "",
 			index:   -1,
 			data:    cloneMap(item),
+			inline:  true,
 		})
 	}
 

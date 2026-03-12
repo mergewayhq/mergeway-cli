@@ -3,7 +3,9 @@ package validation
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
+	"github.com/mergewayhq/mergeway-cli/internal/config"
 	"github.com/mergewayhq/mergeway-cli/internal/scalar"
 )
 
@@ -47,6 +49,36 @@ func getString(m map[string]any, key string) (string, bool) {
 		return "", false
 	}
 	return scalar.AsString(value)
+}
+
+func identifierForObject(obj *rawObject) (string, error) {
+	if obj == nil || obj.typeDef == nil {
+		return "", fmt.Errorf("object type is not configured")
+	}
+	idField := obj.typeDef.Identifier.Field
+	if obj.typeDef.Identifier.IsPath() {
+		if obj.inline {
+			return "", fmt.Errorf("identifier %q requires a file-backed object", idField)
+		}
+		return normalizePathIdentifier(obj.source)
+	}
+	value, ok := getString(obj.data, idField)
+	if !ok {
+		return "", fmt.Errorf("identifier field %q must be a non-empty string or number", idField)
+	}
+	return value, nil
+}
+
+func normalizePathIdentifier(path string) (string, error) {
+	path = strings.TrimSpace(path)
+	if path == "" {
+		return "", fmt.Errorf("identifier %q requires a file-backed object", config.PathIdentifierField)
+	}
+	cleaned := filepath.Clean(filepath.FromSlash(path))
+	if cleaned == "." || cleaned == "" {
+		return "", fmt.Errorf("identifier %q requires a file-backed object", config.PathIdentifierField)
+	}
+	return filepath.ToSlash(cleaned), nil
 }
 
 func toSliceMap(value any) ([]map[string]any, error) {

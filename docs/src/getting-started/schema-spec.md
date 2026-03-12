@@ -73,6 +73,25 @@ entities:
 
 `generated: true` is an advisory hint for downstream automation (code generators, UI scaffolding). The CLI still expects inline identifiers or an explicit `--id` flag when creating objects.
 
+If you want the file path itself to be the identifier, use the reserved `$path` value:
+
+```yaml
+mergeway:
+  version: 1
+
+entities:
+  Note:
+    identifier: $path
+    include:
+      - data/notes/*.yaml
+    fields:
+      title:
+        type: string
+        required: true
+```
+
+In that mode, Mergeway uses the workspace-relative path (for example `data/notes/alpha.yaml`) as the object ID. `$path` only works for one-object-per-file sources. Inline `data`, `items:` arrays, and selectors that return multiple objects from the same file are rejected because they would produce duplicate identifiers.
+
 When several objects live in one file, provide a JSONPath selector to extract them:
 
 ```yaml
@@ -96,11 +115,11 @@ Strings remain a shorthand for `path` with no `selector`; Mergeway then reads th
 
 | Key           | Description                                                                                                                                                                                                                                                                                                                                                                  |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identifier`  | Name of the identifier field inside each record (needs to be unique per entity). Provide either a string (the field name) or a mapping with `field`, optional `generated`, and `pattern`. The identifier value itself can be a string, integer, or number. The `generated` flag is advisory for tooling—the CLI still expects identifiers to be supplied (inline or via `--id`). |
+| `identifier`  | Identifier source for each record. Provide either a string field name (for example `id`), the reserved `$path` value to use the workspace-relative file path, or a mapping with `field`, optional `generated`, and `pattern`. Field-based identifiers can be strings, integers, or numbers. `$path` identifiers are strings and require one object per file. The `generated` flag is advisory for tooling; the CLI still expects identifiers to be supplied inline or via `--id` when creating objects. |
 | `include`     | List of data sources. Each entry can be a glob string (shorthand) or a mapping with `path` and optional `selector` property. Omit only when you rely exclusively on inline `data`. Without a selector, Mergeway treats the whole file as a single object.                                                                                                                    |
 | `fields`      | Map of field definitions. Use either the shorthand `field: type` (defaults to optional) or the expanded mapping for advanced options. Provide either `fields` or `json_schema` for each entity.                                                                                                                                                                              |
 | `json_schema` | Path to a JSON Schema (draft 2020-12) file relative to the schema that declares the entity. When present, Mergeway derives field definitions from the JSON Schema and you can omit the `fields` block.                                                                                                                                                                     |
-| `data`        | Optional array of inline records. Each entry needs to contain the identifier field and follows the same schema rules as external data files.                                                                                                                                                                                                                                     |
+| `data`        | Optional array of inline records. Each entry needs to contain the identifier field and follows the same schema rules as external data files. This block cannot be used when `identifier: $path` because inline records do not have file paths.                                                                                                                                                                         |
 
 Add `description` anywhere you need extra context. Entities accept it alongside `identifier`, and each field definition supports its own `description` value.
 
@@ -134,7 +153,7 @@ entities:
         age: 42
 ```
 
-Inline records are loaded alongside file-based data. If a record with the same identifier exists both inline and on disk, the file wins. Inline records are read-only at runtime—`mergeway-cli data update` and `mergeway-cli data delete` target files only.
+Inline records are loaded alongside file-based data. If a record with the same identifier exists both inline and on disk, the file wins. Inline records are read-only at runtime—`mergeway-cli data update` and `mergeway-cli data delete` target files only. Types that use `identifier: $path` cannot declare inline data.
 
 ### Field Shorthand
 
@@ -180,7 +199,7 @@ body: |
   We are excited to announce the product launch.
 ```
 
-You can store one object per file (as above) or provide an `items:` array to keep several objects together. Mergeway removes any top-level `type` key before validating the record, so referencing the same file from multiple entities requires the selector approach described below.
+You can store one object per file (as above) or provide an `items:` array to keep several objects together. Mergeway removes any top-level `type` key before validating the record, so referencing the same file from multiple entities requires the selector approach described below. If a type uses `identifier: $path`, each file must contain exactly one object; `items:` arrays are rejected.
 
 JSONPath selectors let you extract objects from nested structures—handy when you need to read a subset of a larger document. For example, `selector: "$.users[*]"` walks through the `users` array in a JSON file and emits one record per element. Mergeway validates that the selector returns objects; any other shape triggers a format error.
 

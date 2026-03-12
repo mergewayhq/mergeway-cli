@@ -189,6 +189,10 @@ func (s *Store) removeFile(path string) error {
 }
 
 func (s *Store) chooseCreateTarget(typeDef *config.TypeDefinition, id string) (*createTarget, error) {
+	if typeDef.Identifier.IsPath() {
+		return s.choosePathCreateTarget(typeDef, id)
+	}
+
 	var multiTarget *createTarget
 	var foundWritable bool
 
@@ -225,4 +229,41 @@ func (s *Store) chooseCreateTarget(typeDef *config.TypeDefinition, id string) (*
 	}
 
 	return nil, fmt.Errorf("data: unable to resolve create target for type %s", typeDef.Name)
+}
+
+func (s *Store) choosePathCreateTarget(typeDef *config.TypeDefinition, id string) (*createTarget, error) {
+	relID, err := normalizePathIdentifier(id)
+	if err != nil {
+		return nil, err
+	}
+
+	target := filepath.Clean(filepath.Join(s.root, filepath.FromSlash(relID)))
+	relTarget, err := filepath.Rel(s.root, target)
+	if err != nil {
+		return nil, fmt.Errorf("data: resolve create target for %s: %w", relID, err)
+	}
+	if relTarget == ".." || strings.HasPrefix(relTarget, ".."+string(filepath.Separator)) {
+		return nil, fmt.Errorf("data: field %q must stay within the workspace root", config.PathIdentifierField)
+	}
+
+	for _, include := range typeDef.Include {
+		if include.Selector != "" || include.Path == "" {
+			continue
+		}
+
+		absPattern := include.Path
+		if !filepath.IsAbs(absPattern) {
+			absPattern = filepath.Join(s.root, filepath.Clean(include.Path))
+		}
+
+		matched, err := filepath.Match(absPattern, target)
+		if err != nil {
+			return nil, fmt.Errorf("data: match include %s: %w", include.Path, err)
+		}
+		if matched {
+			return &createTarget{Path: target, Format: detectFormat(target), Multi: false}, nil
+		}
+	}
+
+	return nil, fmt.Errorf("data: %s %q does not match any writable include path", typeDef.Name, relID)
 }

@@ -15,7 +15,7 @@ mergeway-cli [global flags] get --type <type> <id>
 | Flag     | Description                                                      |
 | -------- | ---------------------------------------------------------------- |
 | `--type` | Required. Type identifier that owns the object.                  |
-| `<id>`   | Required positional argument representing the object identifier. |
+| `<id>`   | Required positional argument representing the object identifier. For entities that use `identifier: $path`, this is the workspace-relative file path. |
 
 Use `--format json` if you prefer JSON output.
 
@@ -37,6 +37,12 @@ body: |
   We are excited to announce the product launch.
 id: post-001
 title: Launch Day
+```
+
+For path-based identifiers, the lookup uses the file path instead:
+
+```bash
+mergeway-cli --format yaml get --type Note data/notes/alpha.yaml
 ```
 
 ## Related Commands

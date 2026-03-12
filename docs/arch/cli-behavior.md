@@ -40,7 +40,7 @@ All object-focused commands use `--type <type>` unless the object payload embeds
 - `mergeway-cli create --type <type> --file <path> [--id <id>]`
   - Creates a new object from a payload file or STDIN.
   - Validates format/schema before writing unless `--skip-validate` is provided.
-  - Honors the identifier field defined in the schema. The `identifier.generated` flag is advisory for tooling; the CLI still expects identifiers to be supplied (either inline or via `--id`).
+  - Honors the identifier source defined in the schema. Field-based identifiers come from object payloads, while `identifier: $path` uses the workspace-relative file path. The `identifier.generated` flag is advisory for tooling; the CLI still expects identifiers to be supplied (either inline or via `--id`).
 - `mergeway-cli update --type <type> --id <id> --file <path>`
   - Replaces the stored document with the provided payload (use `--merge` for deep merges).
   - Supports partial updates with `--merge` to deep-merge fields instead of replacing wholesale.

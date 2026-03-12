@@ -46,6 +46,9 @@ const (
 	WriteFormatJSON WriteFormat = "json"
 )
 
+// PathIdentifierField is the reserved identifier value that derives IDs from file paths.
+const PathIdentifierField = "$path"
+
 // DefaultWriteTemplate is the canonical template used for new object files.
 const DefaultWriteTemplate = "{id}.yaml"
 
@@ -60,6 +63,11 @@ type IdentifierDefinition struct {
 	Field     string
 	Generated bool
 	Pattern   string
+}
+
+// IsPath returns true when identifiers are derived from workspace-relative file paths.
+func (d IdentifierDefinition) IsPath() bool {
+	return d.Field == PathIdentifierField
 }
 
 // FieldDefinition holds schema information for a field.

@@ -96,8 +96,10 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 	}
 
 	normalized := cleanFields(fields)
-	idField := typeDef.Identifier.Field
-	normalized[idField] = normalizedID
+	if !typeDef.Identifier.IsPath() {
+		idField := typeDef.Identifier.Field
+		normalized[idField] = normalizedID
+	}
 
 	if target.Multi {
 		fi := doc
@@ -168,17 +170,19 @@ func (s *Store) Update(typeName, id string, fields map[string]any, merge bool) (
 		updated = cleanFields(fields)
 	}
 
-	idField := typeDef.Identifier.Field
-	idFieldDef := typeDef.Fields[idField]
-	var normalizedID any = id
-	if idFieldDef != nil {
-		converted, err := coerceIdentifierValue(idFieldDef.Type, idField, id)
-		if err != nil {
-			return nil, fmt.Errorf("data: %s update: %w", typeName, err)
+	if !typeDef.Identifier.IsPath() {
+		idField := typeDef.Identifier.Field
+		idFieldDef := typeDef.Fields[idField]
+		var normalizedID any = id
+		if idFieldDef != nil {
+			converted, err := coerceIdentifierValue(idFieldDef.Type, idField, id)
+			if err != nil {
+				return nil, fmt.Errorf("data: %s update: %w", typeName, err)
+			}
+			normalizedID = converted
 		}
-		normalizedID = converted
+		updated[idField] = normalizedID
 	}
-	updated[idField] = normalizedID
 	removeTypeKeys(updated)
 
 	if loc.Multi {

@@ -8,39 +8,38 @@ description: "Modify an existing object by replacing it or merging in fields."
 
 ## Usage
 
-````
-
-bash
+```bash
 mergeway-cli [global flags] update --type <type> --id <id> [--file path] [--merge]
-```| Flag | Description |
+```
+
+| Flag | Description |
 | --- | --- |
+| `--type` | Required. Type identifier. |
+| `--id` | Required. Object identifier to update. For entities that use `identifier: $path`, this is the workspace-relative file path. |
 | `--file` | Optional path to a YAML/JSON payload (defaults to STDIN). |
 | `--merge` | Merge fields into the existing object instead of replacing it. |
-type` | Required. Type identifier. |
-| `--id` | Required. Object identifier to update. |
-| `--
-```bash
+
 ## Example
 
 Run the command from the workspace root (or add `--root` to target another workspace). Update a post title by merging in a tiny payload:
 
+```bash
 cat <<'PAYLOAD' > post-update.yaml
 title: Launch Day (Updated)
 PAYLOAD
 
 mergeway-cli update --type Post --id post-001 --file post-update.yaml --merge
-````
-
 ```
+
 Output:
 
+```
 Post post-001 updated
 ```
 
-Run `mergeway-cli validate` after significant updates to confirm references still resolve.
-Without `--merge`, the payload replaces the entire object.
+Run `mergeway-cli validate` after significant updates to confirm references still resolve. Without `--merge`, the payload replaces the entire object.
 
-Delete the temporary payload file once you are done with the update.
+For entities that use `identifier: $path`, pass the workspace-relative file path to `--id`, for example `mergeway-cli update --type Note --id data/notes/alpha.yaml --file note.yaml --merge`.
 
 ## Related Commands
 

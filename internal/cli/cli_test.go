@@ -476,6 +476,96 @@ func TestCreateRespectsCustomIdentifier(t *testing.T) {
 	}
 }
 
+func TestPathIdentifierLifecycleCommands(t *testing.T) {
+	repo := pathIdentifierRepo(t)
+
+	listOut := &bytes.Buffer{}
+	listErr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "list", "--type", "Note"}, listOut, listErr)
+	if code != 0 {
+		t.Fatalf("list exit %d stderr %s", code, listErr.String())
+	}
+	if !strings.Contains(listOut.String(), "data/notes/alpha.yaml") {
+		t.Fatalf("expected path identifier in list output, got %s", listOut.String())
+	}
+
+	getOut := &bytes.Buffer{}
+	getErr := &bytes.Buffer{}
+	code = Run([]string{"--root", repo, "get", "--type", "Note", "data/notes/alpha.yaml"}, getOut, getErr)
+	if code != 0 {
+		t.Fatalf("get exit %d stderr %s", code, getErr.String())
+	}
+	if !strings.Contains(getOut.String(), "title: Alpha") {
+		t.Fatalf("expected note payload, got %s", getOut.String())
+	}
+
+	payload := filepath.Join(t.TempDir(), "note.yaml")
+	if err := os.WriteFile(payload, []byte("title: Beta\n"), 0o644); err != nil {
+		t.Fatalf("write payload: %v", err)
+	}
+
+	createOut := &bytes.Buffer{}
+	createErr := &bytes.Buffer{}
+	code = Run([]string{"--root", repo, "create", "--type", "Note", "--file", payload, "--id", "data/notes/beta.yaml"}, createOut, createErr)
+	if code != 0 {
+		t.Fatalf("create exit %d stderr %s", code, createErr.String())
+	}
+	createdBody, err := os.ReadFile(filepath.Join(repo, "data", "notes", "beta.yaml"))
+	if err != nil {
+		t.Fatalf("read created note: %v", err)
+	}
+	if strings.Contains(string(createdBody), "$path") {
+		t.Fatalf("expected created note to omit $path, got %s", string(createdBody))
+	}
+
+	updatePayload := filepath.Join(t.TempDir(), "note-update.yaml")
+	if err := os.WriteFile(updatePayload, []byte("title: Alpha Updated\n"), 0o644); err != nil {
+		t.Fatalf("write update payload: %v", err)
+	}
+
+	updateOut := &bytes.Buffer{}
+	updateErr := &bytes.Buffer{}
+	code = Run([]string{"--root", repo, "update", "--type", "Note", "--id", "data/notes/alpha.yaml", "--file", updatePayload, "--merge"}, updateOut, updateErr)
+	if code != 0 {
+		t.Fatalf("update exit %d stderr %s", code, updateErr.String())
+	}
+	updatedBody, err := os.ReadFile(filepath.Join(repo, "data", "notes", "alpha.yaml"))
+	if err != nil {
+		t.Fatalf("read updated note: %v", err)
+	}
+	if !strings.Contains(string(updatedBody), "Alpha Updated") {
+		t.Fatalf("expected updated note body, got %s", string(updatedBody))
+	}
+
+	deleteOut := &bytes.Buffer{}
+	deleteErr := &bytes.Buffer{}
+	code = Run([]string{"--root", repo, "--yes", "delete", "--type", "Note", "data/notes/beta.yaml"}, deleteOut, deleteErr)
+	if code != 0 {
+		t.Fatalf("delete exit %d stderr %s", code, deleteErr.String())
+	}
+	if _, err := os.Stat(filepath.Join(repo, "data", "notes", "beta.yaml")); !os.IsNotExist(err) {
+		t.Fatalf("expected note to be deleted, err=%v", err)
+	}
+}
+
+func TestCreatePathIdentifierRequiresID(t *testing.T) {
+	repo := pathIdentifierRepo(t)
+	payload := filepath.Join(t.TempDir(), "note.yaml")
+	if err := os.WriteFile(payload, []byte("title: Beta\n"), 0o644); err != nil {
+		t.Fatalf("write payload: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "create", "--type", "Note", "--file", payload}, stdout, stderr)
+	if code == 0 {
+		t.Fatalf("expected create to require --id for path identifiers")
+	}
+	if !strings.Contains(stderr.String(), "--id is required") {
+		t.Fatalf("expected missing --id error, got %s", stderr.String())
+	}
+}
+
 func TestConfigLintCommand(t *testing.T) {
 	repo := copyFixture(t)
 	stdout := &bytes.Buffer{}
@@ -708,6 +798,33 @@ entities:
 	}
 	if err := os.MkdirAll(filepath.Join(root, "data", "gadgets"), 0o755); err != nil {
 		t.Fatalf("create data dir: %v", err)
+	}
+	return root
+}
+
+func pathIdentifierRepo(t *testing.T) string {
+	t.Helper()
+	root := t.TempDir()
+	config := `mergeway:
+  version: 1
+
+entities:
+  Note:
+    identifier: $path
+    include:
+      - data/notes/*.yaml
+    fields:
+      title:
+        type: string
+`
+	if err := os.WriteFile(filepath.Join(root, "mergeway.yaml"), []byte(config), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(root, "data", "notes"), 0o755); err != nil {
+		t.Fatalf("create data dir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "data", "notes", "alpha.yaml"), []byte("title: Alpha\n"), 0o644); err != nil {
+		t.Fatalf("write seed note: %v", err)
 	}
 	return root
 }

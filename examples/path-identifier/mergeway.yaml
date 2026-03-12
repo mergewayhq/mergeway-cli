@@ -1,0 +1,14 @@
+mergeway:
+  version: 1
+
+entities:
+  Note:
+    description: Notes identified by their workspace-relative file paths
+    identifier: $path
+    include:
+      - data/notes/*.yaml
+    fields:
+      title:
+        type: string
+        required: true
+      body: string

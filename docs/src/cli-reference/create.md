@@ -16,7 +16,7 @@ mergeway-cli [global flags] create --type <type> [--file path] [--id value]
 | -------- | --------------------------------------------------------------------------- |
 | `--type` | Required. Type identifier to create.                                        |
 | `--file` | Optional path to a YAML/JSON payload. If omitted, data is read from STDIN.  |
-| `--id`   | Optional identifier override. Useful when the payload omits the `id` field. |
+| `--id`   | Optional identifier override for field-based identifiers. Required when the entity uses `identifier: $path`, in which case the value must be the workspace-relative file path to create. |
 
 ## Example
 
@@ -37,6 +37,8 @@ User user-bob created
 ```
 
 The command writes `data/users/user-bob.yaml` with the provided fields. Remove the temporary `user.yaml` file afterward and run `mergeway-cli validate` to confirm the new object passes checks.
+
+When an entity uses `identifier: $path`, pass the target file path with `--id`, for example `--id data/notes/alpha.yaml`. Mergeway uses that workspace-relative path as the object ID and does not persist a `$path` field into the file.
 
 ## Related Commands
 

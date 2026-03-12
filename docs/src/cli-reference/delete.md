@@ -15,7 +15,7 @@ mergeway-cli [global flags] delete --type <type> <id>
 | Flag     | Description                                                    |
 | -------- | -------------------------------------------------------------- |
 | `--type` | Required. Type identifier.                                     |
-| `<id>`   | Required positional argument identifying the object to delete. |
+| `<id>`   | Required positional argument identifying the object to delete. For entities that use `identifier: $path`, this is the workspace-relative file path. |
 
 The command prompts for confirmation unless you pass the global `--yes` flag.
 
@@ -33,6 +33,12 @@ Output:
 
 ```
 User user-bob deleted
+```
+
+For path-based identifiers, delete by file path:
+
+```bash
+mergeway-cli --yes delete --type Note data/notes/alpha.yaml
 ```
 
 ## Related Commands

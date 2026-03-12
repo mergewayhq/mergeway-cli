@@ -187,6 +187,71 @@ func TestLoadIncludeWithJSONPath(t *testing.T) {
 	}
 }
 
+func TestLoadAllowsPathIdentifier(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  Note:
+    identifier: $path
+    include:
+      - data/notes/*.yaml
+    fields:
+      title:
+        type: string
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load returned error: %v", err)
+	}
+
+	note, ok := cfg.Types["Note"]
+	if !ok {
+		t.Fatalf("expected type 'Note' to be present")
+	}
+	if note.Identifier.Field != PathIdentifierField {
+		t.Fatalf("expected path identifier, got %q", note.Identifier.Field)
+	}
+	if !note.Identifier.IsPath() {
+		t.Fatalf("expected identifier to report path mode")
+	}
+}
+
+func TestLoadRejectsPathIdentifierWithInlineData(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  Note:
+    identifier: $path
+    include:
+      - data/notes/*.yaml
+    fields:
+      title:
+        type: string
+    data:
+      - title: Inline
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected error for inline data with path identifier")
+	}
+
+	if got := err.Error(); !strings.Contains(got, "cannot use identifier \"$path\" with inline data") {
+		t.Fatalf("expected path identifier inline-data error, got %q", got)
+	}
+}
+
 func TestLoadMissingMergewayBlock(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "mergeway.yaml")
 	content := []byte(`entities:

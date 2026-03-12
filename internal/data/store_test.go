@@ -257,6 +257,110 @@ func TestStoreNumericIdentifiers(t *testing.T) {
 	}
 }
 
+func TestStorePathIdentifiers(t *testing.T) {
+	store, repo := setupStore(t, "path_identifier")
+
+	ids, err := store.List("Note")
+	if err != nil {
+		t.Fatalf("List returned error: %v", err)
+	}
+
+	expected := []string{"data/notes/alpha.yaml"}
+	if !reflect.DeepEqual(ids, expected) {
+		t.Fatalf("expected IDs %v, got %v", expected, ids)
+	}
+
+	obj, err := store.Get("Note", "data/notes/alpha.yaml")
+	if err != nil {
+		t.Fatalf("Get returned error: %v", err)
+	}
+
+	if obj.ID != "data/notes/alpha.yaml" {
+		t.Fatalf("expected path identifier, got %q", obj.ID)
+	}
+	if obj.Fields["title"] != "Alpha" {
+		t.Fatalf("expected title Alpha, got %v", obj.Fields["title"])
+	}
+
+	created, err := store.Create("Note", map[string]any{
+		"$path": "data/notes/beta.yaml",
+		"title": "Beta",
+	})
+	if err != nil {
+		t.Fatalf("Create returned error: %v", err)
+	}
+
+	if created.ID != "data/notes/beta.yaml" {
+		t.Fatalf("expected created path ID, got %q", created.ID)
+	}
+
+	createdBody, err := os.ReadFile(filepath.Join(repo, "data", "notes", "beta.yaml"))
+	if err != nil {
+		t.Fatalf("read created file: %v", err)
+	}
+	if strings.Contains(string(createdBody), "$path") {
+		t.Fatalf("expected created file to omit $path, got %s", string(createdBody))
+	}
+
+	updated, err := store.Update("Note", "data/notes/alpha.yaml", map[string]any{
+		"title": "Alpha Updated",
+	}, true)
+	if err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+	if updated.Fields["title"] != "Alpha Updated" {
+		t.Fatalf("expected updated title, got %v", updated.Fields["title"])
+	}
+
+	if err := store.Delete("Note", "data/notes/beta.yaml"); err != nil {
+		t.Fatalf("Delete returned error: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(repo, "data", "notes", "beta.yaml")); !os.IsNotExist(err) {
+		t.Fatalf("expected created note to be deleted, err=%v", err)
+	}
+}
+
+func TestStoreRejectsPathIdentifierMultiObjectFile(t *testing.T) {
+	repo := t.TempDir()
+	cfgBody := `mergeway:
+  version: 1
+
+entities:
+  Note:
+    identifier: $path
+    include:
+      - data/notes.yaml
+    fields:
+      title:
+        type: string
+`
+	cfgPath := filepath.Join(repo, "mergeway.yaml")
+	if err := os.WriteFile(cfgPath, []byte(cfgBody), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(repo, "data"), 0o755); err != nil {
+		t.Fatalf("mkdir data: %v", err)
+	}
+	body := "items:\n  - title: Alpha\n  - title: Beta\n"
+	if err := os.WriteFile(filepath.Join(repo, "data", "notes.yaml"), []byte(body), 0o644); err != nil {
+		t.Fatalf("write data: %v", err)
+	}
+
+	cfg, err := config.Load(cfgPath)
+	if err != nil {
+		t.Fatalf("load config: %v", err)
+	}
+	store, err := NewStore(repo, cfg)
+	if err != nil {
+		t.Fatalf("new store: %v", err)
+	}
+
+	_, err = store.List("Note")
+	if err == nil || !strings.Contains(err.Error(), "contains multiple objects") {
+		t.Fatalf("expected multi-object path identifier error, got %v", err)
+	}
+}
+
 func TestStoreCreateBubblesLookupErrors(t *testing.T) {
 	repo := t.TempDir()
 	cfgBody := `mergeway:

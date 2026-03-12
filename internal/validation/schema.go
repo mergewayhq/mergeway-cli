@@ -27,7 +27,6 @@ func validateSchema(all map[string]*typeObjects, cfg *config.Config) (*schemaInd
 func validateTypeSchema(objects []*rawObject, typeDef *config.TypeDefinition, index *schemaIndex) []Error {
 	var errs []Error
 
-	idField := typeDef.Identifier.Field
 	if index.byType[typeDef.Name] == nil {
 		index.byType[typeDef.Name] = make(map[string]*rawObject)
 	}
@@ -49,13 +48,13 @@ func validateTypeSchema(objects []*rawObject, typeDef *config.TypeDefinition, in
 			continue
 		}
 
-		idValue, ok := getString(obj.data, idField)
-		if !ok {
+		idValue, err := identifierForObject(obj)
+		if err != nil {
 			errs = append(errs, Error{
 				Phase:   PhaseSchema,
 				Type:    typeDef.Name,
 				File:    objectLocation(obj),
-				Message: fmt.Sprintf("identifier field %q must be a non-empty string or number", idField),
+				Message: err.Error(),
 			})
 			hadError = true
 			continue

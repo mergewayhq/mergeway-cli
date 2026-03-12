@@ -22,7 +22,6 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 	}
 
 	seenIDs := make(map[string]struct{})
-	idField := typeDef.Identifier.Field
 	var objects []*Object
 	for _, match := range matches {
 		fc, err := s.loadFile(match.path, typeDef.Name, match.include.Selector)
@@ -34,9 +33,13 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 			return nil, fmt.Errorf("data: file %s declares type %s; expected %s", fc.Path, fc.TypeName, typeDef.Name)
 		}
 
+		if fc.Multi && typeDef.Identifier.IsPath() {
+			return nil, fmt.Errorf("data: %s uses identifier %q, but file %s contains multiple objects", typeDef.Name, config.PathIdentifierField, fc.Path)
+		}
+
 		if fc.Multi {
 			for _, item := range fc.Items {
-				idVal, err := requiredString(item, idField)
+				idVal, _, err := deriveIdentifierValue(typeDef, item, fc.Path, s.root)
 				if err != nil {
 					return nil, fmt.Errorf("data: %s in %s: %w", typeDef.Name, fc.Path, err)
 				}
@@ -52,7 +55,7 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 			continue
 		}
 
-		idVal, err := requiredString(fc.Single, idField)
+		idVal, _, err := deriveIdentifierValue(typeDef, fc.Single, fc.Path, s.root)
 		if err != nil {
 			return nil, fmt.Errorf("data: %s in %s: %w", typeDef.Name, fc.Path, err)
 		}
@@ -68,7 +71,7 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 	}
 
 	for idx, item := range typeDef.InlineData {
-		idVal, err := requiredString(item, idField)
+		idVal, _, err := deriveIdentifierValue(typeDef, item, "", s.root)
 		if err != nil {
 			return nil, fmt.Errorf("data: %s inline item %d: %w", typeDef.Name, idx+1, err)
 		}
@@ -94,8 +97,6 @@ func (s *Store) findObject(typeDef *config.TypeDefinition, id string) (*objectLo
 		return nil, err
 	}
 
-	idField := typeDef.Identifier.Field
-
 	for _, match := range matches {
 		fc, err := s.loadFile(match.path, typeDef.Name, match.include.Selector)
 		if err != nil {
@@ -109,19 +110,26 @@ func (s *Store) findObject(typeDef *config.TypeDefinition, id string) (*objectLo
 			return nil, fmt.Errorf("data: file %s declares type %s; expected %s", fc.Path, fc.TypeName, typeDef.Name)
 		}
 
+		if fc.Multi && typeDef.Identifier.IsPath() {
+			return nil, fmt.Errorf("data: %s uses identifier %q, but file %s contains multiple objects", typeDef.Name, config.PathIdentifierField, fc.Path)
+		}
+
 		if fc.Multi {
 			for idx, item := range fc.Items {
-				val, _ := getString(item, idField)
+				val, _, err := deriveIdentifierValue(typeDef, item, fc.Path, s.root)
+				if err != nil {
+					return nil, fmt.Errorf("data: %s in %s: %w", typeDef.Name, fc.Path, err)
+				}
 				if val == id {
 					return &objectLocation{
 						FilePath: match.path,
 						Format:   fc.Format,
 						Multi:    true,
 						Index:    idx,
+						ID:       val,
 						Object:   cloneMap(item),
 						File:     fc,
 						TypeName: typeDef.Name,
-						IDField:  idField,
 						ReadOnly: fc.ReadOnly,
 					}, nil
 				}
@@ -129,23 +137,26 @@ func (s *Store) findObject(typeDef *config.TypeDefinition, id string) (*objectLo
 			continue
 		}
 
-		val, _ := getString(fc.Single, idField)
+		val, _, err := deriveIdentifierValue(typeDef, fc.Single, fc.Path, s.root)
+		if err != nil {
+			return nil, fmt.Errorf("data: %s in %s: %w", typeDef.Name, fc.Path, err)
+		}
 		if val == id {
 			return &objectLocation{
 				FilePath: match.path,
 				Format:   fc.Format,
 				Multi:    false,
+				ID:       val,
 				Object:   cloneMap(fc.Single),
 				File:     fc,
 				TypeName: typeDef.Name,
-				IDField:  idField,
 				ReadOnly: fc.ReadOnly,
 			}, nil
 		}
 	}
 
 	for idx, item := range typeDef.InlineData {
-		val, err := requiredString(item, idField)
+		val, _, err := deriveIdentifierValue(typeDef, item, "", s.root)
 		if err != nil {
 			return nil, fmt.Errorf("data: %s inline item %d: %w", typeDef.Name, idx+1, err)
 		}
@@ -155,10 +166,10 @@ func (s *Store) findObject(typeDef *config.TypeDefinition, id string) (*objectLo
 				Format:   formatYAML,
 				Multi:    false,
 				Index:    -1,
+				ID:       val,
 				Object:   cloneMap(item),
 				File:     nil,
 				TypeName: typeDef.Name,
-				IDField:  idField,
 				Inline:   true,
 			}, nil
 		}

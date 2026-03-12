@@ -84,9 +84,9 @@ entities:
         name: Tools Team
 ```
 
-`identifier` accepts either a plain string (e.g., `identifier: id`) or a mapping with `field`, optional `generated`, and `pattern` keys when you need additional behavior. The `generated` flag is advisory for tooling; the CLI still expects identifiers to be supplied (inline or via `--id`). Field entries also accept the shorthand `field: type` when no other metadata is needed; these default to optional fields.
+`identifier` accepts either a plain string field name (for example `identifier: id`), the reserved `$path` value to use the workspace-relative file path as the identifier, or a mapping with `field`, optional `generated`, and `pattern` keys when you need additional behavior. The `generated` flag is advisory for tooling; the CLI still expects identifiers to be supplied (inline or via `--id`). `$path` identifiers require one object per file and cannot be combined with inline `data`. Field entries also accept the shorthand `field: type` when no other metadata is needed; these default to optional fields.
 
-Inline records declared under `data` are optional and most useful for tiny lookup sets or bootstrapping demos without creating separate files.
+Inline records declared under `data` are optional and most useful for tiny lookup sets or bootstrapping demos without creating separate files. Types that use `identifier: $path` cannot declare inline data because the identifier is derived from the backing file path.
 
 ### Field Specification
 
@@ -131,9 +131,9 @@ include:
     selector: "$.users[*]"
 ```
 
-Without a selector, Mergeway treats the entire file as one object (falling back to an `items:` array when present). With `selector`, each match needs to be an object; the CLI surfaces an error otherwise.
+Without a selector, Mergeway treats the entire file as one object (falling back to an `items:` array when present). With `selector`, each match needs to be an object; the CLI surfaces an error otherwise. When `identifier: $path` is enabled, each matched file must yield exactly one object; files with `items:` arrays or selectors that return multiple objects are rejected.
 
-Inline data defined within the schema participates in validation and read operations just like file-backed records. When both inline and file data supply the same identifier, the file-sourced record wins. Inline data is intentionally immutable at runtime; mutating commands continue to operate on disk files only.
+Inline data defined within the schema participates in validation and read operations just like file-backed records. When both inline and file data supply the same identifier, the file-sourced record wins. Inline data is intentionally immutable at runtime; mutating commands continue to operate on disk files only. Types using `identifier: $path` cannot declare inline data because inline records do not have file paths.
 
 ```yaml
 # multi-object file example

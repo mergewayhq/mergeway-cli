@@ -34,9 +34,11 @@ type Error struct {
 type rawObject struct {
 	typeDef *config.TypeDefinition
 	file    string
+	source  string
 	index   int
 	data    map[string]any
 	id      string
+	inline  bool
 }
 
 type typeObjects struct {

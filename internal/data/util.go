@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/mergewayhq/mergeway-cli/internal/config"
 	"github.com/mergewayhq/mergeway-cli/internal/scalar"
 )
 
@@ -173,16 +174,21 @@ func mergeMaps(dst map[string]any, src map[string]any) {
 
 func cleanFields(fields map[string]any) map[string]any {
 	data := cloneMap(fields)
-	removeTypeKeys(data)
+	removeSystemKeys(data)
 	return data
 }
 
 func removeTypeKeys(m map[string]any) {
+	removeSystemKeys(m)
+}
+
+func removeSystemKeys(m map[string]any) {
 	if m == nil {
 		return
 	}
 	delete(m, "type")
 	delete(m, "Type")
+	delete(m, config.PathIdentifierField)
 }
 
 func sanitizeFilename(value string) string {

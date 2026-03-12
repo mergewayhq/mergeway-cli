@@ -48,10 +48,10 @@ type objectLocation struct {
 	Format   fileFormat
 	Multi    bool
 	Index    int
+	ID       string
 	Object   map[string]any
 	File     *fileContent
 	TypeName string
-	IDField  string
 	Inline   bool
 	ReadOnly bool
 }
@@ -60,10 +60,9 @@ func (loc *objectLocation) cloneObject() *Object {
 	if loc == nil {
 		return nil
 	}
-	id, _ := getString(loc.Object, loc.IDField)
 	return &Object{
 		Type:     loc.TypeName,
-		ID:       id,
+		ID:       loc.ID,
 		Fields:   cloneMap(loc.Object),
 		File:     loc.FilePath,
 		Inline:   loc.Inline,

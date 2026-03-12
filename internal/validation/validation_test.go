@@ -143,6 +143,40 @@ func TestValidateAllowsNumericIdentifiers(t *testing.T) {
 	}
 }
 
+func TestValidateAllowsPathIdentifiers(t *testing.T) {
+	root := fixturePath(t, "path_identifier")
+	cfg := loadConfig(t, root)
+
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+
+	if len(res.Errors) != 0 {
+		t.Fatalf("expected no errors, got %v", res.Errors)
+	}
+}
+
+func TestValidateRejectsPathIdentifierMultiObjectFiles(t *testing.T) {
+	root := fixturePath(t, "path_identifier_multi")
+	cfg := loadConfig(t, root)
+
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+
+	if len(res.Errors) != 1 {
+		t.Fatalf("expected 1 error, got %v", res.Errors)
+	}
+	if res.Errors[0].Phase != PhaseSchema {
+		t.Fatalf("expected schema error, got %s", res.Errors[0].Phase)
+	}
+	if !strings.Contains(res.Errors[0].Message, "cannot be used with files containing multiple objects") {
+		t.Fatalf("expected path identifier multi-object error, got %v", res.Errors[0])
+	}
+}
+
 func TestValidateFieldConstraints(t *testing.T) {
 	root := fixturePath(t, "field_constraints")
 	cfg := loadConfig(t, root)

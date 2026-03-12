@@ -141,7 +141,13 @@ func newCreateCommand() *cobra.Command {
 				return newExitError(1)
 			}
 
-			if idFlag != "" {
+			if typeDef.Identifier.IsPath() {
+				if idFlag == "" {
+					_, _ = fmt.Fprintf(ctx.Stderr, "create: --id is required when %s uses identifier %s\n", typeName, typeDef.Identifier.Field)
+					return newExitError(1)
+				}
+				payload[typeDef.Identifier.Field] = idFlag
+			} else if idFlag != "" {
 				idField := typeDef.Identifier.Field
 				if idField == "" {
 					idField = "id"

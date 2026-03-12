@@ -33,6 +33,8 @@ Output:
 post-001
 ```
 
+If an entity uses `identifier: $path`, the output contains workspace-relative file paths such as `data/notes/alpha.yaml`.
+
 Filter by author:
 
 ```bash
