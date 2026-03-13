@@ -1,0 +1,29 @@
+mergeway:
+  version: 1
+
+entities:
+  OrderLine:
+    description: Order lines that reference products by file path
+    identifier: id
+    include:
+      - data/order-lines/*.yaml
+    fields:
+      id:
+        type: integer
+        required: true
+      product_id:
+        type: Product
+        required: true
+      quantity:
+        type: integer
+        required: true
+
+  Product:
+    description: Products loaded from a sibling directory and identified by their file paths
+    identifier: $path
+    include:
+      - ../secondary/products/*.yaml
+    fields:
+      name:
+        type: string
+        required: true
