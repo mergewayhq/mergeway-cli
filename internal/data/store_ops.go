@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+
+	"github.com/mergewayhq/mergeway-cli/internal/config"
 )
 
 // List returns sorted identifiers for the specified type.
@@ -33,6 +35,10 @@ func (s *Store) Get(typeName, id string) (*Object, error) {
 		return nil, errors.New("data: id is required")
 	}
 	typeDef, err := s.requireType(typeName)
+	if err != nil {
+		return nil, err
+	}
+	id, err = normalizeLookupID(typeDef, id)
 	if err != nil {
 		return nil, err
 	}
@@ -148,6 +154,10 @@ func (s *Store) Update(typeName, id string, fields map[string]any, merge bool) (
 	if err != nil {
 		return nil, err
 	}
+	id, err = normalizeLookupID(typeDef, id)
+	if err != nil {
+		return nil, err
+	}
 
 	loc, err := s.findObject(typeDef, id)
 	if err != nil {
@@ -161,6 +171,9 @@ func (s *Store) Update(typeName, id string, fields map[string]any, merge bool) (
 	}
 	if loc.ReadOnly {
 		return nil, fmt.Errorf("data: %s %q is sourced via selector include and cannot be modified", typeName, id)
+	}
+	if err := s.ensureWorkspaceWritablePath(typeDef, id, loc.FilePath); err != nil {
+		return nil, err
 	}
 
 	updated := cloneMap(loc.Object)
@@ -218,6 +231,10 @@ func (s *Store) Delete(typeName, id string) error {
 	if err != nil {
 		return err
 	}
+	id, err = normalizeLookupID(typeDef, id)
+	if err != nil {
+		return err
+	}
 
 	loc, err := s.findObject(typeDef, id)
 	if err != nil {
@@ -232,6 +249,9 @@ func (s *Store) Delete(typeName, id string) error {
 	if loc.ReadOnly {
 		return fmt.Errorf("data: %s %q is sourced via selector include and cannot be modified", typeName, id)
 	}
+	if err := s.ensureWorkspaceWritablePath(typeDef, id, loc.FilePath); err != nil {
+		return err
+	}
 
 	if loc.Multi {
 		items := loc.File.Items
@@ -243,4 +263,29 @@ func (s *Store) Delete(typeName, id string) error {
 	}
 
 	return s.removeFile(loc.FilePath)
+}
+
+func normalizeLookupID(typeDef *config.TypeDefinition, id string) (string, error) {
+	if typeDef == nil || !typeDef.Identifier.IsPath() {
+		return id, nil
+	}
+	return normalizeDiscoveredPathIdentifier(id)
+}
+
+func (s *Store) ensureWorkspaceWritablePath(typeDef *config.TypeDefinition, id, path string) error {
+	if typeDef == nil || !typeDef.Identifier.IsPath() || path == "" {
+		return nil
+	}
+
+	ok, err := pathWithinRoot(s.root, path)
+	if err != nil {
+		return err
+	}
+	if ok {
+		return nil
+	}
+
+	// External-root records stay readable for debugging and export, but write
+	// commands remain workspace-scoped so they do not modify sibling trees.
+	return fmt.Errorf("data: %s %q lives outside the workspace root and cannot be modified", typeDef.Name, id)
 }

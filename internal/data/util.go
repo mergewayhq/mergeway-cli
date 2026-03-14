@@ -201,3 +201,19 @@ func replaceGlob(pattern, value string) string {
 	}
 	return pattern
 }
+
+func pathWithinRoot(root, path string) (bool, error) {
+	absPath := path
+	if !filepath.IsAbs(absPath) {
+		absPath = filepath.Join(root, path)
+	}
+
+	rel, err := filepath.Rel(root, absPath)
+	if err != nil {
+		return false, fmt.Errorf("data: resolve path %s: %w", path, err)
+	}
+	if rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return false, nil
+	}
+	return true, nil
+}

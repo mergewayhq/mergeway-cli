@@ -93,6 +93,8 @@ items:
 - Object identifiers use alphanumeric characters, hyphens, or underscores.
 - Identifiers are unique per type, so different types may reuse the same string.
 - Preserve case when naming files to match the identifier.
+- When a type uses `identifier: $path`, Mergeway derives the identifier from the file path relative to the workspace root. If an include points to a sibling directory, the identifier may therefore contain `../...`.
+- External-root `$path` records are readable and exportable, but write commands remain limited to files inside the workspace root.
 
 ## Cross-Type References
 

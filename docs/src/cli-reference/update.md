@@ -41,6 +41,8 @@ Run `mergeway-cli validate` after significant updates to confirm references stil
 
 For entities that use `identifier: $path`, pass the workspace-relative file path to `--id`, for example `mergeway-cli update --type Note --id data/notes/alpha.yaml --file note.yaml --merge`.
 
+If the resolved record lives outside the workspace root, `update` rejects it. External-root `$path` records are intentionally read-only through the CLI even though they can still be listed, fetched, validated, and exported.
+
 ## Related Commands
 
 - [`mergeway-cli create`](create.md) — add new objects.

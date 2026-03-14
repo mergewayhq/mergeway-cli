@@ -35,6 +35,8 @@ mergeway-cli --format json export --output snapshot.json User Post
 
 Each top-level key in the output map is the entity name; the value is an array of records sorted by ID.
 
+Entities that use `identifier: $path` can also be exported when their include paths point outside the workspace root. In that case the record IDs still resolve from those external file paths, but the exported payload contains only the object fields.
+
 ## Related Commands
 
 - [`mergeway-cli list`](list.md) — inspect available identifiers before exporting.

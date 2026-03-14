@@ -33,7 +33,7 @@ Output:
 post-001
 ```
 
-If an entity uses `identifier: $path`, the output contains workspace-relative file paths such as `data/notes/alpha.yaml`.
+If an entity uses `identifier: $path`, the output contains workspace-relative file paths such as `data/notes/alpha.yaml`. When the entity reads files from outside the workspace root, the identifier may contain `../...`, for example `../secondary/products/widget.yaml`.
 
 Filter by author:
 

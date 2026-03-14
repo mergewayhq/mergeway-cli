@@ -320,6 +320,58 @@ func TestStorePathIdentifiers(t *testing.T) {
 	}
 }
 
+func TestStoreExternalPathIdentifiersAreReadable(t *testing.T) {
+	store, _ := setupExternalRootPathStore(t)
+
+	ids, err := store.List("Product")
+	if err != nil {
+		t.Fatalf("List returned error: %v", err)
+	}
+
+	expected := []string{
+		"../secondary/products/gadget.yaml",
+		"../secondary/products/widget.yaml",
+	}
+	if !reflect.DeepEqual(ids, expected) {
+		t.Fatalf("expected IDs %v, got %v", expected, ids)
+	}
+
+	obj, err := store.Get("Product", "../secondary/products/widget.yaml")
+	if err != nil {
+		t.Fatalf("Get returned error: %v", err)
+	}
+	if obj.ID != "../secondary/products/widget.yaml" {
+		t.Fatalf("expected external path identifier, got %q", obj.ID)
+	}
+	if obj.Fields["name"] != "Widget" {
+		t.Fatalf("expected product name Widget, got %v", obj.Fields["name"])
+	}
+}
+
+func TestStoreExternalPathIdentifiersRejectWrites(t *testing.T) {
+	store, _ := setupExternalRootPathStore(t)
+
+	_, err := store.Create("Product", map[string]any{
+		"$path": "../secondary/products/new.yaml",
+		"name":  "New",
+	})
+	if err == nil || !strings.Contains(err.Error(), "must stay within the workspace root") {
+		t.Fatalf("expected create to reject external path, got %v", err)
+	}
+
+	_, err = store.Update("Product", "../secondary/products/widget.yaml", map[string]any{
+		"name": "Widget Updated",
+	}, true)
+	if err == nil || !strings.Contains(err.Error(), "outside the workspace root and cannot be modified") {
+		t.Fatalf("expected update to reject external path, got %v", err)
+	}
+
+	err = store.Delete("Product", "../secondary/products/widget.yaml")
+	if err == nil || !strings.Contains(err.Error(), "outside the workspace root and cannot be modified") {
+		t.Fatalf("expected delete to reject external path, got %v", err)
+	}
+}
+
 func TestStoreRejectsPathIdentifierMultiObjectFile(t *testing.T) {
 	repo := t.TempDir()
 	cfgBody := `mergeway:
@@ -481,4 +533,78 @@ func copyRepo(t *testing.T, fixture string) string {
 	}
 
 	return dest
+}
+
+func setupExternalRootPathStore(t *testing.T) (*Store, string) {
+	t.Helper()
+	root := externalRootPathRepo(t)
+
+	cfg, err := config.Load(filepath.Join(root, "mergeway.yaml"))
+	if err != nil {
+		t.Fatalf("load config: %v", err)
+	}
+
+	store, err := NewStore(root, cfg)
+	if err != nil {
+		t.Fatalf("new store: %v", err)
+	}
+
+	return store, root
+}
+
+func externalRootPathRepo(t *testing.T) string {
+	t.Helper()
+	base := t.TempDir()
+	primary := filepath.Join(base, "primary")
+	secondary := filepath.Join(base, "secondary")
+
+	if err := os.MkdirAll(filepath.Join(primary, "data", "order-lines"), 0o755); err != nil {
+		t.Fatalf("create primary data dir: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(secondary, "products"), 0o755); err != nil {
+		t.Fatalf("create secondary data dir: %v", err)
+	}
+
+	configBody := `mergeway:
+  version: 1
+
+entities:
+  OrderLine:
+    identifier: id
+    include:
+      - data/order-lines/*.yaml
+    fields:
+      id:
+        type: integer
+        required: true
+      product_id:
+        type: Product
+        required: true
+      quantity:
+        type: integer
+        required: true
+
+  Product:
+    identifier: $path
+    include:
+      - ../secondary/products/*.yaml
+    fields:
+      name:
+        type: string
+        required: true
+`
+	if err := os.WriteFile(filepath.Join(primary, "mergeway.yaml"), []byte(configBody), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(primary, "data", "order-lines", "line-1001.yaml"), []byte("id: 1001\nproduct_id: ../secondary/products/widget.yaml\nquantity: 2\n"), 0o644); err != nil {
+		t.Fatalf("write order line: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(secondary, "products", "widget.yaml"), []byte("name: Widget\n"), 0o644); err != nil {
+		t.Fatalf("write widget: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(secondary, "products", "gadget.yaml"), []byte("name: Gadget\n"), 0o644); err != nil {
+		t.Fatalf("write gadget: %v", err)
+	}
+
+	return primary
 }

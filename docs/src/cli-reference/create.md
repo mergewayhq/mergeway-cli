@@ -40,6 +40,8 @@ The command writes `data/users/user-bob.yaml` with the provided fields. Remove t
 
 When an entity uses `identifier: $path`, pass the target file path with `--id`, for example `--id data/notes/alpha.yaml`. Mergeway uses that workspace-relative path as the object ID and does not persist a `$path` field into the file.
 
+`create` only writes inside the workspace root. If a type loads records from an external path such as `../secondary/products/*.yaml`, you can still list, get, validate, and export those records, but `create` will reject IDs that point outside the workspace root.
+
 ## Related Commands
 
 - [`mergeway-cli update`](update.md) — modify an existing object.

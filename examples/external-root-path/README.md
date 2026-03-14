@@ -7,6 +7,7 @@ This example shows a workspace whose main `mergeway.yaml` file lives in `primary
 - `Product` records loaded from `../secondary/products/*.yaml`
 - `$path` identifiers for externally stored records
 - An `OrderLine.product_id` reference whose value is the product file path
+- Read-only inspection and export of external-root records
 
 ## Layout
 - `examples/external-root-path/primary/mergeway.yaml` defines both entities
@@ -21,11 +22,20 @@ Because `Product` uses `identifier: $path`, the reference value stored in `Order
 product_id: ../secondary/products/widget.yaml
 ```
 
+## Write behavior
+
+`Product` records can be listed, fetched, validated, and exported from the `primary/` workspace even though their files live in `secondary/`.
+
+Create, update, and delete remain blocked for those external-root `Product` files. Those commands only modify files that live inside the workspace root, which avoids accidental writes into sibling directories.
+
 ## Try It
 
 ```bash
+mergeway-cli --root examples/external-root-path/primary list --type Product
 mergeway-cli --root examples/external-root-path/primary --format yaml entity show Product
+mergeway-cli --root examples/external-root-path/primary get --type Product ../secondary/products/widget.yaml
 mergeway-cli --root examples/external-root-path/primary get --type OrderLine 1001
+mergeway-cli --root examples/external-root-path/primary --format json export Product
 mergeway-cli --root examples/external-root-path/primary validate
 ```
 

@@ -202,6 +202,8 @@ body: |
 
 You can store one object per file (as above) or provide an `items:` array to keep several objects together. Mergeway removes any top-level `type` key before validating the record, so referencing the same file from multiple entities requires the selector approach described below. If a type uses `identifier: $path`, each file must contain exactly one object; `items:` arrays are rejected.
 
+For `$path` identifiers, Mergeway normally derives IDs relative to the workspace root, for example `data/notes/alpha.yaml`. If an entity include points outside the workspace root, the derived ID may contain `../...`, for example `../secondary/products/widget.yaml`. Those external-root records can still be listed, fetched, validated, and exported, but `create`, `update`, and `delete` remain limited to files inside the workspace root.
+
 JSONPath selectors let you extract objects from nested structures—handy when you need to read a subset of a larger document. For example, `selector: "$.users[*]"` walks through the `users` array in a JSON file and emits one record per element. Mergeway validates that the selector returns objects; any other shape triggers a format error.
 
 Identifier fields accept numeric payloads as well. For example, the following record is valid when the schema marks `id` as an `integer`:
@@ -219,5 +221,6 @@ name: Numeric Identifier
 - Run `mergeway-cli validate` after every change to catch problems immediately.
 
 See `examples/reference-union` for a minimal runnable workspace that demonstrates `User | Team`.
+See `examples/external-root-path` for a minimal runnable workspace that demonstrates external-root `$path` identifiers.
 
 Need more context? Return to the [Basic Concepts](./README.md) page for the bigger picture.

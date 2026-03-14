@@ -41,6 +41,8 @@ For path-based identifiers, delete by file path:
 mergeway-cli --yes delete --type Note data/notes/alpha.yaml
 ```
 
+Like `create` and `update`, `delete` only operates on files inside the workspace root. If a `$path` record comes from an external include such as `../secondary/products/widget.yaml`, you can inspect and export it, but `delete` will reject that identifier.
+
 ## Related Commands
 
 - [`mergeway-cli list`](list.md) — confirm an object’s identifier before deleting.

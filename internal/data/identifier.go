@@ -17,7 +17,7 @@ func deriveIdentifierValue(typeDef *config.TypeDefinition, fields map[string]any
 		return "", nil, fmt.Errorf("data: type definition is required")
 	}
 	if typeDef.Identifier.IsPath() {
-		id, err := relativePathIdentifier(root, sourcePath)
+		id, err := relativePathIdentifier(root, sourcePath, true)
 		if err != nil {
 			return "", nil, err
 		}
@@ -87,6 +87,14 @@ func extractIdentifierValue(typeDef *config.TypeDefinition, fields map[string]an
 }
 
 func normalizePathIdentifier(value string) (string, error) {
+	return normalizeRelativePathIdentifier(value, false)
+}
+
+func normalizeDiscoveredPathIdentifier(value string) (string, error) {
+	return normalizeRelativePathIdentifier(value, true)
+}
+
+func normalizeRelativePathIdentifier(value string, allowParent bool) (string, error) {
 	value = strings.TrimSpace(value)
 	if value == "" {
 		return "", fmt.Errorf("field %q must be a non-empty string", config.PathIdentifierField)
@@ -98,13 +106,13 @@ func normalizePathIdentifier(value string) (string, error) {
 	if cleaned == "." || cleaned == "" {
 		return "", fmt.Errorf("field %q must be a non-empty string", config.PathIdentifierField)
 	}
-	if cleaned == ".." || strings.HasPrefix(cleaned, ".."+string(filepath.Separator)) {
+	if !allowParent && (cleaned == ".." || strings.HasPrefix(cleaned, ".."+string(filepath.Separator))) {
 		return "", fmt.Errorf("field %q must stay within the workspace root", config.PathIdentifierField)
 	}
 	return filepath.ToSlash(cleaned), nil
 }
 
-func relativePathIdentifier(root, path string) (string, error) {
+func relativePathIdentifier(root, path string, allowParent bool) (string, error) {
 	if path == "" {
 		return "", fmt.Errorf("data: identifier %q requires a file-backed object", config.PathIdentifierField)
 	}
@@ -115,6 +123,11 @@ func relativePathIdentifier(root, path string) (string, error) {
 	rel, err := filepath.Rel(root, absPath)
 	if err != nil {
 		return "", fmt.Errorf("data: resolve identifier path for %s: %w", path, err)
+	}
+	// File-backed records may live outside the workspace root via external
+	// include paths, so read-only commands need to preserve "../..." IDs.
+	if allowParent {
+		return normalizeDiscoveredPathIdentifier(rel)
 	}
 	return normalizePathIdentifier(rel)
 }

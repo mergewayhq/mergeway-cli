@@ -609,6 +609,85 @@ func TestCreatePathIdentifierRequiresID(t *testing.T) {
 	}
 }
 
+func TestExternalPathIdentifierReadCommands(t *testing.T) {
+	repo := externalRootPathRepo(t)
+
+	listOut := &bytes.Buffer{}
+	listErr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "list", "--type", "Product"}, listOut, listErr)
+	if code != 0 {
+		t.Fatalf("list exit %d stderr %s", code, listErr.String())
+	}
+	if !strings.Contains(listOut.String(), "../secondary/products/gadget.yaml") || !strings.Contains(listOut.String(), "../secondary/products/widget.yaml") {
+		t.Fatalf("expected external path identifiers in list output, got %s", listOut.String())
+	}
+
+	getOut := &bytes.Buffer{}
+	getErr := &bytes.Buffer{}
+	code = Run([]string{"--root", repo, "get", "--type", "Product", "../secondary/products/widget.yaml"}, getOut, getErr)
+	if code != 0 {
+		t.Fatalf("get exit %d stderr %s", code, getErr.String())
+	}
+	if !strings.Contains(getOut.String(), "name: Widget") {
+		t.Fatalf("expected product payload, got %s", getOut.String())
+	}
+
+	exportOut := &bytes.Buffer{}
+	exportErr := &bytes.Buffer{}
+	code = Run([]string{"--root", repo, "--format", "json", "export", "Product"}, exportOut, exportErr)
+	if code != 0 {
+		t.Fatalf("export exit %d stderr %s", code, exportErr.String())
+	}
+
+	var payload map[string][]map[string]any
+	if err := json.Unmarshal(exportOut.Bytes(), &payload); err != nil {
+		t.Fatalf("parse export: %v", err)
+	}
+	products := payload["Product"]
+	if len(products) != 2 {
+		t.Fatalf("expected 2 exported products, got %d", len(products))
+	}
+}
+
+func TestExternalPathIdentifierWriteCommandsRejected(t *testing.T) {
+	repo := externalRootPathRepo(t)
+
+	payload := filepath.Join(t.TempDir(), "product.yaml")
+	if err := os.WriteFile(payload, []byte("name: New Product\n"), 0o644); err != nil {
+		t.Fatalf("write payload: %v", err)
+	}
+
+	createOut := &bytes.Buffer{}
+	createErr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "create", "--type", "Product", "--file", payload, "--id", "../secondary/products/new.yaml"}, createOut, createErr)
+	if code == 0 {
+		t.Fatalf("expected create to reject external path")
+	}
+	if !strings.Contains(createErr.String(), "must stay within the workspace root") {
+		t.Fatalf("expected external create error, got %s", createErr.String())
+	}
+
+	updateOut := &bytes.Buffer{}
+	updateErr := &bytes.Buffer{}
+	code = Run([]string{"--root", repo, "update", "--type", "Product", "--id", "../secondary/products/widget.yaml", "--file", payload, "--merge"}, updateOut, updateErr)
+	if code == 0 {
+		t.Fatalf("expected update to reject external path")
+	}
+	if !strings.Contains(updateErr.String(), "outside the workspace root and cannot be modified") {
+		t.Fatalf("expected external update error, got %s", updateErr.String())
+	}
+
+	deleteOut := &bytes.Buffer{}
+	deleteErr := &bytes.Buffer{}
+	code = Run([]string{"--root", repo, "--yes", "delete", "--type", "Product", "../secondary/products/widget.yaml"}, deleteOut, deleteErr)
+	if code == 0 {
+		t.Fatalf("expected delete to reject external path")
+	}
+	if !strings.Contains(deleteErr.String(), "outside the workspace root and cannot be modified") {
+		t.Fatalf("expected external delete error, got %s", deleteErr.String())
+	}
+}
+
 func TestConfigLintCommand(t *testing.T) {
 	repo := copyFixture(t)
 	stdout := &bytes.Buffer{}
@@ -870,6 +949,63 @@ entities:
 		t.Fatalf("write seed note: %v", err)
 	}
 	return root
+}
+
+func externalRootPathRepo(t *testing.T) string {
+	t.Helper()
+	base := t.TempDir()
+	primary := filepath.Join(base, "primary")
+	secondary := filepath.Join(base, "secondary")
+
+	if err := os.MkdirAll(filepath.Join(primary, "data", "order-lines"), 0o755); err != nil {
+		t.Fatalf("create primary data dir: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(secondary, "products"), 0o755); err != nil {
+		t.Fatalf("create secondary data dir: %v", err)
+	}
+
+	config := `mergeway:
+  version: 1
+
+entities:
+  OrderLine:
+    identifier: id
+    include:
+      - data/order-lines/*.yaml
+    fields:
+      id:
+        type: integer
+        required: true
+      product_id:
+        type: Product
+        required: true
+      quantity:
+        type: integer
+        required: true
+
+  Product:
+    identifier: $path
+    include:
+      - ../secondary/products/*.yaml
+    fields:
+      name:
+        type: string
+        required: true
+`
+	if err := os.WriteFile(filepath.Join(primary, "mergeway.yaml"), []byte(config), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(primary, "data", "order-lines", "line-1001.yaml"), []byte("id: 1001\nproduct_id: ../secondary/products/widget.yaml\nquantity: 2\n"), 0o644); err != nil {
+		t.Fatalf("write order line: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(secondary, "products", "widget.yaml"), []byte("name: Widget\n"), 0o644); err != nil {
+		t.Fatalf("write widget: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(secondary, "products", "gadget.yaml"), []byte("name: Gadget\n"), 0o644); err != nil {
+		t.Fatalf("write gadget: %v", err)
+	}
+
+	return primary
 }
 
 func withStdin(t *testing.T, input string, fn func()) {
