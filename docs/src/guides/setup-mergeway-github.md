@@ -80,7 +80,7 @@ Key considerations:
 
 ## 4. Keep Versions Predictable
 
-GrainBox pins versions for long-lived branches by replacing `@latest` with a tag (e.g., `@v0.3.0`) or by caching the binary. Matching versions between local machines and CI prevents "works on my laptop" formatting diffs.
+GrainBox pins versions for long-lived branches by replacing `@latest` with a tag (e.g., `@v1.2.3`) or by caching the binary. Matching versions between local machines and CI prevents "works on my laptop" formatting diffs.
 
 Once the workflow and CODEOWNERS file land in the default branch, any pull request that touches Mergeway files will:
 
