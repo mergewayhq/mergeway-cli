@@ -96,3 +96,44 @@ func TestPrepareERDData_NoEdges(t *testing.T) {
 		t.Errorf("Expected 0 edges, got %d", len(data.Edges))
 	}
 }
+
+func TestPrepareERDData_ReferenceUnion(t *testing.T) {
+	cfg := &config.Config{
+		Types: map[string]*config.TypeDefinition{
+			"Activity": {
+				Name: "Activity",
+				Fields: map[string]*config.FieldDefinition{
+					"ID": {Type: "string"},
+					"Owner": {
+						Type:           "User | Team",
+						ReferenceTypes: []string{"User", "Team"},
+					},
+				},
+			},
+			"Team": {
+				Name: "Team",
+				Fields: map[string]*config.FieldDefinition{
+					"ID": {Type: "string"},
+				},
+			},
+			"User": {
+				Name: "User",
+				Fields: map[string]*config.FieldDefinition{
+					"ID": {Type: "string"},
+				},
+			},
+		},
+	}
+
+	data := prepareERDData(cfg)
+	if len(data.Edges) != 2 {
+		t.Fatalf("Expected 2 edges, got %d", len(data.Edges))
+	}
+
+	if got := data.Edges[0]; got.Source != "Activity" || got.Target != "Team" || got.Label != "Owner" {
+		t.Fatalf("Unexpected first edge: %+v", got)
+	}
+	if got := data.Edges[1]; got.Source != "Activity" || got.Target != "User" || got.Label != "Owner" {
+		t.Fatalf("Unexpected second edge: %+v", got)
+	}
+}

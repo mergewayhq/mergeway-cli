@@ -149,11 +149,11 @@ func prepareERDData(cfg *config.Config) erdData {
 		for fName, fDef := range def.Fields {
 			fields = append(fields, erdField{Name: fName, Type: fDef.Type})
 
-			// Infer edges
-			if _, ok := typeNames[fDef.Type]; ok {
+			// Infer edges from direct references and reference unions.
+			for _, refType := range erdReferenceTargets(fDef, typeNames) {
 				edges = append(edges, erdEdge{
 					Source: name,
-					Target: fDef.Type,
+					Target: refType,
 					Label:  fName,
 				})
 			}
@@ -187,4 +187,36 @@ func prepareERDData(cfg *config.Config) erdData {
 	})
 
 	return erdData{Types: types, Edges: edges}
+}
+
+func erdReferenceTargets(field *config.FieldDefinition, typeNames map[string]struct{}) []string {
+	if field == nil {
+		return nil
+	}
+
+	if len(field.ReferenceTypes) > 0 {
+		return append([]string(nil), field.ReferenceTypes...)
+	}
+
+	// Fallback for synthetic configs used in tests that omit normalized reference metadata.
+	if _, ok := typeNames[field.Type]; ok {
+		return []string{field.Type}
+	}
+
+	parts := strings.Split(field.Type, "|")
+	if len(parts) < 2 {
+		return nil
+	}
+
+	targets := make([]string, 0, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if _, ok := typeNames[part]; ok {
+			targets = append(targets, part)
+		}
+	}
+	if len(targets) != len(parts) {
+		return nil
+	}
+	return targets
 }

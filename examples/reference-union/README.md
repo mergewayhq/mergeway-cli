@@ -15,3 +15,6 @@ mergeway-cli --root examples/reference-union --format yaml entity show Activity
 mergeway-cli --root examples/reference-union list --type Activity
 mergeway-cli --root examples/reference-union validate
 ```
+
+## Diagram
+![ERD](./erd.png)
