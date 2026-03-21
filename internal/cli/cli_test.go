@@ -152,6 +152,34 @@ func TestValidateCommand(t *testing.T) {
 	}
 }
 
+func TestValidateCommandReturnsNonZeroOnValidationErrors(t *testing.T) {
+	repo := copyFixture(t)
+	target := filepath.Join(repo, "data", "posts", "one.yaml")
+	content := `type: Post
+items:
+  - id: Post-1
+    title: First Post
+    author: User-Missing
+    tags:
+      - Tag-One
+`
+	if err := os.WriteFile(target, []byte(content), 0o644); err != nil {
+		t.Fatalf("write invalid post: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "validate"}, stdout, stderr)
+	if code == 0 {
+		t.Fatalf("expected validate to fail, stdout %s stderr %s", stdout.String(), stderr.String())
+	}
+
+	if !strings.Contains(stdout.String(), "references missing User") {
+		t.Fatalf("expected validation error in stdout, got %s", stdout.String())
+	}
+}
+
 func TestConfigExport(t *testing.T) {
 	repo := copyFixture(t)
 	stdout := &bytes.Buffer{}

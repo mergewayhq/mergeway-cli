@@ -44,7 +44,7 @@ func newValidateCommand() *cobra.Command {
 			if code := writeFormatted(ctx, result.Errors); code != 0 {
 				return newExitError(code)
 			}
-			return nil
+			return newExitError(1)
 		},
 	}
 
