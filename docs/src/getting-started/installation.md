@@ -9,10 +9,10 @@ Pick the method that fits your setup. You can install a local `mergeway-cli` bin
 
 ## Option 1 – Download a Release (macOS, Linux)
 
-Use the pre‑built archives published on GitHub releases. The example below downloads version `v0.4.0` for your platform and moves the binary into `/usr/local/bin`:
+Use the pre‑built archives published on GitHub releases. The example below downloads version `v0.4.1` for your platform and moves the binary into `/usr/local/bin`:
 
 ```bash
-curl -L https://github.com/mergewayhq/mergeway-cli/releases/download/v0.4.0/mergeway-cli-\
+curl -L https://github.com/mergewayhq/mergeway-cli/releases/download/v0.4.1/mergeway-cli-\
   $(uname | tr '[:upper:]' '[:lower:]')-amd64.tar.gz | tar -xz
 sudo mv mergeway-cli /usr/local/bin/
 ````
@@ -103,7 +103,7 @@ mergeway-cli --version
 You should see output similar to:
 
 ```
-Mergeway CLI v0.4.0 (commit abc1234)
+Mergeway CLI v0.4.1 (commit abc1234)
 ```
 
 If the command is missing, confirm that the installation path is on your `PATH`.
