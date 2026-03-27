@@ -1,5 +1,6 @@
 id: post-001
 title: Launch Day
+status: PUBLISHED
 author: user-alice
 tags:
   - tag-product

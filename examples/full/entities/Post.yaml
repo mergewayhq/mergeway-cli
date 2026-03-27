@@ -15,6 +15,11 @@ entities:
         type: string
         required: true
         description: Human readable post headline
+      status:
+        type: enum
+        required: true
+        enum: [DRAFT, PUBLISHED]
+        description: Publication lifecycle state
       author:
         type: User
         required: true
