@@ -7,6 +7,7 @@ weight: 10
 
 This guide introduces the basic concepts and structure of a Mergeway workspace.
 It is intended for new users who want to understand how to set up and use Mergeway effectively.
+For runnable sample workspaces, see the [examples directory](https://github.com/mergewayhq/mergeway-cli/tree/main/examples) in the GitHub repository.
 
 A Mergeway workspace is just a folder with a few predictable parts. Knowing the vocabulary makes the CLI output easier to read.
 

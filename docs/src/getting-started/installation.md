@@ -27,6 +27,14 @@ Use the public GitHub Container Registry image to run the CLI without installing
 docker run ghcr.io/mergewayhq/mergeway-cli version
 ```
 
+To run commands against the workspace in your current directory, mount it into the container so the CLI can read the local `mergeway.yaml` and related data files:
+
+```bash
+docker run --rm \
+  -v "$PWD:/work" \
+  ghcr.io/mergewayhq/mergeway-cli validate
+```
+
 ## Option 3 – Go Install (for contributors)
 
 If you have Go installed you can build the CLI directly from the repository using `go install`:

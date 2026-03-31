@@ -37,6 +37,14 @@ docker run ghcr.io/mergewayhq/mergeway-cli version
 
 Use the public GitHub Container Registry image to run the CLI without installing the binary locally.
 
+To run the CLI against the workspace in your current directory, mount it into the container:
+
+```bash
+docker run --rm \
+  -v "$PWD:/work" \
+  ghcr.io/mergewayhq/mergeway-cli validate
+```
+
 ### Using Nix
 
 You can install the CLI using Nix:

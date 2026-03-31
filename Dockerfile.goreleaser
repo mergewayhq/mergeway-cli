@@ -4,4 +4,6 @@ ARG TARGETPLATFORM
 
 COPY $TARGETPLATFORM/mergeway-cli /mergeway-cli
 
+WORKDIR /work
+
 ENTRYPOINT ["/mergeway-cli"]

@@ -27,4 +27,6 @@ FROM scratch
 
 COPY --from=builder /out/mergeway-cli /mergeway-cli
 
+WORKDIR /work
+
 ENTRYPOINT ["/mergeway-cli"]
