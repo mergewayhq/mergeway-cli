@@ -37,6 +37,7 @@ For more information on the schema, please consult the [Schema Format](../gettin
 
 - [`list`](list.md)
 - [`get`](get.md)
+- [`diff`](diff.md)
 - [`create`](create.md)
 - [`update`](update.md)
 - [`delete`](delete.md)

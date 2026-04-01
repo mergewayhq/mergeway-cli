@@ -17,6 +17,7 @@
   - [`mergeway-cli config export`](cli-reference/config-export.md)
   - [`mergeway-cli list`](cli-reference/list.md)
   - [`mergeway-cli get`](cli-reference/get.md)
+  - [`mergeway-cli diff`](cli-reference/diff.md)
   - [`mergeway-cli create`](cli-reference/create.md)
   - [`mergeway-cli update`](cli-reference/update.md)
   - [`mergeway-cli delete`](cli-reference/delete.md)
