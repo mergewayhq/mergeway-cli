@@ -75,8 +75,8 @@ Install the prerequisites manually:
 
 ### Building
 
-- `make build` produces `bin/mergeway-cli` with version metadata injected via `-ldflags`
-- The build includes Git commit hash, semantic version, and build timestamp
+- `make build` produces `bin/mergeway-cli` with the semantic version embedded from `internal/version/VERSION`
+- The build includes Git commit hash and build timestamp via `-ldflags`
 
 ### Documentation
 
@@ -93,10 +93,10 @@ Install the prerequisites manually:
 
 ## Version Metadata
 
-Version information is managed in `internal/version/version.go`:
+Version information is managed in `internal/version/`:
 
-- The `Number` variable contains the semantic version (e.g., `x.y.z-dev`) for the flake build
-- Update this variable before cutting a release
+- `VERSION` contains the semantic version (for example `x.y.z-dev`) and is embedded into the binary with `//go:embed`
+- Update `internal/version/VERSION` before cutting a release
 - Build tooling injects Git commit hash and build timestamp via `-ldflags`
 - Run `mergeway-cli version` to see the current version, commit, and build date
 
@@ -104,7 +104,7 @@ Version information is managed in `internal/version/version.go`:
 
 The project uses [GoReleaser](https://goreleaser.com/) for automated releases:
 
-1. Update the version in `internal/version/version.go` (e.g., change `x.y.1-dev` to `x.y.2-dev`)
+1. Update `internal/version/VERSION` (for example, change `x.y.1-dev` to `x.y.2-dev`)
 2. Commit your changes
 3. Tag the repo with `v<major>.<minor>.<patch>`:
    ```bash
@@ -116,6 +116,6 @@ The project uses [GoReleaser](https://goreleaser.com/) for automated releases:
    - Creates archives (`.tar.gz` for Unix, `.zip` for Windows)
    - Generates checksums
    - Publishes the release with all assets
-   - The version number is overwritten via `ldflags` in the release build, using the tag version
+   - The embedded version comes from `internal/version/VERSION`, so the file must match the release tag before publishing
 
 See `.github/workflows/release.yml` and `.goreleaser.yaml` for configuration details.

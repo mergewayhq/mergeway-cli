@@ -26,7 +26,7 @@ Output:
 
 ```json
 {
-  "version": "0.4.3",
+  "version": "{{VERSION}}",
   "commit": "a713be5",
   "buildDate": "2025-10-22T18:25:03Z"
 }

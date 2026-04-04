@@ -9,10 +9,10 @@ Pick the method that fits your setup. You can install a local `mergeway-cli` bin
 
 ## Option 1 – Download a Release (macOS, Linux)
 
-Use the pre‑built archives published on GitHub releases. The example below downloads version `v0.4.3` for your platform and moves the binary into `/usr/local/bin`:
+Use the pre‑built archives published on GitHub releases. The example below downloads version `v{{VERSION}}` for your platform and moves the binary into `/usr/local/bin`:
 
 ```bash
-curl -L https://github.com/mergewayhq/mergeway-cli/releases/download/v0.4.3/mergeway-cli-\
+curl -L https://github.com/mergewayhq/mergeway-cli/releases/download/{{VERSION}}/mergeway-cli-\
   $(uname | tr '[:upper:]' '[:lower:]')-amd64.tar.gz | tar -xz
 sudo mv mergeway-cli /usr/local/bin/
 ````
@@ -105,13 +105,15 @@ This approach requires Go 1.24.x and is recommended for people packaging the CL
 After installation, confirm that the `mergeway‑cli` binary is on your `PATH` and prints version information:
 
 ```bash
-mergeway-cli --version
+mergeway-cli version
 ```
 
 You should see output similar to:
 
 ```
-Mergeway CLI v0.4.3 (commit abc1234)
+version: {{VERSION}}
+commit: d34db33f
+buildDate: "2021-02-03T04:05:06Z"
 ```
 
 If the command is missing, confirm that the installation path is on your `PATH`.

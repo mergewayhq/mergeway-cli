@@ -14,7 +14,7 @@
       {
         packages.default = pkgs.buildGoModule {
           pname = "mergeway-cli";
-          version = "0.4.3"; # Versioning can be improved later
+          version = builtins.replaceStrings [ "\n" ] [ "" ] (builtins.readFile ./internal/version/VERSION);
           src = self;
 
           #vendorHash = nixpkgs.lib.fakeHash;

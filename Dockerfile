@@ -4,7 +4,6 @@ FROM golang:1.24-alpine AS builder
 
 WORKDIR /src
 
-ARG VERSION=0.3.0-dev
 ARG COMMIT=unknown
 ARG BUILD_DATE=unknown
 
@@ -19,7 +18,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     CGO_ENABLED=0 GOOS=linux \
     go build \
       -trimpath \
-      -ldflags="-s -w -X github.com/mergewayhq/mergeway-cli/internal/version.Number=${VERSION} -X github.com/mergewayhq/mergeway-cli/internal/version.Commit=${COMMIT} -X github.com/mergewayhq/mergeway-cli/internal/version.BuildDate=${BUILD_DATE}" \
+      -ldflags="-s -w -X github.com/mergewayhq/mergeway-cli/internal/version.Commit=${COMMIT} -X github.com/mergewayhq/mergeway-cli/internal/version.BuildDate=${BUILD_DATE}" \
       -o /out/mergeway-cli \
       .
 

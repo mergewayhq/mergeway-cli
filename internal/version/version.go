@@ -1,13 +1,17 @@
 package version
 
 import (
+	_ "embed"
 	"fmt"
 	"strings"
 )
 
+//go:embed VERSION
+var embeddedNumber string
+
 var (
-	// Number is the semantic version for this build. Override via -ldflags when cutting releases.
-	Number = "0.4.3-dev"
+	// Number is the semantic version for this build, sourced from the embedded VERSION file.
+	Number = strings.TrimSpace(embeddedNumber)
 	// Commit captures the git commit for the build when provided via -ldflags.
 	Commit = "unknown"
 	// BuildDate records when the binary was built (ISO-8601, UTC).

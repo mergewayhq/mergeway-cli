@@ -8,5 +8,6 @@
     pkgs.graphviz
     pkgs.shellcheck
     pkgs.mdbook-yml-header
+    pkgs.mdbook-variables
   ];
 }
