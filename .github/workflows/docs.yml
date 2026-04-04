@@ -39,7 +39,13 @@ jobs:
           key: ${{ runner.os }}-devenv-${{ hashFiles('**/devenv.lock') }}
 
       - name: Build documentation
-        run: devenv shell -- mdbook build docs
+        shell: devenv shell bash -- -e {0}
+        run: |
+          export VERSION=$(
+            docker run --pull=always ghcr.io/mergewayhq/mergeway-cli version \
+            | sed -n 's/.*version: \([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p'
+          )
+          mdbook build docs
 
       - name: Deploy to GitHub Pages
         if: github.event_name == 'push'
