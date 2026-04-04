@@ -237,15 +237,6 @@ func loadSnapshotDataIncludePatterns(root, configPath string, snapshot SnapshotR
 	return schema.includePatterns(), nil
 }
 
-type diffConfigDocument struct {
-	Include  []string                    `yaml:"include"`
-	Entities map[string]diffConfigEntity `yaml:"entities"`
-}
-
-type diffConfigEntity struct {
-	Include []diffConfigInclude `yaml:"include"`
-}
-
 type diffConfigInclude struct {
 	Path     string `yaml:"path"`
 	Selector string `yaml:"selector"`

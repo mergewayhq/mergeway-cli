@@ -106,22 +106,6 @@ func newGitRepoFixture(t *testing.T) gitRepoFixture {
 	return initGitRepoFixture(t, root)
 }
 
-func newGitRepoWithFiles(t *testing.T, files map[string]string) gitRepoFixture {
-	t.Helper()
-	root := t.TempDir()
-	for relativePath, content := range files {
-		target := filepath.Join(root, filepath.FromSlash(relativePath))
-		if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
-			t.Fatalf("create parent dir: %v", err)
-		}
-		if err := os.WriteFile(target, []byte(content), 0o644); err != nil {
-			t.Fatalf("write fixture file %s: %v", relativePath, err)
-		}
-	}
-
-	return initGitRepoFixture(t, root)
-}
-
 func initGitRepoFixture(t *testing.T, root string) gitRepoFixture {
 	t.Helper()
 	runGitCommand(t, root, "init")
