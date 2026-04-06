@@ -41,7 +41,7 @@ The current layering is intentionally reusable:
 - data-only snapshot loading excludes configuration changes up front
 - logical database building removes path identity while keeping source metadata
 - semantic diffing produces machine-readable facts that are already serialized
-  by `diff --json`
+  by `mergeway-cli --format json diff`
 
 Future merge work should reuse these layers rather than re-deriving object
 identity or file movement from path-based Git diffs.

@@ -9,8 +9,6 @@ import (
 )
 
 func newDiffCommand() *cobra.Command {
-	var jsonOutput bool
-
 	cmd := &cobra.Command{
 		Use:   "diff [<left>] [<right>]",
 		Short: "Compare Mergeway-managed data between snapshots",
@@ -23,8 +21,7 @@ Snapshot modes:
   diff <left>         compare <left> vs current working tree data including unstaged changes
   diff <left> <right> compare <left> vs <right>
 
-Flags:
-  --json              emit machine-readable semantic diff output`,
+Use the global --format json flag to emit machine-readable semantic diff output.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, err := contextFromCommand(cmd)
 			if err != nil {
@@ -35,7 +32,7 @@ Flags:
 				Root:   ctx.Root,
 				Config: ctx.Config,
 				Args:   args,
-				JSON:   jsonOutput,
+				JSON:   ctx.Format == "json",
 			})
 			if err != nil {
 				if errors.Is(err, diffpkg.ErrTooManyArgs) {
@@ -49,8 +46,6 @@ Flags:
 			return nil
 		},
 	}
-
-	cmd.Flags().BoolVar(&jsonOutput, "json", false, "Emit machine-readable semantic diff output")
 
 	return cmd
 }

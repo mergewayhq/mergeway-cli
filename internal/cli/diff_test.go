@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -120,6 +121,40 @@ func TestDiffHelpMentionsConfigurationIsExcluded(t *testing.T) {
 	}
 	if !strings.Contains(stdout.String(), "excludes configuration files entirely") {
 		t.Fatalf("expected help text to mention configuration exclusion, got %s", stdout.String())
+	}
+}
+
+func TestDiffUsesGlobalFormatFlagForJSONOutput(t *testing.T) {
+	repo := newGitRepoFixture(t)
+	repo.CommitDataChange(t, "data/users/user-bob.yaml", "id: User-Bob\nname: Bob Changed\nemail: bob@example.com\n")
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo.Root, "--format", "json", "diff", "HEAD~1", "HEAD"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("expected json diff to succeed, exit %d stderr %s", code, stderr.String())
+	}
+
+	var payload map[string]any
+	if err := json.Unmarshal(stdout.Bytes(), &payload); err != nil {
+		t.Fatalf("expected json output, got parse error: %v\nbody:\n%s", err, stdout.String())
+	}
+	if payload["version"] != float64(1) {
+		t.Fatalf("expected json diff version 1, got %v", payload["version"])
+	}
+}
+
+func TestDiffRejectsLegacyJSONFlag(t *testing.T) {
+	repo := newGitRepoFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo.Root, "diff", "--json"}, stdout, stderr)
+	if code == 0 {
+		t.Fatalf("expected legacy --json flag to fail")
+	}
+	if !strings.Contains(stderr.String(), "unknown flag: --json") {
+		t.Fatalf("expected unknown flag error, got %s", stderr.String())
 	}
 }
 

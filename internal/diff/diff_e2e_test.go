@@ -273,9 +273,9 @@ func TestDiffJSONOutputIsStable(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "diff", "--json"}, stdout, stderr)
+	code := cli.Run([]string{"--root", repo.Root, "--format", "json", "diff"}, stdout, stderr)
 	if code != 0 {
-		t.Fatalf("diff --json exit %d stderr %s", code, stderr.String())
+		t.Fatalf("diff --format json exit %d stderr %s", code, stderr.String())
 	}
 
 	want := `{
@@ -319,7 +319,7 @@ func TestDiffJSONOutputIsStable(t *testing.T) {
 }
 `
 	if stdout.String() != want {
-		t.Fatalf("unexpected diff --json output\nwant:\n%s\ngot:\n%s", want, stdout.String())
+		t.Fatalf("unexpected diff --format json output\nwant:\n%s\ngot:\n%s", want, stdout.String())
 	}
 }
 

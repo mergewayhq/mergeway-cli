@@ -12,7 +12,7 @@ description: "Compare Mergeway-managed data between logical repository snapshots
 mergeway-cli [global flags] diff
 mergeway-cli [global flags] diff <left>
 mergeway-cli [global flags] diff <left> <right>
-mergeway-cli [global flags] diff [--json] [<left>] [<right>]
+mergeway-cli [global flags] --format json diff [<left>] [<right>]
 ```
 
 This command is a data-only diff. It compares Mergeway-managed records across the repository and excludes configuration entirely.
@@ -29,7 +29,7 @@ Passing more than two positional arguments is an error.
 
 - The command reports semantic record changes, not path-based Git file diffs.
 - Output is intentionally simple for now and may be refined in a later phase.
-- Pass `--json` to emit a machine-readable semantic diff document.
+- Pass the global `--format json` flag to emit a machine-readable semantic diff document.
 
 ## Related Commands
 
