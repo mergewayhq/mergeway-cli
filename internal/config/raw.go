@@ -121,6 +121,7 @@ type rawFieldDefinition struct {
 	Enum        []string    `yaml:"enum"`
 	Default     any         `yaml:"default"`
 	Properties  rawFieldMap `yaml:"properties"`
+	Fields      rawFieldMap `yaml:"fields"`
 	Unique      *bool       `yaml:"unique"`
 	Pattern     string      `yaml:"pattern"`
 	Description string      `yaml:"description"`
@@ -148,6 +149,7 @@ func (r *rawFieldDefinition) UnmarshalYAML(node *yaml.Node) error {
 		r.Enum = nil
 		r.Default = nil
 		r.Properties = rawFieldMap{}
+		r.Fields = rawFieldMap{}
 		r.Unique = nil
 		r.Pattern = ""
 		return nil

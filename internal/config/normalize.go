@@ -152,10 +152,16 @@ func normalizeFieldDefinition(name string, raw rawFieldDefinition, typeName stri
 	if len(raw.Properties.Entries) > 0 && raw.Type != "object" {
 		return nil, fmt.Errorf("config: field %s.%s defines properties but type is %q", typeName, name, raw.Type)
 	}
+	if len(raw.Fields.Entries) > 0 {
+		return nil, fmt.Errorf("config: field %s.%s uses unsupported nested fields; use properties for object fields", typeName, name)
+	}
 
 	properties := make(map[string]*FieldDefinition)
 	var propertyOrder []string
 	if raw.Type == "object" {
+		if len(raw.Properties.Entries) == 0 {
+			return nil, fmt.Errorf("config: field %s.%s type object must define properties", typeName, name)
+		}
 		for _, entry := range raw.Properties.Entries {
 			propName := entry.Name
 			propField := entry.Value

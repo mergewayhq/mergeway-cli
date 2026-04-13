@@ -94,6 +94,72 @@ func TestLoadRepeatedUniqueError(t *testing.T) {
 	}
 }
 
+func TestLoadRejectsObjectFieldWithoutProperties(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  Project:
+    identifier: id
+    data:
+      - id: project-1
+        contacts:
+          - email: owner@example.com
+    fields:
+      id: string
+      contacts:
+        type: object
+        repeated: true
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected error for object field without properties")
+	}
+	if got := err.Error(); !strings.Contains(got, "type object must define properties") {
+		t.Fatalf("expected object/properties error, got %q", got)
+	}
+}
+
+func TestLoadRejectsNestedFieldsForObjectField(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  Project:
+    identifier: id
+    data:
+      - id: project-1
+        contacts:
+          - email: owner@example.com
+    fields:
+      id: string
+      contacts:
+        type: object
+        repeated: true
+        fields:
+          email:
+            type: string
+            required: true
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected error for nested fields on object field")
+	}
+	if got := err.Error(); !strings.Contains(got, "use properties for object fields") {
+		t.Fatalf("expected nested fields error, got %q", got)
+	}
+}
+
 func TestLoadInvalidIdentifier(t *testing.T) {
 	path := filepath.Join("testdata", "invalid_identifier", "mergeway.yaml")
 	_, err := Load(path)
