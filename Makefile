@@ -11,31 +11,37 @@ LDFLAGS := -X $(PKG)/internal/version.Commit=$(GIT_COMMIT) -X $(PKG)/internal/ve
 
 GOFILES := $(shell find . -type f -name '*.go' -not -path './.git/*' -not -path './.cache/*')
 
-.PHONY: build fmt fmt-check lint test race coverage ci clean release docs-build docs-serve
+.PHONY: check-go build fmt fmt-check lint test race coverage ci clean release docs-build docs-serve
 
-build:
+check-go:
+	@command -v $(GO) >/dev/null 2>&1 || { \
+		echo "error: Go is not installed or not available on PATH (GO=$(GO))" >&2; \
+		exit 1; \
+	}
+
+build: check-go
 	$(GORUN) build -ldflags "$(LDFLAGS)" -o bin/mergeway-cli .
 
-fmt:
+fmt: check-go
 	gofmt -w $(GOFILES)
 
-fmt-check:
+fmt-check: check-go
 	@gofmt -l -d $(GOFILES)
 
-lint:
+lint: check-go
 	golangci-lint run
 
-test:
+test: check-go
 	$(GORUN) test ./...
 
-race:
+race: check-go
 	$(GORUN) test -race ./...
 
-coverage:
+coverage: check-go
 	$(GORUN) test -coverprofile=coverage.out ./...
 	$(GORUN) tool cover -html=coverage.out -o coverage.html
 
-ci: fmt-check lint test race coverage
+ci: check-go fmt-check lint test race coverage
 
 clean:
 	rm -rf bin dist coverage.out .cache
