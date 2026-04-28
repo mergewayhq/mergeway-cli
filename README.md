@@ -2,6 +2,13 @@
 
 `mergeway-cli` is a command-line toolkit for keeping metadata in version control. It stores YAML and JSON objects on disk, validates their schemas, and verifies the integrity of relationships between those objects so your automation stays trustworthy.
 
+For full product and documentation coverage, visit:
+
+- [Mergeway website](https://mergewayhq.github.io)
+- [Mergeway CLI getting started guide](https://mergewayhq.github.io/cli/getting-started/)
+- [Mergeway CLI reference documentation](https://mergewayhq.github.io/cli/reference/)
+- [Mergeway CLI guides](https://mergewayhq.github.io/cli/guides/)
+
 ## What It Does
 
 - **Track metadata like code**: Check structured data into Git and review changes with normal diffs.
