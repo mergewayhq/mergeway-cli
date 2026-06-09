@@ -147,8 +147,27 @@ func TestValidateCommand(t *testing.T) {
 		t.Fatalf("validate exit %d stderr %s", code, stderr.String())
 	}
 
-	if !strings.Contains(stdout.String(), "validation succeeded") {
+	if stdout.String() != "status: validation succeeded\n" {
 		t.Fatalf("unexpected output: %s", stdout.String())
+	}
+}
+
+func TestValidateCommandFormatsSuccessAsJSON(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "--format", "json", "validate"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("validate --format json exit %d stderr %s", code, stderr.String())
+	}
+
+	var payload map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &payload); err != nil {
+		t.Fatalf("expected json output, got parse error: %v\nbody:\n%s", err, stdout.String())
+	}
+	if payload["status"] != "validation succeeded" {
+		t.Fatalf("expected success status, got %q", payload["status"])
 	}
 }
 
@@ -177,6 +196,41 @@ items:
 
 	if !strings.Contains(stdout.String(), "references missing User") {
 		t.Fatalf("expected validation error in stdout, got %s", stdout.String())
+	}
+}
+
+func TestValidateCommandFormatsErrorsAsJSON(t *testing.T) {
+	repo := copyFixture(t)
+	target := filepath.Join(repo, "data", "posts", "one.yaml")
+	content := `type: Post
+items:
+  - id: Post-1
+    title: First Post
+    author: User-Missing
+    tags:
+      - Tag-One
+`
+	if err := os.WriteFile(target, []byte(content), 0o644); err != nil {
+		t.Fatalf("write invalid post: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "--format", "json", "validate"}, stdout, stderr)
+	if code == 0 {
+		t.Fatalf("expected validate --format json to fail, stdout %s stderr %s", stdout.String(), stderr.String())
+	}
+
+	var errs []map[string]any
+	if err := json.Unmarshal(stdout.Bytes(), &errs); err != nil {
+		t.Fatalf("expected json output, got parse error: %v\nbody:\n%s", err, stdout.String())
+	}
+	if len(errs) == 0 {
+		t.Fatalf("expected validation errors, got %s", stdout.String())
+	}
+	if errs[0]["Phase"] != "references" {
+		t.Fatalf("expected reference phase error, got %v", errs[0]["Phase"])
 	}
 }
 

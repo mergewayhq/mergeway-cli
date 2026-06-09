@@ -37,7 +37,9 @@ func newValidateCommand() *cobra.Command {
 			}
 
 			if len(result.Errors) == 0 {
-				_, _ = fmt.Fprintln(ctx.Stdout, "validation succeeded")
+				if code := writeFormatted(ctx, map[string]string{"status": "validation succeeded"}); code != 0 {
+					return newExitError(code)
+				}
 				return nil
 			}
 

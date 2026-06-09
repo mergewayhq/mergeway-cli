@@ -33,8 +33,8 @@ Add `--format json` when you need machine-readable output.
 
 Output:
 
-```
-validation succeeded
+```yaml
+status: validation succeeded
 ```
 
 Run validation after introducing a breaking schema change:
