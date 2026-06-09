@@ -1,5 +1,8 @@
 { pkgs, lib, ... }:
 {
+  # To resolve error with double registration of cachix
+  cachix.enable = false;
+
   packages = [
     pkgs.pre-commit
     pkgs.go_1_24
