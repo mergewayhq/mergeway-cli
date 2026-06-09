@@ -82,6 +82,7 @@ func newRootCommand(stdout, stderr io.Writer) *cobra.Command {
 		newInitCommand(),
 		newEntityCommand(),
 		newListCommand(),
+		newFilesCommand(),
 		newGetCommand(),
 		newDiffCommand(),
 		newCreateCommand(),

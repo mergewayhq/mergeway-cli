@@ -137,6 +137,93 @@ items:
 	}
 }
 
+func TestFilesCommand(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "files"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("files exit %d stderr %s", code, stderr.String())
+	}
+
+	var entries []map[string]string
+	if err := yaml.Unmarshal(stdout.Bytes(), &entries); err != nil {
+		t.Fatalf("expected yaml output, got parse error: %v\nbody:\n%s", err, stdout.String())
+	}
+
+	expected := []map[string]string{
+		{"type": "Post", "file": "data/posts/posts.yaml"},
+		{"type": "Tag", "file": "data/tags/tag-product.yaml"},
+		{"type": "Tag", "file": "data/tags/tag-writing.yaml"},
+		{"type": "User", "file": "data/users/user-alice.yaml"},
+		{"type": "User", "file": "data/users/user-bob.yaml"},
+	}
+	if !reflect.DeepEqual(entries, expected) {
+		t.Fatalf("expected %v, got %v", expected, entries)
+	}
+}
+
+func TestFilesCommandFiltersByType(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "files", "--type", "Tag"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("files --type exit %d stderr %s", code, stderr.String())
+	}
+
+	var entries []map[string]string
+	if err := yaml.Unmarshal(stdout.Bytes(), &entries); err != nil {
+		t.Fatalf("expected yaml output, got parse error: %v\nbody:\n%s", err, stdout.String())
+	}
+
+	expected := []map[string]string{
+		{"type": "Tag", "file": "data/tags/tag-product.yaml"},
+		{"type": "Tag", "file": "data/tags/tag-writing.yaml"},
+	}
+	if !reflect.DeepEqual(entries, expected) {
+		t.Fatalf("expected %v, got %v", expected, entries)
+	}
+}
+
+func TestFilesCommandFormatsJSON(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "--format", "json", "files"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("files --format json exit %d stderr %s", code, stderr.String())
+	}
+
+	var entries []map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &entries); err != nil {
+		t.Fatalf("expected json output, got parse error: %v\nbody:\n%s", err, stdout.String())
+	}
+	if len(entries) != 5 {
+		t.Fatalf("expected 5 entries, got %d (%v)", len(entries), entries)
+	}
+	if entries[0]["type"] != "Post" || entries[0]["file"] != "data/posts/posts.yaml" {
+		t.Fatalf("unexpected first entry: %v", entries[0])
+	}
+}
+
+func TestFilesCommandRejectsUnknownType(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "files", "--type", "Missing"}, stdout, stderr)
+	if code == 0 {
+		t.Fatalf("expected files unknown type to fail, stdout %s stderr %s", stdout.String(), stderr.String())
+	}
+	if !strings.Contains(stderr.String(), "unknown type Missing") {
+		t.Fatalf("expected unknown type error, got %s", stderr.String())
+	}
+}
+
 func TestValidateCommand(t *testing.T) {
 	repo := copyFixture(t)
 	stdout := &bytes.Buffer{}

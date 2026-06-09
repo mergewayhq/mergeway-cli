@@ -36,6 +36,7 @@ For more information on the schema, please consult the [Schema Format](../gettin
 ## Object operations
 
 - [`list`](list.md)
+- [`files`](files.md)
 - [`get`](get.md)
 - [`diff`](diff.md)
 - [`create`](create.md)

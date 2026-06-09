@@ -19,6 +19,7 @@
   - [`mergeway-cli config lint`](cli-reference/config-lint.md)
   - [`mergeway-cli config export`](cli-reference/config-export.md)
   - [`mergeway-cli list`](cli-reference/list.md)
+  - [`mergeway-cli files`](cli-reference/files.md)
   - [`mergeway-cli get`](cli-reference/get.md)
   - [`mergeway-cli diff`](cli-reference/diff.md)
   - [`mergeway-cli create`](cli-reference/create.md)

@@ -95,6 +95,9 @@ echo "Validating example dataset..."
 echo "Listing example users..."
 "$MW_BIN" --root "$ROOT_DIR/examples/full" list --type User
 
+echo "Listing example files..."
+"$MW_BIN" --root "$ROOT_DIR/examples/full" --format json files
+
 echo "Showing example post..."
 "$MW_BIN" --root "$ROOT_DIR/examples/full" --format json get --type Post post-001
 
