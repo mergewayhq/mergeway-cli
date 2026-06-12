@@ -154,3 +154,22 @@ func TestMultiFlagSetAndString(t *testing.T) {
 		t.Fatalf("expected invalid phase to error")
 	}
 }
+
+func withWorkingDir(t *testing.T, dir string, fn func()) {
+	t.Helper()
+
+	previous, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatalf("chdir to %s: %v", dir, err)
+	}
+	t.Cleanup(func() {
+		if err := os.Chdir(previous); err != nil {
+			t.Fatalf("restore cwd: %v", err)
+		}
+	})
+
+	fn()
+}

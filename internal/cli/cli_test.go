@@ -210,6 +210,67 @@ func TestFilesCommandFormatsJSON(t *testing.T) {
 	}
 }
 
+func TestFilesCommandGroupsContainers(t *testing.T) {
+	repo := copyFixture(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "--format", "json", "files", "--group"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("files --group exit %d stderr %s", code, stderr.String())
+	}
+
+	var entries []map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &entries); err != nil {
+		t.Fatalf("expected json output, got parse error: %v\nbody:\n%s", err, stdout.String())
+	}
+
+	expected := []map[string]string{
+		{"type": "Post", "file": "data/posts/posts.yaml"},
+		{"type": "Tag", "file": "data/tags/*.yaml"},
+		{"type": "User", "file": "data/users/*.yaml"},
+	}
+	if !reflect.DeepEqual(entries, expected) {
+		t.Fatalf("expected %v, got %v", expected, entries)
+	}
+}
+
+func TestFilesCommandGroupsContainersWithRelativeRoot(t *testing.T) {
+	repo := copyFixture(t)
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	relativeRoot, err := filepath.Rel(cwd, repo)
+	if err != nil {
+		t.Fatalf("relative root: %v", err)
+	}
+
+	withWorkingDir(t, cwd, func() {
+		stdout := &bytes.Buffer{}
+		stderr := &bytes.Buffer{}
+
+		code := Run([]string{"--root", relativeRoot, "--format", "json", "files", "--group"}, stdout, stderr)
+		if code != 0 {
+			t.Fatalf("files --group with relative root exit %d stderr %s", code, stderr.String())
+		}
+
+		var entries []map[string]string
+		if err := json.Unmarshal(stdout.Bytes(), &entries); err != nil {
+			t.Fatalf("expected json output, got parse error: %v\nbody:\n%s", err, stdout.String())
+		}
+
+		expected := []map[string]string{
+			{"type": "Post", "file": "data/posts/posts.yaml"},
+			{"type": "Tag", "file": "data/tags/*.yaml"},
+			{"type": "User", "file": "data/users/*.yaml"},
+		}
+		if !reflect.DeepEqual(entries, expected) {
+			t.Fatalf("expected %v, got %v", expected, entries)
+		}
+	})
+}
+
 func TestFilesCommandRejectsUnknownType(t *testing.T) {
 	repo := copyFixture(t)
 	stdout := &bytes.Buffer{}

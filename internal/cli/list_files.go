@@ -1,12 +1,17 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
+	"github.com/mergewayhq/mergeway-cli/internal/config"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 type listFileEntry struct {
@@ -16,6 +21,7 @@ type listFileEntry struct {
 
 func newFilesCommand() *cobra.Command {
 	var typeName string
+	var group bool
 
 	cmd := &cobra.Command{
 		Use:   "files",
@@ -38,31 +44,10 @@ func newFilesCommand() *cobra.Command {
 				}
 			}
 
-			files, err := collectConfiguredFiles(ctx.Root, cfg)
+			entries, err := collectListFileEntries(ctx.Root, cfg, typeName, group)
 			if err != nil {
 				_, _ = fmt.Fprintf(ctx.Stderr, "files: %v\n", err)
 				return newExitError(1)
-			}
-
-			entries := make([]listFileEntry, 0, len(files.files))
-			for _, path := range files.Slice() {
-				typeDef := files.TypeFor(path)
-				if typeDef == nil {
-					continue
-				}
-				if typeName != "" && typeDef.Name != typeName {
-					continue
-				}
-
-				ext := strings.ToLower(filepath.Ext(path))
-				if ext != ".yaml" && ext != ".yml" {
-					continue
-				}
-
-				entries = append(entries, listFileEntry{
-					Type: typeDef.Name,
-					File: displayWorkspacePath(ctx.Root, path),
-				})
 			}
 
 			sort.Slice(entries, func(i, j int) bool {
@@ -79,9 +64,126 @@ func newFilesCommand() *cobra.Command {
 		},
 	}
 
+	cmd.Flags().BoolVar(&group, "group", false, "Group output by storage container")
 	cmd.Flags().StringVar(&typeName, "type", "", "Type identifier")
 
 	return cmd
+}
+
+func collectListFileEntries(root string, cfg *config.Config, typeName string, group bool) ([]listFileEntry, error) {
+	absRoot, err := filepath.Abs(root)
+	if err != nil {
+		return nil, fmt.Errorf("resolve root %s: %w", root, err)
+	}
+
+	files := &configuredFileSet{
+		files: make(map[string]*config.TypeDefinition),
+	}
+	entries := make(map[string]listFileEntry)
+
+	if cfg == nil {
+		return nil, nil
+	}
+
+	for _, typeDef := range cfg.Types {
+		if typeDef == nil {
+			continue
+		}
+		if typeName != "" && typeDef.Name != typeName {
+			continue
+		}
+
+		for _, include := range typeDef.Include {
+			if include.Path == "" {
+				continue
+			}
+
+			pattern := include.Path
+			if !filepath.IsAbs(pattern) {
+				pattern = filepath.Join(absRoot, filepath.Clean(pattern))
+			}
+
+			matches, err := filepath.Glob(pattern)
+			if err != nil {
+				return nil, fmt.Errorf("glob %s: %w", include.Path, err)
+			}
+			if len(matches) == 0 {
+				continue
+			}
+
+			for _, match := range matches {
+				info, err := os.Stat(match)
+				if err != nil {
+					if errors.Is(err, fs.ErrNotExist) {
+						continue
+					}
+					return nil, fmt.Errorf("stat %s: %w", match, err)
+				}
+				if info.IsDir() {
+					continue
+				}
+
+				absMatch := match
+				if !filepath.IsAbs(absMatch) {
+					absMatch, err = filepath.Abs(absMatch)
+					if err != nil {
+						return nil, fmt.Errorf("resolve match %s: %w", match, err)
+					}
+				}
+				absMatch = filepath.Clean(absMatch)
+
+				if !isYAMLPath(absMatch) {
+					continue
+				}
+				if err := files.add(absMatch, typeDef); err != nil {
+					return nil, err
+				}
+
+				entryPath := displayWorkspacePath(absRoot, absMatch)
+				if group && include.Selector == "" && includeHasGlob(include.Path) {
+					if multi, ok := yamlFileContainsItems(absMatch); ok && !multi {
+						entryPath = displayWorkspacePath(absRoot, pattern)
+					}
+				}
+
+				key := typeDef.Name + "\x00" + entryPath
+				entries[key] = listFileEntry{
+					Type: typeDef.Name,
+					File: entryPath,
+				}
+			}
+		}
+	}
+
+	result := make([]listFileEntry, 0, len(entries))
+	for _, entry := range entries {
+		result = append(result, entry)
+	}
+	return result, nil
+}
+
+func isYAMLPath(path string) bool {
+	ext := strings.ToLower(filepath.Ext(path))
+	return ext == ".yaml" || ext == ".yml"
+}
+
+func includeHasGlob(path string) bool {
+	return strings.ContainsAny(path, "*?[")
+}
+
+func yamlFileContainsItems(path string) (multi bool, ok bool) {
+	body, err := os.ReadFile(path)
+	if err != nil {
+		return false, false
+	}
+
+	var doc map[string]any
+	if err := yaml.Unmarshal(body, &doc); err != nil {
+		return false, false
+	}
+
+	_, multi = doc["items"]
+	return multi, true
 }
 
 func displayWorkspacePath(root, path string) string {

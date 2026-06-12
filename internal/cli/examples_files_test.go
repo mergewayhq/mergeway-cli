@@ -84,3 +84,58 @@ func TestFilesExternalRootPathExample(t *testing.T) {
 		t.Fatalf("expected %v, got %v", expected, entries)
 	}
 }
+
+func TestFilesFullExampleGroupsContainers(t *testing.T) {
+	root, err := filepath.Abs(filepath.Join("..", "..", "examples", "full"))
+	if err != nil {
+		t.Fatalf("abs path: %v", err)
+	}
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", root, "--format", "json", "files", "--group"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("files --group full example exit %d stdout %s stderr %s", code, stdout.String(), stderr.String())
+	}
+
+	var entries []map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &entries); err != nil {
+		t.Fatalf("expected json output, got parse error: %v\nbody:\n%s", err, stdout.String())
+	}
+
+	expected := []map[string]string{
+		{"type": "Post", "file": "data/posts/*.yaml"},
+		{"type": "Tag", "file": "data/tags/product.yaml"},
+		{"type": "User", "file": "data/users/*.yaml"},
+	}
+	if !reflect.DeepEqual(entries, expected) {
+		t.Fatalf("expected %v, got %v", expected, entries)
+	}
+}
+
+func TestFilesExternalRootPathExampleGroupsContainers(t *testing.T) {
+	root, err := filepath.Abs(filepath.Join("..", "..", "examples", "external-root-path", "primary"))
+	if err != nil {
+		t.Fatalf("abs path: %v", err)
+	}
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", root, "--format", "json", "files", "--group"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("files --group external-root example exit %d stdout %s stderr %s", code, stdout.String(), stderr.String())
+	}
+
+	var entries []map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &entries); err != nil {
+		t.Fatalf("expected json output, got parse error: %v\nbody:\n%s", err, stdout.String())
+	}
+
+	expected := []map[string]string{
+		{"type": "OrderLine", "file": "data/order-lines/*.yaml"},
+		{"type": "Product", "file": "../secondary/products/*.yaml"},
+	}
+	if !reflect.DeepEqual(entries, expected) {
+		t.Fatalf("expected %v, got %v", expected, entries)
+	}
+}
