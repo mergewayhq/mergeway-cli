@@ -1,0 +1,354 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Getting Started with Mergeway CLI Using the Example Repository - Mergeway Documentation</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="Developer and operator documentation for the Mergeway CLI.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Mergeway Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/mergewayhq/mergeway-cli" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fab-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p>Mergeway is a command‑line tool that helps teams describe and validate structured data alongside their code. The <a href="https://github.com/mergewayhq/mergeway-example-repo">mergeway‑example‑repo</a> demonstrates how the CLI can enforce schemas, format YAML/JSON files and generate relationship diagrams using a minimal blog dataset. This guide shows how to set up Mergeway, explore the example repository and add automation so contributors always follow the rules.</p>
+<h2 id="1-cloning-the-example-repository-and-installing-the-cli"><a class="header" href="#1-cloning-the-example-repository-and-installing-the-cli">1. Cloning the example repository and installing the CLI</a></h2>
+<p>Start by cloning the example repository and moving into it:</p>
+<pre><code class="language-bash">git clone git@github.com:mergewayhq/mergeway-example-repo.git
+cd mergeway-example-repo
+</code></pre>
+<p>The repository’s <strong>Getting started</strong> section explains two ways to access the CLI:</p>
+<ul>
+<li><strong>Use your own install.</strong> Follow the official installation instructions to install <code>mergeway‑cli</code>. Once installed you can run commands directly in the repo.</li>
+<li><strong>Use the provided dev shell.</strong> If you use <a href="https://nixos.org/">Nix</a> and optionally <a href="https://direnv.net/">direnv</a>, you can run <code>nix develop</code> from the root. This builds <code>mergeway‑cli</code> from source and sets up pre‑commit hooks and validation for you.</li>
+</ul>
+<p>With the CLI available, try printing the version and usage information:</p>
+<pre><code class="language-bash">mergeway-cli --help    # show usage information
+mergeway-cli version   # print the CLI version
+</code></pre>
+<h2 id="2-understanding-the-repository-structure"><a class="header" href="#2-understanding-the-repository-structure">2. Understanding the repository structure</a></h2>
+<p>The example repository models a simple blog with four entities: <code>User</code>, <code>Tag</code>, <code>Post</code> and <code>Comment</code>. Each entity stores its schema in <code>entities/</code> and the corresponding records in <code>data/</code>. The top‑level <code>mergeway.yaml</code> file ties everything together and tells Mergeway where to find schemas and data.</p>
+<p><strong>Directory overview</strong>:</p>
+<div class="table-wrapper"><table><thead><tr><th>Folder</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><code>entities/</code></td><td>Contains YAML schemas for each entity (<code>User.yaml</code>, <code>Tag.yaml</code>, <code>Post.yaml</code>, <code>Comment.yaml</code>).</td></tr>
+<tr><td><code>data/</code></td><td>Holds YAML or JSON files with records. The subfolders (<code>users/</code>, <code>tags/</code>, <code>posts/</code>, <code>comments/</code>) mirror the entities.</td></tr>
+<tr><td><code>mergeway.yaml</code></td><td>Top‑level configuration referencing entity schemas and data globs.</td></tr>
+</tbody></table>
+</div>
+<p>To see the contents of the dataset, you can run:</p>
+<pre><code class="language-bash">mergeway-cli entity list          # list all entity types
+mergeway-cli entity show User     # inspect the User schema
+mergeway-cli list --type Post     # list all post records
+mergeway-cli get --type User 1    # fetch a single user by id
+mergeway-cli validate             # validate schemas, data and references
+</code></pre>
+<p>These commands read <code>mergeway.yaml</code>, load each entity definition under <code>entities/</code>, and then validate all records under <code>data/</code>. Validation errors are printed in a structured format with the phase (format, schema or references) and the offending file and message.</p>
+<h2 id="3-exploring-and-extending-a-workspace"><a class="header" href="#3-exploring-and-extending-a-workspace">3. Exploring and extending a workspace</a></h2>
+<p>You are not limited to the blog dataset. The Mergeway workspace guide demonstrates how to scaffold a brand‑new workspace, move inline records into separate files and add JSON sources:</p>
+<ol>
+<li><strong>Create a workspace.</strong> Make a directory and run <code>mergeway-cli init</code> to create a new <code>mergeway.yaml</code>. The file starts with an inline entity definition; you can customise it to match your data model.</li>
+<li><strong>Use CLI commands.</strong> List entities, show schemas, list records and validate the workspace.</li>
+<li><strong>Externalise data.</strong> As the table grows, move records into files under <code>data/</code> and update the <code>include</code> globs in <code>mergeway.yaml</code>. Re‑run <code>mergeway-cli list</code> and <code>mergeway-cli validate</code> to see the effect.</li>
+<li><strong>Split schemas and add JSON.</strong> Create an <code>entities/</code> directory and define additional entities (e.g. <code>Product</code>) that pull from JSON via JSONPath selectors. Add the JSON file under <code>data/</code> and include external schemas using the <code>include</code> key in <code>mergeway.yaml</code>.</li>
+<li><strong>Fix reference errors.</strong> When validation reports missing references (e.g. a <code>Product</code> record refers to a non‑existent category), update the relevant data file and re‑validate to ensure consistency.</li>
+<li><strong>Export a snapshot.</strong> Use <code>mergeway-cli export --format json --output &lt;file&gt;</code> to collect the full dataset into a single JSON snapshot.</li>
+</ol>
+<p>By following these steps you can evolve the example repository or build your own dataset from scratch while preserving referential integrity.</p>
+<h2 id="4-automating-formatting-and-reviews-with-github-actions"><a class="header" href="#4-automating-formatting-and-reviews-with-github-actions">4. Automating formatting and reviews with GitHub Actions</a></h2>
+<p>To keep data formatted and ensure the right people review changes, configure a GitHub Actions workflow and CODEOWNERS. The <strong>Set up Mergeway with GitHub Actions</strong> guide recommends adding a workflow file called <code>.github/workflows/mergeway-fmt.yml</code>:</p>
+<pre><code class="language-yaml">name: Mergeway Formatting
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "**/*.yaml"
+      - "**/*.yml"
+      - mergeway.yaml
+  push:
+    branches: [main]
+
+jobs:
+  mergeway-cli-fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Go toolchain
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install Mergeway CLI
+        run: go install github.com/mergewayhq/mergeway-cli@latest
+
+      - name: Lint Mergeway formatting
+        run: mergeway-cli fmt --lint
+</code></pre>
+<p>This workflow runs on every pull request and push to <code>main</code>. It checks out the code, installs Go and Mergeway, then runs <code>mergeway-cli fmt --lint</code> to lint YAML and JSON files. Adjust the <code>paths</code> filters if your data lives outside of YAML files. To ensure only valid PRs are merged, add a <strong>CODEOWNERS</strong> file that assigns responsibility for specific paths. For example:</p>
+<pre><code># mergeway schema is owned by the Data Platform team
+mergeway.yaml @myorg/data-platform
+
+# Data files are split by operational team
+data/users/ @myorg/inventory
+data/posts/ @myorg/content
+</code></pre>
+<p>GitHub will automatically request reviews from the specified teams when a pull request touches those files. Pinning a version of the CLI (e.g. <code>@v0.11.0</code>) or caching the binary makes CI runs reproducible.</p>
+<h2 id="5-enforcing-formatting-locally-with-precommit"><a class="header" href="#5-enforcing-formatting-locally-with-precommit">5. Enforcing formatting locally with pre‑commit</a></h2>
+<p>Developers can catch formatting issues before pushing by using <a href="https://pre-commit.com/">pre‑commit</a>. The <strong>Pre‑commit integration</strong> guide outlines the steps:</p>
+<ol>
+<li>
+<p><strong>Install pre‑commit</strong> once per workstation using <code>pipx install pre-commit</code>, <code>pip install pre-commit</code> or <code>brew install pre-commit</code>.</p>
+</li>
+<li>
+<p><strong>Add a configuration file</strong> <code>.pre-commit-config.yaml</code> with a local hook that runs <code>mergeway-cli fmt</code> on your data directories:</p>
+<pre><code class="language-yaml">repos:
+  - repo: local
+    hooks:
+      - id: mergeway-fmt
+        name: mergeway fmt
+        entry: mergeway-cli fmt
+        language: system
+        pass_filenames: false
+        files: ^data/(users|tags|posts|comments)/.*\.(ya?ml|json)$
+</code></pre>
+<p>The <code>entry</code> runs <code>mergeway-cli fmt</code> to rewrite any out‑of‑format records, <code>pass_filenames: false</code> tells Mergeway to discover files via <code>mergeway.yaml</code>, and the <code>files</code> regex limits the hook to data directories.</p>
+</li>
+<li>
+<p><strong>Install the hook</strong> into your Git repository:</p>
+<pre><code class="language-bash">pre-commit install --hook-type pre-commit
+# optionally also install a pre‑push hook
+pre-commit install --hook-type pre-push
+</code></pre>
+</li>
+<li>
+<p><strong>Test the hook</strong> by running it against all tracked files:</p>
+<pre><code class="language-bash">pre-commit run mergeway-fmt --all-files
+</code></pre>
+</li>
+</ol>
+<p>If the dataset already follows Mergeway’s canonical layout, the hook passes silently; otherwise it rewrites offending files or fails when using <code>--lint</code> mode. This keeps data consistent even before it reaches CI.</p>
+<h2 id="6-next-steps"><a class="header" href="#6-next-steps">6. Next steps</a></h2>
+<p>With the example repository and these guides you can experiment with Mergeway, extend the schema to reflect your own domain and automate formatting and validation. Use Mergeway’s other subcommands—such as <code>mergeway-cli gen-erd</code> to generate an entity relationship diagram and <code>mergeway-cli export</code> to snapshot the dataset—to further explore the capabilities. For deeper reference, consult the CLI documentation for commands like <code>mergeway-cli init</code>, <code>mergeway-cli list</code>, <code>mergeway-cli validate</code> and others.</p>
+<p>Mergeway encourages teams to treat their data like code: schemas live alongside source files, relationships are validated automatically and collaboration workflows ensure the right reviewers approve every change. Using the example repository as a starting point, you can adapt these patterns to your own projects.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../guides/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../guides/json-schema.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../guides/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../guides/json-schema.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>
