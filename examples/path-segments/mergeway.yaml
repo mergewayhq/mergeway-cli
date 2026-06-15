@@ -1,0 +1,35 @@
+mergeway:
+  version: 1
+
+entities:
+  Page:
+    description: Documentation pages stored in nested folders and identified by slug
+    identifier: slug
+    include:
+      - data/library/*/*.yaml
+    fields:
+      slug:
+        type: string
+        required: true
+      title:
+        type: string
+        required: true
+      kind:
+        type: string
+        required: true
+      section:
+        type: string
+        required: true
+        source:
+          path_segment: 2
+      filename:
+        type: string
+        required: true
+        source:
+          path_segment_rev: 0
+      relative_path:
+        type: string
+        required: true
+        source:
+          path: true
+      summary: string

@@ -121,6 +121,18 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		}
 	}
 
+	for name, field := range fields {
+		if field == nil || !field.Source.IsPathDerived() {
+			continue
+		}
+		if len(spec.Data) > 0 {
+			return nil, fmt.Errorf("config: type %q cannot use field %q source with inline data", rawType.Name, name)
+		}
+		if spec.Identifier.Field == name {
+			return nil, fmt.Errorf("config: type %q identifier field %q cannot derive its value from field source", rawType.Name, name)
+		}
+	}
+
 	inlineData := cloneInlineData(spec.Data)
 
 	return &TypeDefinition{
@@ -154,6 +166,22 @@ func normalizeFieldDefinition(name string, raw rawFieldDefinition, typeName stri
 	}
 	if len(raw.Fields.Entries) > 0 {
 		return nil, fmt.Errorf("config: field %s.%s uses unsupported nested fields; use properties for object fields", typeName, name)
+	}
+
+	source, err := normalizeFieldSource(raw.Source, name, typeName)
+	if err != nil {
+		return nil, err
+	}
+	if source != nil {
+		if raw.Repeated {
+			return nil, fmt.Errorf("config: field %s.%s cannot be repeated when source is defined", typeName, name)
+		}
+		if raw.Type == "integer" || raw.Type == "number" || raw.Type == "boolean" || raw.Type == "object" {
+			return nil, fmt.Errorf("config: field %s.%s source requires a string-like field type", typeName, name)
+		}
+		if raw.Default != nil {
+			return nil, fmt.Errorf("config: field %s.%s cannot define both source and default", typeName, name)
+		}
 	}
 
 	properties := make(map[string]*FieldDefinition)
@@ -197,7 +225,46 @@ func normalizeFieldDefinition(name string, raw rawFieldDefinition, typeName stri
 		Unique:        unique,
 		Pattern:       raw.Pattern,
 		Description:   raw.Description,
+		Source:        source,
 	}, nil
+}
+
+func normalizeFieldSource(raw rawFieldSourceDefinition, name, typeName string) (*FieldSourceDefinition, error) {
+	selected := 0
+	if raw.Path {
+		selected++
+	}
+	if raw.PathSegment != nil {
+		selected++
+	}
+	if raw.PathSegmentRev != nil {
+		selected++
+	}
+	if selected == 0 {
+		return nil, nil
+	}
+	if selected > 1 {
+		return nil, fmt.Errorf("config: field %s.%s source must declare exactly one path selector", typeName, name)
+	}
+	if raw.PathSegment != nil && *raw.PathSegment < 0 {
+		return nil, fmt.Errorf("config: field %s.%s source.path_segment must be >= 0", typeName, name)
+	}
+	if raw.PathSegmentRev != nil && *raw.PathSegmentRev < 0 {
+		return nil, fmt.Errorf("config: field %s.%s source.path_segment_rev must be >= 0", typeName, name)
+	}
+
+	source := &FieldSourceDefinition{
+		Path: raw.Path,
+	}
+	if raw.PathSegment != nil {
+		value := *raw.PathSegment
+		source.PathSegment = &value
+	}
+	if raw.PathSegmentRev != nil {
+		value := *raw.PathSegmentRev
+		source.PathSegmentRev = &value
+	}
+	return source, nil
 }
 
 var primitiveTypes = map[string]struct{}{

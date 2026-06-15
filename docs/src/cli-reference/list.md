@@ -15,7 +15,7 @@ mergeway-cli [global flags] list --type <type> [--filter key=value]
 | Flag       | Description                                                                                                                    |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `--type`   | Required. Type identifier to query.                                                                                            |
-| `--filter` | Optional `key=value` string used to filter objects before listing their IDs. The comparison is a simple string equality check. |
+| `--filter` | Optional `key=value` string used to filter objects before listing their IDs. The comparison is a simple string equality check. Declared read-only fields derived from file paths can also be used here. |
 
 ## Example
 
@@ -45,6 +45,12 @@ Output:
 
 ```
 post-001
+```
+
+Filter by a declared path-derived field:
+
+```bash
+mergeway-cli list --type Page --filter 'section=guides'
 ```
 
 ## Related Commands

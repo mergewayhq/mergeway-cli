@@ -19,6 +19,8 @@ mergeway-cli [global flags] get --type <type> <id>
 
 Use `--format json` if you prefer JSON output.
 
+If the schema declares read-only fields derived from the backing file path, `get` includes those fields in the output.
+
 ## Example
 
 Run the command from the workspace root. Use `--root` if you need to target another workspace.

@@ -86,6 +86,8 @@ entities:
 
 `identifier` accepts either a plain string field name (for example `identifier: id`), the reserved `$path` value to use the workspace-relative file path as the identifier, or a mapping with `field`, optional `generated`, and `pattern` keys when you need additional behavior. The `generated` flag is advisory for tooling; the CLI still expects identifiers to be supplied (inline or via `--id`). `$path` identifiers require one object per file and cannot be combined with inline `data`. Field entries also accept the shorthand `field: type` when no other metadata is needed; these default to optional fields.
 
+Field definitions may also declare a read-only `source` to derive values from the backing file path. Supported selectors are `path: true`, `path_segment: <n>`, and `path_segment_rev: <n>`. These values are exposed during reads and exports but are not persisted into the underlying files, and they are not available for inline records.
+
 Inline records declared under `data` are optional and most useful for tiny lookup sets or bootstrapping demos without creating separate files. Types that use `identifier: $path` cannot declare inline data because the identifier is derived from the backing file path.
 
 ### Field Specification

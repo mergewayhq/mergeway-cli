@@ -184,6 +184,9 @@ func appendFieldSchema(existing any, required []string, name string, field *conf
 	if field.Description != "" {
 		prop["description"] = field.Description
 	}
+	if field.Source != nil && field.Source.IsPathDerived() {
+		prop["readOnly"] = true
+	}
 
 	if field.Required {
 		required = append(required, name)

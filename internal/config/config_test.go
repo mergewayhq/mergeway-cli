@@ -172,6 +172,85 @@ func TestLoadInvalidIdentifier(t *testing.T) {
 	}
 }
 
+func TestLoadFieldPathSource(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  Page:
+    identifier: slug
+    include:
+      - data/pages/*.yaml
+    fields:
+      slug: string
+      section:
+        type: string
+        source:
+          path_segment: 1
+      filename:
+        type: string
+        source:
+          path_segment_rev: 0
+      relative_path:
+        type: string
+        source:
+          path: true
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load returned error: %v", err)
+	}
+
+	page := cfg.Types["Page"]
+	if page == nil {
+		t.Fatalf("expected Page type")
+	}
+	if page.Fields["section"].Source == nil || page.Fields["section"].Source.PathSegment == nil || *page.Fields["section"].Source.PathSegment != 1 {
+		t.Fatalf("expected section field path_segment source, got %#v", page.Fields["section"].Source)
+	}
+	if page.Fields["filename"].Source == nil || page.Fields["filename"].Source.PathSegmentRev == nil || *page.Fields["filename"].Source.PathSegmentRev != 0 {
+		t.Fatalf("expected filename field reverse path source, got %#v", page.Fields["filename"].Source)
+	}
+	if page.Fields["relative_path"].Source == nil || !page.Fields["relative_path"].Source.Path {
+		t.Fatalf("expected relative_path field full path source, got %#v", page.Fields["relative_path"].Source)
+	}
+}
+
+func TestLoadRejectsInlineDataWithFieldPathSource(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  Page:
+    identifier: slug
+    data:
+      - slug: guide-install
+    fields:
+      slug: string
+      section:
+        type: string
+        source:
+          path_segment: 1
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected error for inline data with field path source")
+	}
+	if got := err.Error(); !strings.Contains(got, "cannot use field \"section\" source with inline data") {
+		t.Fatalf("expected inline-data/path-source error, got %q", got)
+	}
+}
+
 func TestLoadUnknownReference(t *testing.T) {
 	path := filepath.Join("testdata", "unknown_reference", "mergeway.yaml")
 	_, err := Load(path)

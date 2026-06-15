@@ -76,14 +76,35 @@ func loadTypeObjects(root string, typeDef *config.TypeDefinition) ([]*rawObject,
 
 		if parsed.Multi {
 			for idx, item := range parsed.Items {
+				fields, err := fieldsWithDerivedValues(typeDef, relPath(root, match.path), item)
+				if err != nil {
+					errs = append(errs, Error{
+						Phase:   PhaseSchema,
+						Type:    typeDef.Name,
+						File:    relPath(root, match.path),
+						Message: err.Error(),
+					})
+					continue
+				}
 				records = append(records, &rawObject{
 					typeDef: typeDef,
 					file:    relPath(root, match.path),
 					source:  relPath(root, match.path),
 					index:   idx,
-					data:    item,
+					data:    fields,
 				})
 			}
+			continue
+		}
+
+		fields, err := fieldsWithDerivedValues(typeDef, relPath(root, match.path), parsed.Single)
+		if err != nil {
+			errs = append(errs, Error{
+				Phase:   PhaseSchema,
+				Type:    typeDef.Name,
+				File:    relPath(root, match.path),
+				Message: err.Error(),
+			})
 			continue
 		}
 
@@ -92,7 +113,7 @@ func loadTypeObjects(root string, typeDef *config.TypeDefinition) ([]*rawObject,
 			file:    relPath(root, match.path),
 			source:  relPath(root, match.path),
 			index:   -1,
-			data:    parsed.Single,
+			data:    fields,
 		})
 	}
 

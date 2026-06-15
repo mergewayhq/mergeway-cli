@@ -121,6 +121,26 @@ Strings remain a shorthand for `path` with no `selector`; Mergeway then reads th
 | `json_schema` | Path to a JSON Schema (draft 2020-12) file relative to the schema that declares the entity. When present, Mergeway derives field definitions from the JSON Schema and you can omit the `fields` block.                                                                                                                                                                     |
 | `data`        | Optional array of inline records. Each entry needs to contain the identifier field and follows the same schema rules as external data files. This block cannot be used when `identifier: $path` because inline records do not have file paths.                                                                                                                                                                         |
 
+Fields can also declare a read-only `source` that derives values from the backing file path:
+
+```yaml
+fields:
+  section:
+    type: string
+    source:
+      path_segment: 2
+  filename:
+    type: string
+    source:
+      path_segment_rev: 0
+  relative_path:
+    type: string
+    source:
+      path: true
+```
+
+Exactly one source selector may be set per field. `path_segment` counts from the workspace root downward, `path_segment_rev` counts backward from the filename, and `path: true` exposes the full normalized relative file path. These fields are available in `get`, `list --filter`, and `export`, but they are not written back into source files. Path-derived fields require file-backed records and therefore cannot be used with inline `data`.
+
 Add `description` anywhere you need extra context. Entities accept it alongside `identifier`, and each field definition supports its own `description` value.
 
 ### Inline Data

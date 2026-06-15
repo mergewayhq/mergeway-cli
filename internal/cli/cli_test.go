@@ -57,6 +57,26 @@ func TestGet(t *testing.T) {
 	if !strings.Contains(stdout.String(), "\"name\": \"Alice Example\"") {
 		t.Fatalf("unexpected output: %s", stdout.String())
 	}
+	if strings.Contains(stdout.String(), "\"$path\"") {
+		t.Fatalf("expected no implicit path metadata, got %s", stdout.String())
+	}
+}
+
+func TestListFilterSupportsDeclaredPathDerivedFields(t *testing.T) {
+	repo := pathSegmentsRepo(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "list", "--type", "Page", "--filter", "section=guides"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("exit code %d, stderr %s", code, stderr.String())
+	}
+
+	lines := strings.Fields(stdout.String())
+	expected := []string{"guide-install", "guide-validate"}
+	if !reflect.DeepEqual(lines, expected) {
+		t.Fatalf("expected filtered IDs %v, got %v", expected, lines)
+	}
 }
 
 func TestCreateAndList(t *testing.T) {
@@ -771,6 +791,9 @@ func TestPathIdentifierLifecycleCommands(t *testing.T) {
 	if !strings.Contains(getOut.String(), "title: Alpha") {
 		t.Fatalf("expected note payload, got %s", getOut.String())
 	}
+	if strings.Contains(getOut.String(), "$path:") || strings.Contains(getOut.String(), "$path_segment") {
+		t.Fatalf("expected no implicit path metadata, got %s", getOut.String())
+	}
 
 	payload := filepath.Join(t.TempDir(), "note.yaml")
 	if err := os.WriteFile(payload, []byte("title: Beta\n"), 0o644); err != nil {
@@ -876,6 +899,48 @@ func TestExternalPathIdentifierReadCommands(t *testing.T) {
 	products := payload["Product"]
 	if len(products) != 2 {
 		t.Fatalf("expected 2 exported products, got %d", len(products))
+	}
+	if products[0]["$path"] != nil {
+		t.Fatalf("expected exported products to omit implicit path metadata, got %v", products[0])
+	}
+}
+
+func TestDeclaredPathDerivedFieldsAppearInGetAndExport(t *testing.T) {
+	repo := pathSegmentsRepo(t)
+
+	getOut := &bytes.Buffer{}
+	getErr := &bytes.Buffer{}
+	code := Run([]string{"--root", repo, "get", "--type", "Page", "guide-install"}, getOut, getErr)
+	if code != 0 {
+		t.Fatalf("get exit %d stderr %s", code, getErr.String())
+	}
+	if !strings.Contains(getOut.String(), "section: guides") || !strings.Contains(getOut.String(), "filename: install.yaml") || !strings.Contains(getOut.String(), "relative_path: data/library/guides/install.yaml") {
+		t.Fatalf("expected declared derived fields in get output, got %s", getOut.String())
+	}
+	if strings.Contains(getOut.String(), "$path_segment") {
+		t.Fatalf("expected no implicit path segment fields, got %s", getOut.String())
+	}
+
+	exportOut := &bytes.Buffer{}
+	exportErr := &bytes.Buffer{}
+	code = Run([]string{"--root", repo, "--format", "json", "export", "Page"}, exportOut, exportErr)
+	if code != 0 {
+		t.Fatalf("export exit %d stderr %s", code, exportErr.String())
+	}
+
+	var payload map[string][]map[string]any
+	if err := json.Unmarshal(exportOut.Bytes(), &payload); err != nil {
+		t.Fatalf("parse export: %v", err)
+	}
+	pages := payload["Page"]
+	if len(pages) == 0 {
+		t.Fatalf("expected exported pages, got %v", payload)
+	}
+	if pages[0]["section"] == nil || pages[0]["filename"] == nil || pages[0]["relative_path"] == nil {
+		t.Fatalf("expected declared derived fields in export, got %v", pages[0])
+	}
+	if pages[0]["$path"] != nil {
+		t.Fatalf("expected no implicit path metadata in export, got %v", pages[0])
 	}
 }
 
@@ -1177,6 +1242,58 @@ entities:
 	}
 	if err := os.WriteFile(filepath.Join(root, "data", "notes", "alpha.yaml"), []byte("title: Alpha\n"), 0o644); err != nil {
 		t.Fatalf("write seed note: %v", err)
+	}
+	return root
+}
+
+func pathSegmentsRepo(t *testing.T) string {
+	t.Helper()
+	root := t.TempDir()
+	config := `mergeway:
+  version: 1
+
+entities:
+  Page:
+    identifier: slug
+    include:
+      - data/library/*/*.yaml
+    fields:
+      slug:
+        type: string
+      title:
+        type: string
+      kind:
+        type: string
+      section:
+        type: string
+        source:
+          path_segment: 2
+      filename:
+        type: string
+        source:
+          path_segment_rev: 0
+      relative_path:
+        type: string
+        source:
+          path: true
+`
+	if err := os.WriteFile(filepath.Join(root, "mergeway.yaml"), []byte(config), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(root, "data", "library", "guides"), 0o755); err != nil {
+		t.Fatalf("create guides dir: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(root, "data", "library", "reference"), 0o755); err != nil {
+		t.Fatalf("create reference dir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "data", "library", "guides", "install.yaml"), []byte("slug: guide-install\ntitle: Install Mergeway\nkind: guide\n"), 0o644); err != nil {
+		t.Fatalf("write install page: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "data", "library", "guides", "validate.yaml"), []byte("slug: guide-validate\ntitle: Validate a Workspace\nkind: guide\n"), 0o644); err != nil {
+		t.Fatalf("write validate page: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "data", "library", "reference", "config.yaml"), []byte("slug: ref-config\ntitle: Configuration Reference\nkind: reference\n"), 0o644); err != nil {
+		t.Fatalf("write config page: %v", err)
 	}
 	return root
 }

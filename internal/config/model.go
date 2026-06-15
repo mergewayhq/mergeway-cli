@@ -86,6 +86,19 @@ type FieldDefinition struct {
 	Pattern        string
 	Description    string
 	PropertyOrder  []string
+	Source         *FieldSourceDefinition `yaml:"source,omitempty" json:"source,omitempty"`
+}
+
+// FieldSourceDefinition describes a synthetic field value derived at read time.
+type FieldSourceDefinition struct {
+	Path           bool `yaml:"path,omitempty" json:"path,omitempty"`
+	PathSegment    *int `yaml:"path_segment,omitempty" json:"path_segment,omitempty"`
+	PathSegmentRev *int `yaml:"path_segment_rev,omitempty" json:"path_segment_rev,omitempty"`
+}
+
+// IsPathDerived returns true when the field value is derived from the backing file path.
+func (d *FieldSourceDefinition) IsPathDerived() bool {
+	return d != nil && (d.Path || d.PathSegment != nil || d.PathSegmentRev != nil)
 }
 
 // IsReference returns true when the field stores an identifier for one or more entity types.

@@ -1,0 +1,4 @@
+slug: guide-validate
+title: Validate a Workspace
+kind: guide
+summary: Run schema, format, and reference checks before committing.

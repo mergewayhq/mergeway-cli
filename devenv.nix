@@ -5,7 +5,8 @@
 
   packages = [
     pkgs.pre-commit
-    pkgs.go_1_24
+    pkgs.yamllint
+    pkgs.go_1_26
     pkgs.golangci-lint
     pkgs.mdbook
     pkgs.graphviz

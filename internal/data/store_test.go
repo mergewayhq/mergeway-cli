@@ -36,6 +36,9 @@ func TestStoreListAndGet(t *testing.T) {
 	if obj.Fields["title"] != "First Post" {
 		t.Fatalf("expected title 'First Post', got %v", obj.Fields["title"])
 	}
+	if _, ok := obj.Fields["$path"]; ok {
+		t.Fatalf("expected no implicit $path metadata, got %#v", obj.Fields)
+	}
 
 	tags, ok := obj.Fields["tags"].([]any)
 	if !ok || len(tags) != 2 {
@@ -281,6 +284,9 @@ func TestStorePathIdentifiers(t *testing.T) {
 	if obj.Fields["title"] != "Alpha" {
 		t.Fatalf("expected title Alpha, got %v", obj.Fields["title"])
 	}
+	if _, ok := obj.Fields["$path"]; ok {
+		t.Fatalf("expected no implicit $path metadata, got %#v", obj.Fields)
+	}
 
 	created, err := store.Create("Note", map[string]any{
 		"$path": "data/notes/beta.yaml",
@@ -345,6 +351,74 @@ func TestStoreExternalPathIdentifiersAreReadable(t *testing.T) {
 	}
 	if obj.Fields["name"] != "Widget" {
 		t.Fatalf("expected product name Widget, got %v", obj.Fields["name"])
+	}
+	if _, ok := obj.Fields["$path"]; ok {
+		t.Fatalf("expected no implicit $path metadata, got %#v", obj.Fields)
+	}
+}
+
+func TestStoreDeclaredPathDerivedFields(t *testing.T) {
+	store, repo := setupPathSegmentsStore(t)
+
+	obj, err := store.Get("Page", "guide-install")
+	if err != nil {
+		t.Fatalf("Get returned error: %v", err)
+	}
+	if obj.Fields["section"] != "guides" {
+		t.Fatalf("expected section guides, got %v", obj.Fields["section"])
+	}
+	if obj.Fields["filename"] != "install.yaml" {
+		t.Fatalf("expected filename install.yaml, got %v", obj.Fields["filename"])
+	}
+	if obj.Fields["relative_path"] != "data/library/guides/install.yaml" {
+		t.Fatalf("expected derived relative path, got %v", obj.Fields["relative_path"])
+	}
+	if _, ok := obj.Fields["$path_segment0"]; ok {
+		t.Fatalf("expected no implicit path segment fields, got %#v", obj.Fields)
+	}
+
+	created, err := store.Create("Page", map[string]any{
+		"slug":          "guide-release",
+		"title":         "Release Guide",
+		"kind":          "guide",
+		"section":       "bad",
+		"filename":      "bad.yaml",
+		"relative_path": "bad/path.yaml",
+	})
+	if err != nil {
+		t.Fatalf("Create returned error: %v", err)
+	}
+	if created.Fields["section"] != "guides" || created.Fields["filename"] != "guide-release.yaml" {
+		t.Fatalf("expected created object to expose derived values, got %#v", created.Fields)
+	}
+
+	createdBody, err := os.ReadFile(filepath.Join(repo, "data", "library", "guides", "guide-release.yaml"))
+	if err != nil {
+		t.Fatalf("read created page: %v", err)
+	}
+	if strings.Contains(string(createdBody), "section:") || strings.Contains(string(createdBody), "filename:") || strings.Contains(string(createdBody), "relative_path:") {
+		t.Fatalf("expected created file to omit derived fields, got %s", string(createdBody))
+	}
+
+	updated, err := store.Update("Page", "guide-install", map[string]any{
+		"title":         "Install Mergeway Updated",
+		"section":       "bad",
+		"filename":      "bad.yaml",
+		"relative_path": "bad/path.yaml",
+	}, true)
+	if err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+	if updated.Fields["section"] != "guides" || updated.Fields["filename"] != "install.yaml" {
+		t.Fatalf("expected updated object to recompute derived values, got %#v", updated.Fields)
+	}
+
+	updatedBody, err := os.ReadFile(filepath.Join(repo, "data", "library", "guides", "install.yaml"))
+	if err != nil {
+		t.Fatalf("read updated page: %v", err)
+	}
+	if strings.Contains(string(updatedBody), "section:") || strings.Contains(string(updatedBody), "filename:") || strings.Contains(string(updatedBody), "relative_path:") {
+		t.Fatalf("expected updated file to omit derived fields, got %s", string(updatedBody))
 	}
 }
 
@@ -469,6 +543,59 @@ func setupStore(t *testing.T, fixture string) (*Store, string) {
 		t.Fatalf("new store: %v", err)
 	}
 
+	return store, repo
+}
+
+func setupPathSegmentsStore(t *testing.T) (*Store, string) {
+	t.Helper()
+	repo := t.TempDir()
+	cfgBody := `mergeway:
+  version: 1
+
+entities:
+  Page:
+    identifier: slug
+    include:
+      - data/library/guides/*.yaml
+    fields:
+      slug:
+        type: string
+      title:
+        type: string
+      kind:
+        type: string
+      section:
+        type: string
+        source:
+          path_segment: 2
+      filename:
+        type: string
+        source:
+          path_segment_rev: 0
+      relative_path:
+        type: string
+        source:
+          path: true
+`
+	if err := os.WriteFile(filepath.Join(repo, "mergeway.yaml"), []byte(cfgBody), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(repo, "data", "library", "guides"), 0o755); err != nil {
+		t.Fatalf("mkdir guides: %v", err)
+	}
+	body := "slug: guide-install\ntitle: Install Mergeway\nkind: guide\n"
+	if err := os.WriteFile(filepath.Join(repo, "data", "library", "guides", "install.yaml"), []byte(body), 0o644); err != nil {
+		t.Fatalf("write data: %v", err)
+	}
+
+	cfg, err := config.Load(filepath.Join(repo, "mergeway.yaml"))
+	if err != nil {
+		t.Fatalf("load config: %v", err)
+	}
+	store, err := NewStore(repo, cfg)
+	if err != nil {
+		t.Fatalf("new store: %v", err)
+	}
 	return store, repo
 }
 

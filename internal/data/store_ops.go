@@ -51,7 +51,13 @@ func (s *Store) Get(typeName, id string) (*Object, error) {
 		return nil, fmt.Errorf("data: %s %q not found", typeName, id)
 	}
 
-	return loc.cloneObject(), nil
+	obj := loc.cloneObject()
+	fields, err := s.fieldsWithDerivedValues(typeDef, obj.File, obj.Fields)
+	if err != nil {
+		return nil, err
+	}
+	obj.Fields = fields
+	return obj, nil
 }
 
 // LoadAll retrieves all objects of a type.
@@ -101,7 +107,7 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 		return nil, err
 	}
 
-	normalized := cleanFields(fields)
+	normalized := cleanFieldsForType(typeDef, fields)
 	if !typeDef.Identifier.IsPath() {
 		idField := typeDef.Identifier.Field
 		normalized[idField] = normalizedID
@@ -126,10 +132,14 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 		if err := s.writeFile(target.Path, fi); err != nil {
 			return nil, err
 		}
+		returnFields, err := s.fieldsWithDerivedValues(typeDef, target.Path, normalized)
+		if err != nil {
+			return nil, err
+		}
 		return &Object{
 			Type:     typeDef.Name,
 			ID:       idValue,
-			Fields:   cloneMap(normalized),
+			Fields:   returnFields,
 			File:     target.Path,
 			ReadOnly: false,
 		}, nil
@@ -138,11 +148,15 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 	if err := s.writeSingle(target.Path, target.Format, normalized); err != nil {
 		return nil, err
 	}
+	returnFields, err := s.fieldsWithDerivedValues(typeDef, target.Path, normalized)
+	if err != nil {
+		return nil, err
+	}
 
 	return &Object{
 		Type:     typeDef.Name,
 		ID:       idValue,
-		Fields:   cloneMap(normalized),
+		Fields:   returnFields,
 		File:     target.Path,
 		ReadOnly: false,
 	}, nil
@@ -180,7 +194,7 @@ func (s *Store) Update(typeName, id string, fields map[string]any, merge bool) (
 	if merge {
 		mergeMaps(updated, fields)
 	} else {
-		updated = cleanFields(fields)
+		updated = cleanFieldsForType(typeDef, fields)
 	}
 
 	if !typeDef.Identifier.IsPath() {
@@ -197,16 +211,21 @@ func (s *Store) Update(typeName, id string, fields map[string]any, merge bool) (
 		updated[idField] = normalizedID
 	}
 	removeTypeKeys(updated)
+	removeDerivedFieldKeys(typeDef, updated)
 
 	if loc.Multi {
 		loc.File.Items[loc.Index] = cloneMap(updated)
 		if err := s.writeFile(loc.FilePath, loc.File); err != nil {
 			return nil, err
 		}
+		returnFields, err := s.fieldsWithDerivedValues(typeDef, loc.FilePath, updated)
+		if err != nil {
+			return nil, err
+		}
 		return &Object{
 			Type:     typeDef.Name,
 			ID:       id,
-			Fields:   cloneMap(updated),
+			Fields:   returnFields,
 			File:     loc.FilePath,
 			ReadOnly: false,
 		}, nil
@@ -215,11 +234,15 @@ func (s *Store) Update(typeName, id string, fields map[string]any, merge bool) (
 	if err := s.writeSingle(loc.FilePath, loc.Format, updated); err != nil {
 		return nil, err
 	}
+	returnFields, err := s.fieldsWithDerivedValues(typeDef, loc.FilePath, updated)
+	if err != nil {
+		return nil, err
+	}
 
 	return &Object{
 		Type:     typeDef.Name,
 		ID:       id,
-		Fields:   cloneMap(updated),
+		Fields:   returnFields,
 		File:     loc.FilePath,
 		ReadOnly: false,
 	}, nil

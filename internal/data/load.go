@@ -43,10 +43,14 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 				if err != nil {
 					return nil, fmt.Errorf("data: %s in %s: %w", typeDef.Name, fc.Path, err)
 				}
+				fields, err := s.fieldsWithDerivedValues(typeDef, fc.Path, item)
+				if err != nil {
+					return nil, fmt.Errorf("data: %s in %s: %w", typeDef.Name, fc.Path, err)
+				}
 				objects = append(objects, &Object{
 					Type:     typeDef.Name,
 					ID:       idVal,
-					Fields:   cloneMap(item),
+					Fields:   fields,
 					File:     fc.Path,
 					ReadOnly: fc.ReadOnly,
 				})
@@ -59,11 +63,15 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 		if err != nil {
 			return nil, fmt.Errorf("data: %s in %s: %w", typeDef.Name, fc.Path, err)
 		}
+		fields, err := s.fieldsWithDerivedValues(typeDef, fc.Path, fc.Single)
+		if err != nil {
+			return nil, fmt.Errorf("data: %s in %s: %w", typeDef.Name, fc.Path, err)
+		}
 
 		objects = append(objects, &Object{
 			Type:     typeDef.Name,
 			ID:       idVal,
-			Fields:   cloneMap(fc.Single),
+			Fields:   fields,
 			File:     fc.Path,
 			ReadOnly: fc.ReadOnly,
 		})

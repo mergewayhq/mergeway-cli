@@ -157,12 +157,6 @@ func mergeMaps(dst map[string]any, src map[string]any) {
 	}
 }
 
-func cleanFields(fields map[string]any) map[string]any {
-	data := cloneMap(fields)
-	removeSystemKeys(data)
-	return data
-}
-
 func removeTypeKeys(m map[string]any) {
 	removeSystemKeys(m)
 }

@@ -114,17 +114,24 @@ func (r *rawIdentifierSpec) UnmarshalYAML(node *yaml.Node) error {
 }
 
 type rawFieldDefinition struct {
-	Type        string      `yaml:"type"`
-	Required    bool        `yaml:"required"`
-	Repeated    bool        `yaml:"repeated"`
-	Format      string      `yaml:"format"`
-	Enum        []string    `yaml:"enum"`
-	Default     any         `yaml:"default"`
-	Properties  rawFieldMap `yaml:"properties"`
-	Fields      rawFieldMap `yaml:"fields"`
-	Unique      *bool       `yaml:"unique"`
-	Pattern     string      `yaml:"pattern"`
-	Description string      `yaml:"description"`
+	Type        string                   `yaml:"type"`
+	Required    bool                     `yaml:"required"`
+	Repeated    bool                     `yaml:"repeated"`
+	Format      string                   `yaml:"format"`
+	Enum        []string                 `yaml:"enum"`
+	Default     any                      `yaml:"default"`
+	Properties  rawFieldMap              `yaml:"properties"`
+	Fields      rawFieldMap              `yaml:"fields"`
+	Unique      *bool                    `yaml:"unique"`
+	Pattern     string                   `yaml:"pattern"`
+	Description string                   `yaml:"description"`
+	Source      rawFieldSourceDefinition `yaml:"source"`
+}
+
+type rawFieldSourceDefinition struct {
+	Path           bool `yaml:"path"`
+	PathSegment    *int `yaml:"path_segment"`
+	PathSegmentRev *int `yaml:"path_segment_rev"`
 }
 
 func (r *rawFieldDefinition) UnmarshalYAML(node *yaml.Node) error {

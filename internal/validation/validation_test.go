@@ -223,6 +223,55 @@ func TestValidateAllowsPathIdentifiers(t *testing.T) {
 	}
 }
 
+func TestValidateAllowsDeclaredPathDerivedFields(t *testing.T) {
+	root := t.TempDir()
+	cfgBody := `mergeway:
+  version: 1
+
+entities:
+  Page:
+    identifier: slug
+    include:
+      - data/library/*/*.yaml
+    fields:
+      slug:
+        type: string
+        required: true
+      title:
+        type: string
+        required: true
+      section:
+        type: string
+        required: true
+        source:
+          path_segment: 2
+      filename:
+        type: string
+        required: true
+        source:
+          path_segment_rev: 0
+`
+	if err := os.WriteFile(filepath.Join(root, "mergeway.yaml"), []byte(cfgBody), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(root, "data", "library", "guides"), 0o755); err != nil {
+		t.Fatalf("mkdir data: %v", err)
+	}
+	body := "slug: guide-install\ntitle: Install Mergeway\n"
+	if err := os.WriteFile(filepath.Join(root, "data", "library", "guides", "install.yaml"), []byte(body), 0o644); err != nil {
+		t.Fatalf("write data: %v", err)
+	}
+
+	cfg := loadConfig(t, root)
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+	if len(res.Errors) != 0 {
+		t.Fatalf("expected no errors, got %v", res.Errors)
+	}
+}
+
 func TestValidateRejectsPathIdentifierMultiObjectFiles(t *testing.T) {
 	root := fixturePath(t, "path_identifier_multi")
 	cfg := loadConfig(t, root)
