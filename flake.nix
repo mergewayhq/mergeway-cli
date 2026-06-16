@@ -18,7 +18,7 @@
           src = self;
 
           #vendorHash = nixpkgs.lib.fakeHash;
-          vendorHash = "sha256-XWZkA4OfZxHifxu61vdknzd4TIM+UVK7LOygIhZsFIg=";
+          vendorHash = "sha256-GIywKtfAg2YM699l9Jzw+yuiSyU9IpD3XV8ix93U5Ms=";
 
           ldflags =
             let
