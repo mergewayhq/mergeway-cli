@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/mergewayhq/mergeway-cli/internal/validation"
+	"github.com/mergewayhq/mergeway-cli/internal/workspace"
 	"github.com/spf13/cobra"
 )
 
@@ -19,22 +20,17 @@ func newValidateCommand() *cobra.Command {
 				return err
 			}
 
-			cfg, err := loadConfig(ctx)
-			if err != nil {
-				_, _ = fmt.Fprintf(ctx.Stderr, "validate: %v\n", err)
-				return newExitError(1)
-			}
-
 			opts := validation.Options{
 				FailFast: ctx.FailFast,
 				Phases:   phaseFlags.Values,
 			}
 
-			result, err := validation.Validate(ctx.Root, cfg, opts)
+			report, err := workspace.Validate(ctx.Root, ctx.Config, opts)
 			if err != nil {
 				_, _ = fmt.Fprintf(ctx.Stderr, "validate: %v\n", err)
 				return newExitError(1)
 			}
+			result := report.Result
 
 			if len(result.Errors) == 0 {
 				if code := writeFormatted(ctx, map[string]string{"status": "validation succeeded"}); code != 0 {

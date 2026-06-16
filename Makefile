@@ -41,6 +41,9 @@ lint: check-go
 test: check-go
 	$(GORUN) test ./...
 
+e2e: build-cli
+	./e2e_test/mw_e2e_test.sh
+
 race: check-go
 	$(GORUN) test -race ./...
 
