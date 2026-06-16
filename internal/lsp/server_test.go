@@ -9,6 +9,7 @@ import (
 	"io"
 	"log/slog"
 	"net"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -44,6 +45,9 @@ func TestRunInitializeShutdownExit(t *testing.T) {
 	if result.ServerInfo == nil || result.ServerInfo.Name != "mergeway-lsp" {
 		t.Fatalf("unexpected server info: %+v", result.ServerInfo)
 	}
+	if result.Capabilities.Workspace == nil || result.Capabilities.Workspace.WorkspaceFolders == nil || !result.Capabilities.Workspace.WorkspaceFolders.Supported {
+		t.Fatalf("expected workspace folder capability to be advertised, got %+v", result.Capabilities.Workspace)
+	}
 
 	if _, err := client.Call(context.Background(), protocol.MethodShutdown, nil, nil); err != nil {
 		t.Fatalf("shutdown: %v", err)
@@ -58,6 +62,68 @@ func TestRunInitializeShutdownExit(t *testing.T) {
 	}
 	if res.code != 0 {
 		t.Fatalf("expected clean shutdown exit code, got %d", res.code)
+	}
+}
+
+func TestHandleInitializeBuildsRootsFromWorkspaceFolders(t *testing.T) {
+	server := NewServer(Options{Logger: testLogger()})
+	base := filepath.Join("..", "workspace", "testdata", "phase4")
+	rootA := uri.File(filepath.Join(base, "multi-root", "root-a"))
+	rootB := uri.File(filepath.Join(base, "multi-root", "root-b"))
+	missing := uri.File(filepath.Join(base, "no-config"))
+
+	req, err := jsonrpc2.NewCall(jsonrpc2.NewNumberID(1), protocol.MethodInitialize, &protocol.InitializeParams{
+		WorkspaceFolders: []protocol.WorkspaceFolder{
+			{URI: string(rootA), Name: "root-a"},
+			{URI: string(rootB), Name: "root-b"},
+			{URI: string(missing), Name: "no-config"},
+		},
+	})
+	if err != nil {
+		t.Fatalf("NewCall: %v", err)
+	}
+
+	var result protocol.InitializeResult
+	if err := server.Handle(context.Background(), captureReply(t, &result), req); err != nil {
+		t.Fatalf("Handle(initialize): %v", err)
+	}
+
+	if server.roots == nil {
+		t.Fatalf("expected roots to be initialized")
+	}
+	if got := len(server.roots.Roots); got != 2 {
+		t.Fatalf("expected 2 detected roots, got %d", got)
+	}
+	if got := len(server.roots.MissingRoots); got != 1 {
+		t.Fatalf("expected 1 missing root, got %d", got)
+	}
+	if result.Capabilities.Workspace == nil || result.Capabilities.Workspace.WorkspaceFolders == nil {
+		t.Fatalf("expected workspace capabilities in initialize result")
+	}
+}
+
+func TestHandleInitializeSupportsNoConfigRootURI(t *testing.T) {
+	server := NewServer(Options{Logger: testLogger()})
+	missing := uri.File(filepath.Join("..", "workspace", "testdata", "phase4", "no-config"))
+
+	req, err := jsonrpc2.NewCall(jsonrpc2.NewNumberID(1), protocol.MethodInitialize, map[string]any{
+		"rootUri": string(missing),
+	})
+	if err != nil {
+		t.Fatalf("NewCall: %v", err)
+	}
+
+	if err := server.Handle(context.Background(), captureReply[protocol.InitializeResult](t, nil), req); err != nil {
+		t.Fatalf("Handle(initialize): %v", err)
+	}
+	if server.roots == nil {
+		t.Fatalf("expected roots state to be initialized")
+	}
+	if got := len(server.roots.Roots); got != 0 {
+		t.Fatalf("expected no detected roots, got %d", got)
+	}
+	if got := len(server.roots.MissingRoots); got != 1 {
+		t.Fatalf("expected one missing root, got %d", got)
 	}
 }
 
@@ -205,6 +271,27 @@ func waitServeResult(t *testing.T, ch <-chan serveResult) serveResult {
 
 func testLogger() *slog.Logger {
 	return slog.New(slog.NewTextHandler(io.Discard, nil))
+}
+
+func captureReply[T any](t *testing.T, target *T) jsonrpc2.Replier {
+	t.Helper()
+	return func(_ context.Context, result interface{}, err error) error {
+		if err != nil {
+			return err
+		}
+		if target == nil || result == nil {
+			return nil
+		}
+
+		body, marshalErr := json.Marshal(result)
+		if marshalErr != nil {
+			t.Fatalf("marshal reply: %v", marshalErr)
+		}
+		if unmarshalErr := json.Unmarshal(body, target); unmarshalErr != nil {
+			t.Fatalf("unmarshal reply: %v", unmarshalErr)
+		}
+		return nil
+	}
 }
 
 func mustCleanupClose(t *testing.T, closer io.Closer) {

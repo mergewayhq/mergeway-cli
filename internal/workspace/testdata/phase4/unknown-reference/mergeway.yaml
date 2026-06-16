@@ -1,0 +1,29 @@
+mergeway:
+  version: 1
+
+entities:
+  User:
+    identifier: id
+    include:
+      - data/users/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true
+  Post:
+    identifier: id
+    include:
+      - data/posts/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      author:
+        type: User
+        required: true
+      title:
+        type: string
+        required: true

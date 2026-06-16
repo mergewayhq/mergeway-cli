@@ -1,0 +1,15 @@
+mergeway:
+  version: 1
+
+entities:
+  User:
+    identifier: id
+    include:
+      - data/users/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true

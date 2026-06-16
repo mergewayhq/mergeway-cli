@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/mergewayhq/mergeway-cli/internal/version"
+	"github.com/mergewayhq/mergeway-cli/internal/workspace"
 	"go.lsp.dev/jsonrpc2"
 	"go.lsp.dev/protocol"
 	"go.lsp.dev/uri"
@@ -31,6 +32,7 @@ type Server struct {
 	trace             protocol.TraceValue
 	rootURI           uri.URI
 	workspaceFolders  []uri.URI
+	roots             *workspace.RootSet
 }
 
 // Run serves LSP traffic over a stdio-compatible connection until the client
@@ -136,6 +138,12 @@ func (s *Server) handleInitialize(ctx context.Context, reply jsonrpc2.Replier, r
 	s.trace = params.Trace
 	s.rootURI = resolveRootURI(&params, legacy)
 	s.workspaceFolders = resolveWorkspaceFolders(&params)
+	roots, err := workspace.OpenRoots(resolveRootCandidates(s.rootURI, s.workspaceFolders))
+	if err != nil {
+		s.mu.Unlock()
+		return reply(ctx, nil, err)
+	}
+	s.roots = roots
 	s.initialized = true
 	s.shutdownRequested = false
 	s.exitCode = 1
@@ -144,11 +152,20 @@ func (s *Server) handleInitialize(ctx context.Context, reply jsonrpc2.Replier, r
 	s.logger.Debug("initialize",
 		slog.String("root_uri", string(s.rootURI)),
 		slog.Int("workspace_folders", len(s.workspaceFolders)),
+		slog.Int("detected_roots", len(roots.Roots)),
+		slog.Int("missing_roots", len(roots.MissingRoots)),
 		slog.String("trace", string(s.trace)),
 	)
 
 	result := &protocol.InitializeResult{
-		Capabilities: protocol.ServerCapabilities{},
+		Capabilities: protocol.ServerCapabilities{
+			Workspace: &protocol.ServerCapabilitiesWorkspace{
+				WorkspaceFolders: &protocol.ServerCapabilitiesWorkspaceFolders{
+					Supported:           true,
+					ChangeNotifications: false,
+				},
+			},
+		},
 		ServerInfo: &protocol.ServerInfo{
 			Name:    "mergeway-lsp",
 			Version: version.Number,
@@ -260,6 +277,23 @@ func resolveWorkspaceFolders(params *protocol.InitializeParams) []uri.URI {
 		folders = append(folders, uri.URI(folder.URI))
 	}
 	return folders
+}
+
+func resolveRootCandidates(rootURI uri.URI, workspaceFolders []uri.URI) []string {
+	if len(workspaceFolders) > 0 {
+		roots := make([]string, 0, len(workspaceFolders))
+		for _, folder := range workspaceFolders {
+			if folder == "" {
+				continue
+			}
+			roots = append(roots, folder.Filename())
+		}
+		return roots
+	}
+	if rootURI != "" {
+		return []string{rootURI.Filename()}
+	}
+	return nil
 }
 
 func decodeParams(raw json.RawMessage, dst interface{}) error {

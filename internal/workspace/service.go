@@ -174,7 +174,15 @@ func resolvePaths(root, configPath string) (string, string, error) {
 
 	resolvedConfig := configPath
 	if resolvedConfig == "" {
-		resolvedConfig = filepath.Join(resolvedRoot, "mergeway.yaml")
+		detected, ok, err := DetectConfigPath(resolvedRoot)
+		if err != nil {
+			return "", "", err
+		}
+		if ok {
+			resolvedConfig = detected
+		} else {
+			resolvedConfig = filepath.Join(resolvedRoot, "mergeway.yaml")
+		}
 	}
 	if !filepath.IsAbs(resolvedConfig) {
 		resolvedConfig = filepath.Join(resolvedRoot, resolvedConfig)
