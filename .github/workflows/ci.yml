@@ -41,7 +41,7 @@ jobs:
 
       - name: Verify version command
         run: |
-          go run . version
+          go run cmd/mergeway-cli/main.go version
 
       - name: Install Nix
         uses: nixbuild/nix-quick-install-action@v30
