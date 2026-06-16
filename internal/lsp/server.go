@@ -19,21 +19,28 @@ import (
 // Options configures the LSP transport service.
 type Options struct {
 	Logger *slog.Logger
+
+	// PublishDiagnostics optionally overrides outbound diagnostics publishing.
+	// It is primarily intended for tests.
+	PublishDiagnostics func(context.Context, *protocol.PublishDiagnosticsParams) error
 }
 
 // Server handles the minimal LSP lifecycle required for phase 3.
 type Server struct {
 	logger *slog.Logger
 
-	mu                sync.Mutex
-	initialized       bool
-	shutdownRequested bool
-	exitCode          int
-	trace             protocol.TraceValue
-	rootURI           uri.URI
-	workspaceFolders  []uri.URI
-	roots             *workspace.RootSet
-	runtime           *workspace.Runtime
+	mu                 sync.Mutex
+	initialized        bool
+	shutdownRequested  bool
+	exitCode           int
+	trace              protocol.TraceValue
+	rootURI            uri.URI
+	workspaceFolders   []uri.URI
+	roots              *workspace.RootSet
+	runtime            *workspace.Runtime
+	publishDiagnostics diagnosticPublisher
+	publishMu          sync.Mutex
+	publishedPaths     map[string]struct{}
 }
 
 // Run serves LSP traffic over a stdio-compatible connection until the client
@@ -45,6 +52,10 @@ func Run(ctx context.Context, conn io.ReadWriteCloser, opts Options) (int, error
 
 	server := NewServer(opts)
 	stream := jsonrpc2.NewStream(conn)
+	writeMu := &sync.Mutex{}
+	if server.publishDiagnostics == nil {
+		server.publishDiagnostics = streamDiagnosticPublisher(stream, writeMu)
+	}
 	handler := protocol.CancelHandler(jsonrpc2.ReplyHandler(server.Handle))
 
 	for {
@@ -63,7 +74,7 @@ func Run(ctx context.Context, conn io.ReadWriteCloser, opts Options) (int, error
 			continue
 		}
 
-		err = handler(ctx, replier(stream, req), req)
+		err = handler(ctx, replier(stream, writeMu, req), req)
 		switch {
 		case err == nil:
 			continue
@@ -83,9 +94,11 @@ func NewServer(opts Options) *Server {
 	}
 
 	return &Server{
-		logger:   logger,
-		exitCode: 1,
-		trace:    protocol.TraceOff,
+		logger:             logger,
+		exitCode:           1,
+		trace:              protocol.TraceOff,
+		publishDiagnostics: opts.PublishDiagnostics,
+		publishedPaths:     make(map[string]struct{}),
 	}
 }
 
@@ -152,10 +165,19 @@ func (s *Server) handleInitialize(ctx context.Context, reply jsonrpc2.Replier, r
 	}
 	s.roots = roots
 	s.runtime = workspace.NewRuntime(roots)
+	s.runtime.SetReloadHook(func() {
+		if err := s.publishWorkspaceDiagnostics(context.Background()); err != nil {
+			s.logger.Error("publish_diagnostics", slog.Any("error", err))
+		}
+	})
 	s.initialized = true
 	s.shutdownRequested = false
 	s.exitCode = 1
 	s.mu.Unlock()
+
+	if err := s.runtime.FlushReload(); err != nil {
+		return reply(ctx, nil, err)
+	}
 
 	s.logger.Debug("initialize",
 		slog.String("root_uri", string(s.rootURI)),
@@ -393,7 +415,16 @@ func decodeLegacyInitialize(raw json.RawMessage) (legacyInitializeParams, error)
 	return params, nil
 }
 
-func replier(stream jsonrpc2.Stream, req jsonrpc2.Request) jsonrpc2.Replier {
+type jsonrpc2StreamWriter interface {
+	Write(context.Context, jsonrpc2.Message) (int64, error)
+}
+
+type locker interface {
+	Lock()
+	Unlock()
+}
+
+func replier(stream jsonrpc2StreamWriter, writeMu locker, req jsonrpc2.Request) jsonrpc2.Replier {
 	return func(ctx context.Context, result interface{}, err error) error {
 		call, ok := req.(*jsonrpc2.Call)
 		if !ok {
@@ -404,9 +435,19 @@ func replier(stream jsonrpc2.Stream, req jsonrpc2.Request) jsonrpc2.Replier {
 		if responseErr != nil {
 			return responseErr
 		}
-		_, responseErr = stream.Write(ctx, response)
-		return responseErr
+		return writeJSONRPCMessage(ctx, stream, writeMu, response)
 	}
+}
+
+func newNotification(method string, params interface{}) (*jsonrpc2.Notification, error) {
+	return jsonrpc2.NewNotification(method, params)
+}
+
+func writeJSONRPCMessage(ctx context.Context, stream jsonrpc2StreamWriter, writeMu locker, msg jsonrpc2.Message) error {
+	writeMu.Lock()
+	defer writeMu.Unlock()
+	_, err := stream.Write(ctx, msg)
+	return err
 }
 
 func isClosedConnError(err error) bool {

@@ -59,11 +59,13 @@ func OpenRoots(candidates []string) (*RootSet, error) {
 
 		cfg, err := config.Load(configPath)
 		if err != nil {
-			return nil, err
+			result.Roots = append(result.Roots, buildFallbackRootIndex(resolvedRoot, configPath))
+			continue
 		}
+
 		ws, err := LoadWithConfig(resolvedRoot, configPath, cfg)
 		if err != nil {
-			return nil, err
+			ws = nil
 		}
 
 		rootIndex, err := buildRootIndex(resolvedRoot, configPath, cfg, ws)
@@ -154,6 +156,20 @@ func buildRootIndex(root, configPath string, cfg *config.Config, ws *Workspace) 
 		DataFiles:   dataFiles,
 		Workspace:   ws,
 	}, nil
+}
+
+func buildFallbackRootIndex(root, configPath string) *RootIndex {
+	configFiles := make(map[string]struct{}, 1)
+	if resolved, ok := normalizeOwnedPath(configPath); ok {
+		configFiles[resolved] = struct{}{}
+	}
+
+	return &RootIndex{
+		Root:        root,
+		ConfigPath:  configPath,
+		ConfigFiles: configFiles,
+		DataFiles:   make(map[string][]string),
+	}
 }
 
 func collectOwnedDataFiles(root string, cfg *config.Config) (map[string][]string, error) {

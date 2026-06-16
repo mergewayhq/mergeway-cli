@@ -41,6 +41,14 @@ type Runtime struct {
 	roots     map[string]*RootRuntime
 	documents map[string]*OpenDocument
 	timer     *time.Timer
+	onReload  func()
+}
+
+// Snapshot captures a read-only copy of the runtime state used by callers that
+// need a consistent view across roots and open documents.
+type Snapshot struct {
+	Roots     map[string]*RootRuntime
+	Documents map[string]*OpenDocument
 }
 
 // NewRuntime constructs a runtime around a detected root set.
@@ -130,6 +138,23 @@ func (r *Runtime) RootByPath(path string) *RootRuntime {
 	return nil
 }
 
+// Snapshot returns a stable copy of the current runtime state.
+func (r *Runtime) Snapshot() *Snapshot {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return &Snapshot{
+		Roots:     cloneRuntimes(r.roots),
+		Documents: cloneDocuments(r.documents),
+	}
+}
+
+// SetReloadHook registers a callback that runs after each successful reload.
+func (r *Runtime) SetReloadHook(hook func()) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.onReload = hook
+}
+
 func (r *Runtime) scheduleReloadLocked() {
 	if r.timer != nil {
 		r.timer.Stop()
@@ -172,9 +197,13 @@ func (r *Runtime) reload() error {
 	}
 
 	r.mu.Lock()
-	defer r.mu.Unlock()
+	hook := r.onReload
 	for root, state := range next {
 		r.roots[root] = state
+	}
+	r.mu.Unlock()
+	if hook != nil {
+		hook()
 	}
 	return nil
 }
@@ -275,4 +304,12 @@ func cloneRuntime(runtime *RootRuntime) *RootRuntime {
 	}
 	cloned := *runtime
 	return &cloned
+}
+
+func cloneRuntimes(roots map[string]*RootRuntime) map[string]*RootRuntime {
+	cloned := make(map[string]*RootRuntime, len(roots))
+	for root, runtime := range roots {
+		cloned[root] = cloneRuntime(runtime)
+	}
+	return cloned
 }

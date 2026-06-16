@@ -320,6 +320,37 @@ func TestValidateCommand(t *testing.T) {
 	}
 }
 
+func TestValidateCommandWithRelativeRoot(t *testing.T) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Getwd: %v", err)
+	}
+	repoRoot, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatalf("Abs(repo root): %v", err)
+	}
+	if err := os.Chdir(repoRoot); err != nil {
+		t.Fatalf("Chdir(repo root): %v", err)
+	}
+	t.Cleanup(func() {
+		if chdirErr := os.Chdir(cwd); chdirErr != nil {
+			t.Fatalf("restore cwd: %v", chdirErr)
+		}
+	})
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", "examples/full", "validate"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("validate with relative root exit %d stderr %s", code, stderr.String())
+	}
+
+	if stdout.String() != "status: validation succeeded\n" {
+		t.Fatalf("unexpected output: %s", stdout.String())
+	}
+}
+
 func TestValidateCommandFormatsSuccessAsJSON(t *testing.T) {
 	repo := copyFixture(t)
 	stdout := &bytes.Buffer{}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
 	"github.com/mergewayhq/mergeway-cli/internal/data"
@@ -209,7 +210,12 @@ func resolvePaths(root, configPath string) (string, string, error) {
 		}
 	}
 	if !filepath.IsAbs(resolvedConfig) {
-		resolvedConfig = filepath.Join(resolvedRoot, resolvedConfig)
+		absConfig, absErr := filepath.Abs(resolvedConfig)
+		if absErr == nil && pathWithinRoot(resolvedRoot, absConfig) {
+			resolvedConfig = absConfig
+		} else {
+			resolvedConfig = filepath.Join(resolvedRoot, resolvedConfig)
+		}
 	}
 	resolvedConfig, err = filepath.Abs(resolvedConfig)
 	if err != nil {
@@ -217,6 +223,14 @@ func resolvePaths(root, configPath string) (string, string, error) {
 	}
 
 	return resolvedRoot, resolvedConfig, nil
+}
+
+func pathWithinRoot(root, path string) bool {
+	rel, err := filepath.Rel(root, path)
+	if err != nil {
+		return false
+	}
+	return rel == "." || (rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)))
 }
 
 func sortedTypeNames(types map[string]*config.TypeDefinition) []string {
