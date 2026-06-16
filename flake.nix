@@ -37,7 +37,10 @@
               "-X github.com/mergewayhq/mergeway-cli/internal/version.BuildDate=${buildDate}"
             ];
 
-          subPackages = [ "." ];
+            subPackages = [
+              "cmd/mergeway-cli"
+              "cmd/mergeway-lsp"
+            ];
 
           meta = with pkgs.lib; {
             description = "The official CLI for Mergeway";
