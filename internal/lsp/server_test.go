@@ -61,6 +61,15 @@ func TestRunInitializeShutdownExit(t *testing.T) {
 	if result.Capabilities.DefinitionProvider != true {
 		t.Fatalf("expected definition capability to be advertised, got %+v", result.Capabilities.DefinitionProvider)
 	}
+	if result.Capabilities.ReferencesProvider != true {
+		t.Fatalf("expected references capability to be advertised, got %+v", result.Capabilities.ReferencesProvider)
+	}
+	if result.Capabilities.DocumentSymbolProvider != true {
+		t.Fatalf("expected document symbol capability to be advertised, got %+v", result.Capabilities.DocumentSymbolProvider)
+	}
+	if result.Capabilities.WorkspaceSymbolProvider != true {
+		t.Fatalf("expected workspace symbol capability to be advertised, got %+v", result.Capabilities.WorkspaceSymbolProvider)
+	}
 	if result.Capabilities.Workspace == nil || result.Capabilities.Workspace.WorkspaceFolders == nil || !result.Capabilities.Workspace.WorkspaceFolders.Supported {
 		t.Fatalf("expected workspace folder capability to be advertised, got %+v", result.Capabilities.Workspace)
 	}
