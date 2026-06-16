@@ -1,6 +1,6 @@
 # Mergeway CLI
 
-`mergeway-cli` is a command-line toolkit for keeping metadata in version control. It stores YAML and JSON objects on disk, validates their schemas, and verifies the integrity of relationships between those objects so your automation stays trustworthy.
+`mergeway-cli` is a command-line toolkit for keeping metadata in version control. It stores YAML and JSON objects on disk, validates their schemas, and verifies the integrity of relationships between those objects so your automation stays trustworthy. This repository also ships `mergeway-lsp`, a stdio language server for editor integrations.
 
 For full product and documentation coverage, visit:
 
@@ -68,7 +68,11 @@ nix run github:mergewayhq/mergeway-cli -- help
 
 ### Download a Release Binary
 
-Each GitHub release ships macOS and Linux archives. Drop the `mergeway-cli` binary somewhere on `PATH` and make it executable (`chmod +x`).
+Each GitHub release publishes macOS, Linux, and Windows assets for `amd64` and `arm64`, covering both `mergeway-cli` and `mergeway-lsp`.
+
+- Put `mergeway-cli` on `PATH` for CLI use.
+- Put `mergeway-lsp` on `PATH` for editor integration.
+- The published container image remains CLI-only.
 
 ### Build from Source
 
@@ -77,7 +81,24 @@ git clone https://github.com/mergewayhq/mergeway-cli.git
 cd mergeway-cli
 make build
 ./bin/mergeway-cli version
+./bin/mergeway-lsp --log-stderr --log-level=debug
 ```
+
+## Language Server
+
+`mergeway-lsp` speaks the Language Server Protocol over stdio and is intended to be launched by your editor.
+
+- Build it locally with `make build` or extract it from a release archive.
+- Use `--log-file`, `--log-stderr`, or `--log-level` for debugging.
+- Manual wiring is documented here:
+  - [Run mergeway-lsp manually](docs/src/getting-started/language-server.md)
+  - [Set up mergeway-lsp in VS Code and Neovim](docs/src/guides/setup-mergeway-lsp-editors.md)
+
+Current limitations:
+
+- Manual editor configuration is the supported path for now; this repo does not yet ship a VS Code extension.
+- The LSP currently uses full-document sync.
+- The Docker image contains `mergeway-cli` only.
 
 ## Quick Start
 

@@ -24,9 +24,9 @@ docs/
 └── src/
     ├── SUMMARY.md
     ├── README.md           # landing page
-    ├── installation.md     # install commands + source build
-    ├── getting-started.md  # first validation walkthrough
-    └── concepts.md         # terminology
+    ├── getting-started/    # install, workspace setup, and manual LSP startup
+    ├── guides/             # task-focused workflows, including editor setup
+    └── cli-reference/      # command reference pages
 ```
 
 Add new pages under `docs/src/` and register them in `SUMMARY.md`.

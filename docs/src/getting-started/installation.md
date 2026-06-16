@@ -1,33 +1,38 @@
 ---
 title: "Install Mergeway CLI"
 linkTitle: "Installation"
-description: "Install the Mergeway CLI using a release download, Docker, Go install, or Nix."
-weight: 10
+description: "Install mergeway-cli and mergeway-lsp from a release archive, Docker, Go, Nix, or source."
+weight: 15
 ---
 
-Pick the method that fits your setup. You can install a local `mergeway-cli` binary or run the public container image directly.
+Use one of the installation paths below depending on whether you need the CLI only or both the CLI and the language server.
 
-## Option 1 – Download a Release (macOS, Linux)
+## Option 1: Download a Release Archive
 
-Use the pre‑built archives published on GitHub releases. The example below downloads version `v{{VERSION}}` for your platform and moves the binary into `/usr/local/bin`:
+GitHub releases publish platform assets for:
 
-```bash
-curl -L https://github.com/mergewayhq/mergeway-cli/releases/download/{{VERSION}}/mergeway-cli-\
-  $(uname | tr '[:upper:]' '[:lower:]')-amd64.tar.gz | tar -xz
-sudo mv mergeway-cli /usr/local/bin/
-````
+- Linux, macOS, and Windows
+- `amd64` and `arm64`
+- both `mergeway-cli` and `mergeway-lsp`
 
-Check the published SHA‑256 checksum before moving the binary if you operate in a locked‑down environment.
-
-## Option 2 – Docker
-
-Use the public GitHub Container Registry image to run the CLI without installing the binary locally:
+Download the asset or assets for your platform from the latest release page, then install the extracted binaries you need:
 
 ```bash
-docker run ghcr.io/mergewayhq/mergeway-cli version
+install -m 0755 mergeway-cli /usr/local/bin/mergeway-cli
+install -m 0755 mergeway-lsp /usr/local/bin/mergeway-lsp
 ```
 
-To run commands against the workspace in your current directory, mount it into the container so the CLI can read the local `mergeway.yaml` and related data files:
+Put `mergeway-cli` on `PATH` for terminal use and `mergeway-lsp` on `PATH` for editor integration.
+
+## Option 2: Docker
+
+The published container image is useful for CLI-only workflows:
+
+```bash
+docker run --rm ghcr.io/mergewayhq/mergeway-cli version
+```
+
+To run against the workspace in your current directory:
 
 ```bash
 docker run --rm \
@@ -35,87 +40,57 @@ docker run --rm \
   ghcr.io/mergewayhq/mergeway-cli validate
 ```
 
-## Option 3 – Go Install (for contributors)
+The container image does **not** include `mergeway-lsp`.
 
-If you have Go installed you can build the CLI directly from the repository using `go install`:
+## Option 3: Go Install
 
 ```bash
 go install github.com/mergewayhq/mergeway-cli@latest
 ```
 
-This drops the binary in `$GOPATH/bin` (often `~/go/bin`). Prefer tagged versions in production.
+This installs `mergeway-cli`. If you also need `mergeway-lsp`, use a release archive or build from source.
 
-## Option 4 – Nix / Flake Install
+## Option 4: Nix
 
-The repository defines a [Nix flake](https://nixos.wiki/wiki/Flakes) that packages the CLI. Using the Nix package manager you can install, run or develop the CLI without managing Go toolchains manually:
-
-### Install into your Nix profile
+Install the CLI with Nix:
 
 ```bash
 nix profile install github:mergewayhq/mergeway-cli
 ```
 
-This command builds the flake’s default package (`mergeway‑cli`) and adds it to your user profile. The binary is symlinked into `$HOME/.nix-profile/bin`.
-
-### Run without installing
+Or run it directly:
 
 ```bash
 nix run github:mergewayhq/mergeway-cli -- help
 ```
 
-Use `nix run` to execute the CLI directly from the flake without permanently installing it. Append `--` and your subcommand (e.g. `nix run github:mergewayhq/mergeway-cli -- version`) to pass arguments to the CLI.
+The flake path is currently oriented around the CLI. Use a release archive or a local source build if you also need `mergeway-lsp`.
 
-### Build locally
-
-If you clone the repository you can build the binary via Nix:
-
-```bash
-# Clone and enter the repository
-git clone https://github.com/mergewayhq/mergeway-cli.git
-cd mergeway-cli
-
-# Build the CLI from the flake
-nix build
-
-# The binary appears in ./result/bin/mergeway-cli
-./result/bin/mergeway-cli version
-```
-
-This method uses the `flake.nix` file to produce reproducible builds.
-
-### Development shell
-
-For contributors, the flake exposes a development shell that provides Go 1.24.x, linters and documentation tooling. Run `nix develop` (or the provided `devenv shell`) from the project root to enter a shell with all dependencies and pre‑commit hooks installed.
-
-## Option 5 – Build from Source
-
-You can also build the CLI manually from source. Clone the repository and build using the provided `Makefile`:
+## Option 5: Build from Source
 
 ```bash
 git clone https://github.com/mergewayhq/mergeway-cli.git
 cd mergeway-cli
-make build      # compiles the CLI into bin/mergeway-cli
+make build
 ./bin/mergeway-cli version
+./bin/mergeway-lsp --log-stderr --log-level=debug
 ```
 
-This approach requires Go 1.24.x and is recommended for people packaging the CLI themselves or contributing to the project.
+`make build` produces both binaries under `bin/`.
 
-## Verify the installation
+## Supported Platforms
 
-After installation, confirm that the `mergeway‑cli` binary is on your `PATH` and prints version information:
+- Release archives support Linux, macOS, and Windows.
+- Each release includes `amd64` and `arm64` builds.
+- The container image is Linux-only and CLI-only.
+
+## Verify the Installation
 
 ```bash
 mergeway-cli version
+mergeway-lsp --log-stderr --log-level=debug
 ```
 
-You should see output similar to:
+If the language server starts successfully, it waits for LSP input on stdin. Stop it with `Ctrl+C`.
 
-```
-version: {{VERSION}}
-commit: d34db33f
-buildDate: "2021-02-03T04:05:06Z"
-```
-
-If the command is missing, confirm that the installation path is on your `PATH`.
-
-Move on to the [Getting Started](README.md) guide once the binary is available.
+For manual startup and editor wiring, continue with [Run mergeway-lsp manually](language-server.md).

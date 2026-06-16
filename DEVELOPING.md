@@ -48,12 +48,27 @@ Install the prerequisites manually:
 ## Project Layout
 
 - `cmd/mergeway-cli/main.go` is the CLI entrypoint that wires flags into internal packages
-- `cmd/mergeway-lsp/main.go` is reserved for the future language server binary
+- `cmd/mergeway-lsp/main.go` is the stdio language server entrypoint
 - `internal/` contains shared packages that power metadata handling and integrity checks
 - `pkg/` contains public packages
 - `examples/` stores sample configuration and data for demos and local tests
 - `docs/` captures design notes and behavioral specs
 - `e2e_test/` contains end-to-end tests
+
+## LSP Architecture
+
+- `cmd/mergeway-lsp/main.go` owns process startup, stdio wiring, and logging configuration.
+- `internal/lsp/` owns protocol handlers, diagnostics conversion, semantic editor features, and conservative quick fixes.
+- `internal/workspace/` owns root detection, indexing, and overlay-backed runtime state for unsaved buffers.
+- `internal/config/`, `internal/data/`, and `internal/validation/` remain the source of truth for schema loading, object parsing, and validation semantics.
+
+Keep the layering intentional:
+
+1. `cmd/mergeway-lsp` handles flags, stderr/file logging, and stdio transport.
+2. `internal/lsp` translates protocol requests into shared workspace and validation operations.
+3. Shared packages under `internal/` keep CLI and LSP semantics aligned.
+
+If you add an editor-facing feature, prefer extending shared workspace/index helpers first and keep `internal/lsp` focused on protocol mapping.
 
 ## Common Tasks
 
@@ -73,11 +88,13 @@ Install the prerequisites manually:
 - `make coverage` generates a coverage report
   - Coverage profile is written to `coverage.out`
   - HTML report is automatically generated at `coverage.html`
+- `go test ./internal/lsp` is the focused protocol-level suite for the language server
 
 ### Building
 
 - `make build` produces `bin/mergeway-cli` and `bin/mergeway-lsp`
 - The CLI build includes Git commit hash and build timestamp via `-ldflags`
+- GoReleaser release assets cover both binaries for each supported platform
 
 ### Documentation
 
@@ -113,10 +130,18 @@ The project uses [GoReleaser](https://goreleaser.com/) for automated releases:
    git push origin vX.Y.Z
    ```
 4. GitHub Actions automatically:
-   - Builds binaries for Linux, macOS, and Windows on `amd64` and `arm64`
-   - Creates archives (`.tar.gz` for Unix, `.zip` for Windows)
+   - Builds `mergeway-cli` and `mergeway-lsp` for Linux, macOS, and Windows on `amd64` and `arm64`
+   - Creates release assets (`.tar.gz` for Unix, `.zip` for Windows) for both binaries
    - Generates checksums
    - Publishes the release with all assets
+   - Builds and publishes the CLI-only GHCR image
    - The embedded version comes from `internal/version/VERSION`, so the file must match the release tag before publishing
 
 See `.github/workflows/release.yml` and `.goreleaser.yaml` for configuration details.
+
+## LSP Debugging
+
+- Keep stdout protocol-only. Human-readable logs must go to stderr or a log file.
+- Use `./bin/mergeway-lsp --log-stderr --log-level=debug` for local debugging.
+- Use `MERGEWAY_LSP_LOG_FILE=/tmp/mergeway-lsp.log` when you want logs without mixing them into editor stderr capture.
+- Protocol regression coverage lives in `internal/lsp/*_test.go`; prefer adding fixture-driven tests there for new editor features.

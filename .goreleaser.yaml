@@ -23,6 +23,20 @@ builds:
       - -X github.com/mergewayhq/mergeway-cli/internal/version.Number={{.Version}}
       - -X github.com/mergewayhq/mergeway-cli/internal/version.Commit={{.Commit}}
       - -X github.com/mergewayhq/mergeway-cli/internal/version.BuildDate={{.Date}}
+  - id: lsp
+    binary: mergeway-lsp
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/mergeway-lsp
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
 
 dockers_v2:
   - id: container
