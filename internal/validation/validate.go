@@ -6,13 +6,20 @@ import (
 	"path/filepath"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
+	"github.com/mergewayhq/mergeway-cli/internal/fileutil"
 )
 
 // Validate runs the requested validation phases for the given repository root and configuration.
 func Validate(root string, cfg *config.Config, opts Options) (*Result, error) {
+	return ValidateWithOps(root, cfg, opts, fileutil.OS)
+}
+
+// ValidateWithOps runs validation with custom file operations.
+func ValidateWithOps(root string, cfg *config.Config, opts Options, ops fileutil.Ops) (*Result, error) {
 	if cfg == nil {
 		return nil, errors.New("validation: config is required")
 	}
+	ops = ops.WithDefaults()
 
 	absRoot, err := filepath.Abs(root)
 	if err != nil {
@@ -26,7 +33,7 @@ func Validate(root string, cfg *config.Config, opts Options) (*Result, error) {
 
 	res := &Result{}
 
-	rawObjects, formatErrs := collectObjects(absRoot, cfg)
+	rawObjects, formatErrs := collectObjects(absRoot, cfg, ops)
 	if len(formatErrs) > 0 {
 		if opts.FailFast && len(formatErrs) > 1 {
 			formatErrs = formatErrs[:1]

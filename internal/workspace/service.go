@@ -8,6 +8,7 @@ import (
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
 	"github.com/mergewayhq/mergeway-cli/internal/data"
+	"github.com/mergewayhq/mergeway-cli/internal/fileutil"
 	"github.com/mergewayhq/mergeway-cli/internal/validation"
 )
 
@@ -39,22 +40,34 @@ type ValidationReport struct {
 // Load reads the workspace config, loads all configured entities, and builds
 // a per-type/per-identifier index without invoking CLI code.
 func Load(root, configPath string) (*Workspace, error) {
+	return LoadWithOps(root, configPath, fileutil.OS)
+}
+
+// LoadWithOps reads the workspace config and builds an index using the
+// provided file operations.
+func LoadWithOps(root, configPath string, ops fileutil.Ops) (*Workspace, error) {
 	resolvedRoot, resolvedConfig, err := resolvePaths(root, configPath)
 	if err != nil {
 		return nil, err
 	}
 
-	cfg, err := config.Load(resolvedConfig)
+	cfg, err := config.LoadWithOps(resolvedConfig, ops)
 	if err != nil {
 		return nil, err
 	}
 
-	return LoadWithConfig(resolvedRoot, resolvedConfig, cfg)
+	return LoadWithConfigAndOps(resolvedRoot, resolvedConfig, cfg, ops)
 }
 
 // LoadWithConfig loads all configured entities and builds an entity index using
 // a caller-provided config.
 func LoadWithConfig(root, configPath string, cfg *config.Config) (*Workspace, error) {
+	return LoadWithConfigAndOps(root, configPath, cfg, fileutil.OS)
+}
+
+// LoadWithConfigAndOps loads all configured entities and builds an entity index using
+// a caller-provided config and file operations.
+func LoadWithConfigAndOps(root, configPath string, cfg *config.Config, ops fileutil.Ops) (*Workspace, error) {
 	if cfg == nil {
 		return nil, errors.New("workspace: config is required")
 	}
@@ -64,7 +77,7 @@ func LoadWithConfig(root, configPath string, cfg *config.Config) (*Workspace, er
 		return nil, err
 	}
 
-	store, err := data.NewStore(resolvedRoot, cfg)
+	store, err := data.NewStoreWithOps(resolvedRoot, cfg, ops)
 	if err != nil {
 		return nil, err
 	}
@@ -115,22 +128,33 @@ func (w *Workspace) Find(typeName, id string) []*data.Object {
 // Validate loads config, runs the existing semantic validator, and attaches a
 // best-effort loaded workspace/index for valid callers that need both outputs.
 func Validate(root, configPath string, opts validation.Options) (*ValidationReport, error) {
+	return ValidateWithOps(root, configPath, opts, fileutil.OS)
+}
+
+// ValidateWithOps loads config and validates using the provided file operations.
+func ValidateWithOps(root, configPath string, opts validation.Options, ops fileutil.Ops) (*ValidationReport, error) {
 	resolvedRoot, resolvedConfig, err := resolvePaths(root, configPath)
 	if err != nil {
 		return nil, err
 	}
 
-	cfg, err := config.Load(resolvedConfig)
+	cfg, err := config.LoadWithOps(resolvedConfig, ops)
 	if err != nil {
 		return nil, err
 	}
 
-	return ValidateWithConfig(resolvedRoot, resolvedConfig, cfg, opts)
+	return ValidateWithConfigAndOps(resolvedRoot, resolvedConfig, cfg, opts, ops)
 }
 
 // ValidateWithConfig runs the existing semantic validator with a caller-provided
 // config and attaches a best-effort loaded workspace/index.
 func ValidateWithConfig(root, configPath string, cfg *config.Config, opts validation.Options) (*ValidationReport, error) {
+	return ValidateWithConfigAndOps(root, configPath, cfg, opts, fileutil.OS)
+}
+
+// ValidateWithConfigAndOps runs semantic validation with caller-provided config
+// and file operations.
+func ValidateWithConfigAndOps(root, configPath string, cfg *config.Config, opts validation.Options, ops fileutil.Ops) (*ValidationReport, error) {
 	if cfg == nil {
 		return nil, errors.New("workspace: config is required")
 	}
@@ -140,7 +164,7 @@ func ValidateWithConfig(root, configPath string, cfg *config.Config, opts valida
 		return nil, err
 	}
 
-	result, err := validation.Validate(resolvedRoot, cfg, opts)
+	result, err := validation.ValidateWithOps(resolvedRoot, cfg, opts, ops)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +176,7 @@ func ValidateWithConfig(root, configPath string, cfg *config.Config, opts valida
 		Result:     result,
 	}
 
-	ws, loadErr := LoadWithConfig(resolvedRoot, resolvedConfig, cfg)
+	ws, loadErr := LoadWithConfigAndOps(resolvedRoot, resolvedConfig, cfg, ops)
 	if loadErr != nil {
 		report.WorkspaceLoadError = loadErr
 		return report, nil

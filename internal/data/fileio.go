@@ -14,7 +14,7 @@ import (
 )
 
 func (s *Store) loadFile(path string, expectedType string, selector string) (*fileContent, error) {
-	data, err := os.ReadFile(path)
+	data, err := s.ops.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

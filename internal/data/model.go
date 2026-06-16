@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
+	"github.com/mergewayhq/mergeway-cli/internal/fileutil"
 )
 
 // Object represents a single database object loaded from disk.
@@ -23,10 +24,17 @@ type Object struct {
 type Store struct {
 	root   string
 	config *config.Config
+	ops    fileutil.Ops
 }
 
 // NewStore constructs a data store rooted at the given directory.
 func NewStore(root string, cfg *config.Config) (*Store, error) {
+	return NewStoreWithOps(root, cfg, defaultFileOps())
+}
+
+// NewStoreWithOps constructs a data store rooted at the given directory using
+// the provided file operations.
+func NewStoreWithOps(root string, cfg *config.Config, ops fileutil.Ops) (*Store, error) {
 	if root == "" {
 		return nil, errors.New("data: root is required")
 	}
@@ -39,7 +47,7 @@ func NewStore(root string, cfg *config.Config) (*Store, error) {
 		return nil, fmt.Errorf("data: resolve root: %w", err)
 	}
 
-	return &Store{root: absRoot, config: cfg}, nil
+	return &Store{root: absRoot, config: cfg, ops: ops.WithDefaults()}, nil
 }
 
 // objectLocation captures where an object lives.

@@ -3,7 +3,6 @@ package data
 import (
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 
@@ -201,7 +200,7 @@ func (s *Store) resolveIncludeMatches(typeDef *config.TypeDefinition) ([]include
 			absPattern = filepath.Join(s.root, filepath.Clean(pattern))
 		}
 
-		globbed, err := filepath.Glob(absPattern)
+		globbed, err := s.ops.Glob(absPattern)
 		if err != nil {
 			return nil, fmt.Errorf("data: glob %s: %w", pattern, err)
 		}
@@ -209,7 +208,7 @@ func (s *Store) resolveIncludeMatches(typeDef *config.TypeDefinition) ([]include
 		sort.Strings(globbed)
 
 		for _, match := range globbed {
-			info, err := os.Stat(match)
+			info, err := s.ops.Stat(match)
 			if err != nil {
 				if errors.Is(err, errFileNotFound) {
 					continue

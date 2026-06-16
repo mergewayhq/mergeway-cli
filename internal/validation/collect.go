@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
+	"github.com/mergewayhq/mergeway-cli/internal/fileutil"
 )
 
 type includeMatch struct {
@@ -13,12 +14,12 @@ type includeMatch struct {
 	path    string
 }
 
-func collectObjects(root string, cfg *config.Config) (map[string]*typeObjects, []Error) {
+func collectObjects(root string, cfg *config.Config, ops fileutil.Ops) (map[string]*typeObjects, []Error) {
 	result := make(map[string]*typeObjects)
 	var errs []Error
 
 	for _, typeDef := range cfg.Types {
-		records, recordErrs := loadTypeObjects(root, typeDef)
+		records, recordErrs := loadTypeObjects(root, typeDef, ops)
 		if len(recordErrs) > 0 {
 			errs = append(errs, recordErrs...)
 		}
@@ -33,8 +34,8 @@ func collectObjects(root string, cfg *config.Config) (map[string]*typeObjects, [
 	return result, errs
 }
 
-func loadTypeObjects(root string, typeDef *config.TypeDefinition) ([]*rawObject, []Error) {
-	matches, collectErrs := resolveIncludeMatches(root, typeDef)
+func loadTypeObjects(root string, typeDef *config.TypeDefinition, ops fileutil.Ops) ([]*rawObject, []Error) {
+	matches, collectErrs := resolveIncludeMatches(root, typeDef, ops)
 	if len(collectErrs) > 0 {
 		return nil, collectErrs
 	}
@@ -43,7 +44,7 @@ func loadTypeObjects(root string, typeDef *config.TypeDefinition) ([]*rawObject,
 	var errs []Error
 
 	for _, match := range matches {
-		parsed, err := parseDataFile(match.path, typeDef.Name, match.include.Selector)
+		parsed, err := parseDataFile(match.path, typeDef.Name, match.include.Selector, ops)
 		if err != nil {
 			errs = append(errs, Error{
 				Phase:   PhaseFormat,
@@ -137,7 +138,7 @@ func loadTypeObjects(root string, typeDef *config.TypeDefinition) ([]*rawObject,
 	return records, errs
 }
 
-func resolveIncludeMatches(root string, typeDef *config.TypeDefinition) ([]includeMatch, []Error) {
+func resolveIncludeMatches(root string, typeDef *config.TypeDefinition, ops fileutil.Ops) ([]includeMatch, []Error) {
 	seen := make(map[string]struct{})
 	var matches []includeMatch
 
@@ -148,7 +149,7 @@ func resolveIncludeMatches(root string, typeDef *config.TypeDefinition) ([]inclu
 		}
 
 		absPattern := filepath.Join(root, filepath.Clean(pattern))
-		globbed, err := filepath.Glob(absPattern)
+		globbed, err := ops.Glob(absPattern)
 		if err != nil {
 			return nil, []Error{Error{
 				Phase:   PhaseFormat,

@@ -3,18 +3,25 @@ package config
 import (
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 
+	"github.com/mergewayhq/mergeway-cli/internal/fileutil"
 	"gopkg.in/yaml.v3"
 )
 
 // Load reads the configuration entry file and resolves includes.
 func Load(path string) (*Config, error) {
+	return LoadWithOps(path, fileutil.OS)
+}
+
+// LoadWithOps reads the configuration entry file and resolves includes using
+// the provided file operations.
+func LoadWithOps(path string, ops fileutil.Ops) (*Config, error) {
 	if path == "" {
 		return nil, errors.New("config: path is required")
 	}
+	ops = ops.WithDefaults()
 
 	absPath, err := filepath.Abs(path)
 	if err != nil {
@@ -24,7 +31,7 @@ func Load(path string) (*Config, error) {
 	cache := make(map[string]*aggregateConfig)
 	stack := make(map[string]bool)
 
-	agg, err := loadRecursive(absPath, cache, stack)
+	agg, err := loadRecursive(absPath, cache, stack, ops)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +39,7 @@ func Load(path string) (*Config, error) {
 	return normalizeAggregate(agg)
 }
 
-func loadRecursive(path string, cache map[string]*aggregateConfig, stack map[string]bool) (*aggregateConfig, error) {
+func loadRecursive(path string, cache map[string]*aggregateConfig, stack map[string]bool, ops fileutil.Ops) (*aggregateConfig, error) {
 	if cached, ok := cache[path]; ok {
 		return cached, nil
 	}
@@ -44,7 +51,7 @@ func loadRecursive(path string, cache map[string]*aggregateConfig, stack map[str
 	stack[path] = true
 	defer delete(stack, path)
 
-	content, err := os.ReadFile(path)
+	content, err := ops.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("config: read %s: %w", path, err)
 	}
@@ -63,7 +70,7 @@ func loadRecursive(path string, cache map[string]*aggregateConfig, stack map[str
 			includePath = filepath.Join(baseDir, includePath)
 		}
 
-		matches, err := filepath.Glob(includePath)
+		matches, err := ops.Glob(includePath)
 		if err != nil {
 			return nil, fmt.Errorf("config: glob %s from %s: %w", include, path, err)
 		}
@@ -80,7 +87,7 @@ func loadRecursive(path string, cache map[string]*aggregateConfig, stack map[str
 				return nil, fmt.Errorf("config: resolve include %s: %w", match, err)
 			}
 
-			childAgg, err := loadRecursive(absMatch, cache, stack)
+			childAgg, err := loadRecursive(absMatch, cache, stack, ops)
 			if err != nil {
 				return nil, err
 			}

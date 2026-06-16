@@ -33,6 +33,7 @@ type Server struct {
 	rootURI           uri.URI
 	workspaceFolders  []uri.URI
 	roots             *workspace.RootSet
+	runtime           *workspace.Runtime
 }
 
 // Run serves LSP traffic over a stdio-compatible connection until the client
@@ -108,6 +109,12 @@ func (s *Server) Handle(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc
 		return s.handleExit(ctx, reply, req)
 	case protocol.MethodSetTrace:
 		return s.handleSetTrace(ctx, reply, req)
+	case protocol.MethodTextDocumentDidOpen:
+		return s.handleDidOpen(ctx, reply, req)
+	case protocol.MethodTextDocumentDidChange:
+		return s.handleDidChange(ctx, reply, req)
+	case protocol.MethodTextDocumentDidClose:
+		return s.handleDidClose(ctx, reply, req)
 	default:
 		if !s.isInitialized() {
 			return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.ServerNotInitialized, "server not initialized"))
@@ -144,6 +151,7 @@ func (s *Server) handleInitialize(ctx context.Context, reply jsonrpc2.Replier, r
 		return reply(ctx, nil, err)
 	}
 	s.roots = roots
+	s.runtime = workspace.NewRuntime(roots)
 	s.initialized = true
 	s.shutdownRequested = false
 	s.exitCode = 1
@@ -159,6 +167,10 @@ func (s *Server) handleInitialize(ctx context.Context, reply jsonrpc2.Replier, r
 
 	result := &protocol.InitializeResult{
 		Capabilities: protocol.ServerCapabilities{
+			TextDocumentSync: &protocol.TextDocumentSyncOptions{
+				OpenClose: true,
+				Change:    protocol.TextDocumentSyncKindFull,
+			},
 			Workspace: &protocol.ServerCapabilitiesWorkspace{
 				WorkspaceFolders: &protocol.ServerCapabilitiesWorkspaceFolders{
 					Supported:           true,
@@ -233,6 +245,65 @@ func (s *Server) handleSetTrace(ctx context.Context, reply jsonrpc2.Replier, req
 	s.mu.Unlock()
 
 	s.logger.Debug("set_trace", slog.String("trace", string(params.Value)))
+	return reply(ctx, nil, nil)
+}
+
+func (s *Server) handleDidOpen(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
+	var params protocol.DidOpenTextDocumentParams
+	if err := decodeParams(req.Params(), &params); err != nil {
+		return reply(ctx, nil, fmt.Errorf("%s: %w", jsonrpc2.ErrParse, err))
+	}
+
+	if s.runtime == nil {
+		return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.ServerNotInitialized, "server not initialized"))
+	}
+
+	path := params.TextDocument.URI.Filename()
+	err := s.runtime.DidOpen(&workspace.OpenDocument{
+		URI:        string(params.TextDocument.URI),
+		Path:       path,
+		LanguageID: string(params.TextDocument.LanguageID),
+		Version:    params.TextDocument.Version,
+		Text:       params.TextDocument.Text,
+	})
+	if err != nil {
+		return reply(ctx, nil, err)
+	}
+	return reply(ctx, nil, nil)
+}
+
+func (s *Server) handleDidChange(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
+	var params protocol.DidChangeTextDocumentParams
+	if err := decodeParams(req.Params(), &params); err != nil {
+		return reply(ctx, nil, fmt.Errorf("%s: %w", jsonrpc2.ErrParse, err))
+	}
+
+	if s.runtime == nil {
+		return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.ServerNotInitialized, "server not initialized"))
+	}
+	if len(params.ContentChanges) == 0 {
+		return reply(ctx, nil, nil)
+	}
+
+	change := params.ContentChanges[len(params.ContentChanges)-1]
+	err := s.runtime.DidChange(params.TextDocument.URI.Filename(), params.TextDocument.Version, change.Text)
+	if err != nil {
+		return reply(ctx, nil, err)
+	}
+	return reply(ctx, nil, nil)
+}
+
+func (s *Server) handleDidClose(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
+	var params protocol.DidCloseTextDocumentParams
+	if err := decodeParams(req.Params(), &params); err != nil {
+		return reply(ctx, nil, fmt.Errorf("%s: %w", jsonrpc2.ErrParse, err))
+	}
+
+	if s.runtime == nil {
+		return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.ServerNotInitialized, "server not initialized"))
+	}
+
+	s.runtime.DidClose(params.TextDocument.URI.Filename())
 	return reply(ctx, nil, nil)
 }
 

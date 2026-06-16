@@ -45,6 +45,13 @@ func TestRunInitializeShutdownExit(t *testing.T) {
 	if result.ServerInfo == nil || result.ServerInfo.Name != "mergeway-lsp" {
 		t.Fatalf("unexpected server info: %+v", result.ServerInfo)
 	}
+	syncOptions, ok := result.Capabilities.TextDocumentSync.(map[string]any)
+	if !ok || syncOptions == nil {
+		t.Fatalf("expected text sync options, got %#v", result.Capabilities.TextDocumentSync)
+	}
+	if syncOptions["openClose"] != true || syncOptions["change"] != float64(protocol.TextDocumentSyncKindFull) {
+		t.Fatalf("expected full-document open/close sync, got %+v", syncOptions)
+	}
 	if result.Capabilities.Workspace == nil || result.Capabilities.Workspace.WorkspaceFolders == nil || !result.Capabilities.Workspace.WorkspaceFolders.Supported {
 		t.Fatalf("expected workspace folder capability to be advertised, got %+v", result.Capabilities.Workspace)
 	}
@@ -124,6 +131,219 @@ func TestHandleInitializeSupportsNoConfigRootURI(t *testing.T) {
 	}
 	if got := len(server.roots.MissingRoots); got != 1 {
 		t.Fatalf("expected one missing root, got %d", got)
+	}
+}
+
+func TestHandleDidOpenDidChangeDidClosePreferOpenBuffer(t *testing.T) {
+	server := NewServer(Options{Logger: testLogger()})
+	root := filepath.Join("..", "workspace", "testdata", "phase4", "valid-basic")
+	rootURI := uri.File(root)
+
+	initReq, err := jsonrpc2.NewCall(jsonrpc2.NewNumberID(1), protocol.MethodInitialize, map[string]any{
+		"rootUri": string(rootURI),
+	})
+	if err != nil {
+		t.Fatalf("NewCall(initialize): %v", err)
+	}
+	if err := server.Handle(context.Background(), captureReply[protocol.InitializeResult](t, nil), initReq); err != nil {
+		t.Fatalf("Handle(initialize): %v", err)
+	}
+
+	targetPath := filepath.Join(root, "data", "users", "alice.yaml")
+	targetURI := uri.File(targetPath)
+
+	openReq, err := jsonrpc2.NewCall(jsonrpc2.NewNumberID(2), protocol.MethodTextDocumentDidOpen, &protocol.DidOpenTextDocumentParams{
+		TextDocument: protocol.TextDocumentItem{
+			URI:        protocol.DocumentURI(targetURI),
+			LanguageID: "yaml",
+			Version:    1,
+			Text:       "id: user-1\nname: Unsaved Alice\n",
+		},
+	})
+	if err != nil {
+		t.Fatalf("NewCall(didOpen): %v", err)
+	}
+	if err := server.Handle(context.Background(), captureReply[struct{}](t, nil), openReq); err != nil {
+		t.Fatalf("Handle(didOpen): %v", err)
+	}
+	if err := server.runtime.FlushReload(); err != nil {
+		t.Fatalf("FlushReload(open): %v", err)
+	}
+
+	runtimeRoot := server.runtime.RootByPath(targetPath)
+	if runtimeRoot == nil || runtimeRoot.Workspace == nil {
+		t.Fatalf("expected runtime root after didOpen")
+	}
+	if got := runtimeRoot.Workspace.Find("User", "user-1")[0].Fields["name"]; got != "Unsaved Alice" {
+		t.Fatalf("expected open buffer value, got %v", got)
+	}
+
+	changeReq, err := jsonrpc2.NewCall(jsonrpc2.NewNumberID(3), protocol.MethodTextDocumentDidChange, &protocol.DidChangeTextDocumentParams{
+		TextDocument: protocol.VersionedTextDocumentIdentifier{
+			TextDocumentIdentifier: protocol.TextDocumentIdentifier{URI: protocol.DocumentURI(targetURI)},
+			Version:                2,
+		},
+		ContentChanges: []protocol.TextDocumentContentChangeEvent{
+			{Text: "id: user-1\nname: Changed Alice\n"},
+		},
+	})
+	if err != nil {
+		t.Fatalf("NewCall(didChange): %v", err)
+	}
+	if err := server.Handle(context.Background(), captureReply[struct{}](t, nil), changeReq); err != nil {
+		t.Fatalf("Handle(didChange): %v", err)
+	}
+	if err := server.runtime.FlushReload(); err != nil {
+		t.Fatalf("FlushReload(change): %v", err)
+	}
+
+	runtimeRoot = server.runtime.RootByPath(targetPath)
+	if got := runtimeRoot.Workspace.Find("User", "user-1")[0].Fields["name"]; got != "Changed Alice" {
+		t.Fatalf("expected changed buffer value, got %v", got)
+	}
+
+	closeReq, err := jsonrpc2.NewCall(jsonrpc2.NewNumberID(4), protocol.MethodTextDocumentDidClose, &protocol.DidCloseTextDocumentParams{
+		TextDocument: protocol.TextDocumentIdentifier{URI: protocol.DocumentURI(targetURI)},
+	})
+	if err != nil {
+		t.Fatalf("NewCall(didClose): %v", err)
+	}
+	if err := server.Handle(context.Background(), captureReply[struct{}](t, nil), closeReq); err != nil {
+		t.Fatalf("Handle(didClose): %v", err)
+	}
+	if err := server.runtime.FlushReload(); err != nil {
+		t.Fatalf("FlushReload(close): %v", err)
+	}
+
+	runtimeRoot = server.runtime.RootByPath(targetPath)
+	if got := runtimeRoot.Workspace.Find("User", "user-1")[0].Fields["name"]; got != "Alice" {
+		t.Fatalf("expected disk fallback after close, got %v", got)
+	}
+}
+
+func TestHandleDidChangePartialDocumentsAreRecoverable(t *testing.T) {
+	server := NewServer(Options{Logger: testLogger()})
+	root := filepath.Join("..", "workspace", "testdata", "phase4", "unknown-reference")
+	rootURI := uri.File(root)
+	targetPath := filepath.Join(root, "data", "posts", "post.yaml")
+	targetURI := uri.File(targetPath)
+
+	initReq, err := jsonrpc2.NewCall(jsonrpc2.NewNumberID(1), protocol.MethodInitialize, map[string]any{
+		"rootUri": string(rootURI),
+	})
+	if err != nil {
+		t.Fatalf("NewCall(initialize): %v", err)
+	}
+	if err := server.Handle(context.Background(), captureReply[protocol.InitializeResult](t, nil), initReq); err != nil {
+		t.Fatalf("Handle(initialize): %v", err)
+	}
+
+	openReq, err := jsonrpc2.NewCall(jsonrpc2.NewNumberID(2), protocol.MethodTextDocumentDidOpen, &protocol.DidOpenTextDocumentParams{
+		TextDocument: protocol.TextDocumentItem{
+			URI:        protocol.DocumentURI(targetURI),
+			LanguageID: "yaml",
+			Version:    1,
+			Text:       "id: post-1\nauthor: missing-user\ntitle: Missing Author\n",
+		},
+	})
+	if err != nil {
+		t.Fatalf("NewCall(didOpen): %v", err)
+	}
+	if err := server.Handle(context.Background(), captureReply[struct{}](t, nil), openReq); err != nil {
+		t.Fatalf("Handle(didOpen): %v", err)
+	}
+
+	changeReq, err := jsonrpc2.NewCall(jsonrpc2.NewNumberID(3), protocol.MethodTextDocumentDidChange, &protocol.DidChangeTextDocumentParams{
+		TextDocument: protocol.VersionedTextDocumentIdentifier{
+			TextDocumentIdentifier: protocol.TextDocumentIdentifier{URI: protocol.DocumentURI(targetURI)},
+			Version:                2,
+		},
+		ContentChanges: []protocol.TextDocumentContentChangeEvent{
+			{Text: "id: post-1\nauthor: [\n"},
+		},
+	})
+	if err != nil {
+		t.Fatalf("NewCall(didChange): %v", err)
+	}
+	if err := server.Handle(context.Background(), captureReply[struct{}](t, nil), changeReq); err != nil {
+		t.Fatalf("Handle(didChange): %v", err)
+	}
+	if err := server.runtime.FlushReload(); err != nil {
+		t.Fatalf("FlushReload(partial): %v", err)
+	}
+
+	runtimeRoot := server.runtime.RootByPath(targetPath)
+	if runtimeRoot == nil {
+		t.Fatalf("expected runtime root for partial document")
+	}
+	if runtimeRoot.Workspace != nil {
+		t.Fatalf("expected invalid partial document to drop current workspace snapshot")
+	}
+	if runtimeRoot.LoadErr == nil {
+		t.Fatalf("expected recoverable load error for partial document")
+	}
+}
+
+func TestHandleDidChangePartialJSONDocumentsAreRecoverable(t *testing.T) {
+	server := NewServer(Options{Logger: testLogger()})
+	root := filepath.Join("..", "..", "examples", "jsonpath")
+	rootURI := uri.File(root)
+	targetPath := filepath.Join(root, "data", "users.json")
+	targetURI := uri.File(targetPath)
+
+	initReq, err := jsonrpc2.NewCall(jsonrpc2.NewNumberID(1), protocol.MethodInitialize, map[string]any{
+		"rootUri": string(rootURI),
+	})
+	if err != nil {
+		t.Fatalf("NewCall(initialize): %v", err)
+	}
+	if err := server.Handle(context.Background(), captureReply[protocol.InitializeResult](t, nil), initReq); err != nil {
+		t.Fatalf("Handle(initialize): %v", err)
+	}
+
+	openReq, err := jsonrpc2.NewCall(jsonrpc2.NewNumberID(2), protocol.MethodTextDocumentDidOpen, &protocol.DidOpenTextDocumentParams{
+		TextDocument: protocol.TextDocumentItem{
+			URI:        protocol.DocumentURI(targetURI),
+			LanguageID: "json",
+			Version:    1,
+			Text:       "{\n  \"users\": [\n    {\n      \"id\": \"User-001\",\n      \"name\": \"Ada\"\n    }\n  ]\n}\n",
+		},
+	})
+	if err != nil {
+		t.Fatalf("NewCall(didOpen): %v", err)
+	}
+	if err := server.Handle(context.Background(), captureReply[struct{}](t, nil), openReq); err != nil {
+		t.Fatalf("Handle(didOpen): %v", err)
+	}
+
+	changeReq, err := jsonrpc2.NewCall(jsonrpc2.NewNumberID(3), protocol.MethodTextDocumentDidChange, &protocol.DidChangeTextDocumentParams{
+		TextDocument: protocol.VersionedTextDocumentIdentifier{
+			TextDocumentIdentifier: protocol.TextDocumentIdentifier{URI: protocol.DocumentURI(targetURI)},
+			Version:                2,
+		},
+		ContentChanges: []protocol.TextDocumentContentChangeEvent{
+			{Text: "{\n  \"users\": [\n"},
+		},
+	})
+	if err != nil {
+		t.Fatalf("NewCall(didChange): %v", err)
+	}
+	if err := server.Handle(context.Background(), captureReply[struct{}](t, nil), changeReq); err != nil {
+		t.Fatalf("Handle(didChange): %v", err)
+	}
+	if err := server.runtime.FlushReload(); err != nil {
+		t.Fatalf("FlushReload(partial json): %v", err)
+	}
+
+	runtimeRoot := server.runtime.RootByPath(targetPath)
+	if runtimeRoot == nil {
+		t.Fatalf("expected runtime root for partial json document")
+	}
+	if runtimeRoot.Workspace != nil {
+		t.Fatalf("expected invalid partial json document to drop current workspace snapshot")
+	}
+	if runtimeRoot.LoadErr == nil {
+		t.Fatalf("expected recoverable load error for partial json document")
 	}
 }
 

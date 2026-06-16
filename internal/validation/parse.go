@@ -2,8 +2,8 @@ package validation
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/mergewayhq/mergeway-cli/internal/fileutil"
 	"github.com/theory/jsonpath"
 	"gopkg.in/yaml.v3"
 )
@@ -15,8 +15,8 @@ type parsedFile struct {
 	Single   map[string]any
 }
 
-func parseDataFile(path string, expectedType string, selector string) (*parsedFile, error) {
-	content, err := osReadFile(path)
+func parseDataFile(path string, expectedType string, selector string, ops fileutil.Ops) (*parsedFile, error) {
+	content, err := ops.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -101,9 +101,4 @@ func parseDataFile(path string, expectedType string, selector string) (*parsedFi
 	}
 
 	return &parsedFile{TypeName: expectedType, Multi: true, Items: items}, nil
-}
-
-// osReadFile is a test seam for injecting failures.
-var osReadFile = func(path string) ([]byte, error) {
-	return os.ReadFile(path)
 }
