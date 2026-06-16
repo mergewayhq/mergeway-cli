@@ -70,6 +70,9 @@ func TestRunInitializeShutdownExit(t *testing.T) {
 	if result.Capabilities.WorkspaceSymbolProvider != true {
 		t.Fatalf("expected workspace symbol capability to be advertised, got %+v", result.Capabilities.WorkspaceSymbolProvider)
 	}
+	if result.Capabilities.CodeActionProvider != true {
+		t.Fatalf("expected code action capability to be advertised, got %+v", result.Capabilities.CodeActionProvider)
+	}
 	if result.Capabilities.Workspace == nil || result.Capabilities.Workspace.WorkspaceFolders == nil || !result.Capabilities.Workspace.WorkspaceFolders.Supported {
 		t.Fatalf("expected workspace folder capability to be advertised, got %+v", result.Capabilities.Workspace)
 	}

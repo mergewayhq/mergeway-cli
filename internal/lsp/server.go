@@ -140,6 +140,8 @@ func (s *Server) Handle(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc
 		return s.handleDocumentSymbol(ctx, reply, req)
 	case protocol.MethodWorkspaceSymbol:
 		return s.handleWorkspaceSymbol(ctx, reply, req)
+	case protocol.MethodTextDocumentCodeAction:
+		return s.handleCodeAction(ctx, reply, req)
 	default:
 		if !s.isInitialized() {
 			return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.ServerNotInitialized, "server not initialized"))
@@ -211,6 +213,7 @@ func (s *Server) handleInitialize(ctx context.Context, reply jsonrpc2.Replier, r
 			ReferencesProvider:      true,
 			DocumentSymbolProvider:  true,
 			WorkspaceSymbolProvider: true,
+			CodeActionProvider:      true,
 			Workspace: &protocol.ServerCapabilitiesWorkspace{
 				WorkspaceFolders: &protocol.ServerCapabilitiesWorkspaceFolders{
 					Supported:           true,
@@ -440,6 +443,22 @@ func (s *Server) handleWorkspaceSymbol(ctx context.Context, reply jsonrpc2.Repli
 	}
 
 	result, err := s.workspaceSymbols(ctx, &params)
+	return reply(ctx, result, err)
+}
+
+func (s *Server) handleCodeAction(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
+	var params protocol.CodeActionParams
+	if err := decodeParams(req.Params(), &params); err != nil {
+		return reply(ctx, nil, fmt.Errorf("%s: %w", jsonrpc2.ErrParse, err))
+	}
+	if !s.isInitialized() {
+		return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.ServerNotInitialized, "server not initialized"))
+	}
+	if s.isShuttingDown() {
+		return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.InvalidRequest, "server is shutting down"))
+	}
+
+	result, err := s.codeActions(ctx, &params)
 	return reply(ctx, result, err)
 }
 
