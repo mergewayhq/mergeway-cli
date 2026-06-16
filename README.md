@@ -90,13 +90,14 @@ make build
 
 - Build it locally with `make build` or extract it from a release archive.
 - Use `--log-file`, `--log-stderr`, or `--log-level` for debugging.
-- Manual wiring is documented here:
+- Editor setup is documented here:
+  - [VS Code extension README](vscode/README.md)
   - [Run mergeway-lsp manually](docs/src/getting-started/language-server.md)
   - [Set up mergeway-lsp in VS Code and Neovim](docs/src/guides/setup-mergeway-lsp-editors.md)
 
 Current limitations:
 
-- Manual editor configuration is the supported path for now; this repo does not yet ship a VS Code extension.
+- The VS Code extension currently expects you to install or build `mergeway-lsp` yourself and point `mergeway.lsp.path` at it.
 - The LSP currently uses full-document sync.
 - The Docker image contains `mergeway-cli` only.
 

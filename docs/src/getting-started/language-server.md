@@ -63,7 +63,7 @@ Keep stdout protocol-only. Human-readable logging on stdout will break editor in
 
 ## Current Limitations
 
-- Manual editor configuration is the supported path for now. This repo does not yet ship a dedicated VS Code extension.
+- The VS Code extension still requires manual configuration of the local `mergeway-lsp` binary path.
 - The server currently uses full-document sync.
 - Missing-required-field quick fixes are limited to YAML and YML files.
 - Features only apply to files owned by a detected Mergeway root.

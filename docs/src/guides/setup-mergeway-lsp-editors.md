@@ -1,13 +1,11 @@
 ---
 title: "Set up mergeway-lsp in VS Code and Neovim"
 linkTitle: "Set up mergeway-lsp in VS Code and Neovim"
-description: "Configure a generic LSP client to launch mergeway-lsp and troubleshoot editor integration."
+description: "Configure the Mergeway VS Code extension or a generic LSP client to launch mergeway-lsp."
 weight: 35
 ---
 
-This guide covers the supported editor setup path for `mergeway-lsp` into an editor that already has a generic LSP client.
-
-Manual wiring is the supported path for now. This repository does not yet ship a dedicated VS Code extension.
+This guide covers the current editor setup paths for `mergeway-lsp`.
 
 ## Before You Start
 
@@ -17,7 +15,22 @@ Manual wiring is the supported path for now. This repository does not yet ship a
 
 ## VS Code
 
-Use a VS Code extension that can launch arbitrary language servers, then point it at `mergeway-lsp`.
+Use the extension in `vscode/` and follow `vscode/README.md`, then point it at your local `mergeway-lsp` binary.
+
+Example workspace settings:
+
+```json
+{
+  "mergeway.lsp.path": "/absolute/path/to/mergeway-lsp",
+  "mergeway.lsp.trace.server": "off"
+}
+```
+
+The extension activates only when the opened workspace contains `mergeway.yaml` or `mergeway.yml`.
+
+## VS Code Generic LSP Client
+
+If you prefer a generic LSP launcher extension, configure it to run `mergeway-lsp`.
 
 Example settings shape:
 

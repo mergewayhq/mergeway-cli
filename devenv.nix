@@ -3,6 +3,11 @@
   # To resolve error with double registration of cachix
   cachix.enable = false;
 
+  languages.javascript = {
+    enable = true;
+    npm.enable = true;
+  };
+
   packages = [
     pkgs.pre-commit
     pkgs.yamllint

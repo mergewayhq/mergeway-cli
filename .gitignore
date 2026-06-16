@@ -7,3 +7,6 @@ dist/
 coverage.*
 scratch/
 .codex
+vscode/node_modules/
+vscode/out/
+vscode/*.vsix

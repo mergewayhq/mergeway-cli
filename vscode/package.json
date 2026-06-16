@@ -1,0 +1,81 @@
+{
+  "name": "mergeway-vscode",
+  "displayName": "Mergeway",
+  "description": "Language support for Mergeway repositories",
+  "version": "0.0.1",
+  "publisher": "mergewayhq",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mergewayhq/mergeway-cli.git"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "workspaceContains:mergeway.yaml",
+    "workspaceContains:mergeway.yml"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile",
+    "package": "vsce package"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "yaml",
+        "aliases": [
+          "YAML",
+          "yaml"
+        ],
+        "extensions": [
+          ".yaml",
+          ".yml"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "mergeway.restartLanguageServer",
+        "title": "Mergeway: Restart Language Server"
+      }
+    ],
+    "configuration": {
+      "title": "Mergeway",
+      "properties": {
+        "mergeway.lsp.path": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to the mergeway-lsp binary. Required for local development."
+        },
+        "mergeway.lsp.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Trace communication between VS Code and the Mergeway language server."
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.6.2",
+    "typescript": "^5.5.4"
+  }
+}
