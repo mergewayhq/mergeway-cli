@@ -128,6 +128,12 @@ func (s *Server) Handle(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc
 		return s.handleDidChange(ctx, reply, req)
 	case protocol.MethodTextDocumentDidClose:
 		return s.handleDidClose(ctx, reply, req)
+	case protocol.MethodTextDocumentCompletion:
+		return s.handleCompletion(ctx, reply, req)
+	case protocol.MethodTextDocumentHover:
+		return s.handleHover(ctx, reply, req)
+	case protocol.MethodTextDocumentDefinition:
+		return s.handleDefinition(ctx, reply, req)
 	default:
 		if !s.isInitialized() {
 			return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.ServerNotInitialized, "server not initialized"))
@@ -193,6 +199,9 @@ func (s *Server) handleInitialize(ctx context.Context, reply jsonrpc2.Replier, r
 				OpenClose: true,
 				Change:    protocol.TextDocumentSyncKindFull,
 			},
+			CompletionProvider: &protocol.CompletionOptions{},
+			HoverProvider:      true,
+			DefinitionProvider: true,
 			Workspace: &protocol.ServerCapabilitiesWorkspace{
 				WorkspaceFolders: &protocol.ServerCapabilitiesWorkspaceFolders{
 					Supported:           true,
@@ -327,6 +336,54 @@ func (s *Server) handleDidClose(ctx context.Context, reply jsonrpc2.Replier, req
 
 	s.runtime.DidClose(params.TextDocument.URI.Filename())
 	return reply(ctx, nil, nil)
+}
+
+func (s *Server) handleCompletion(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
+	var params protocol.CompletionParams
+	if err := decodeParams(req.Params(), &params); err != nil {
+		return reply(ctx, nil, fmt.Errorf("%s: %w", jsonrpc2.ErrParse, err))
+	}
+	if !s.isInitialized() {
+		return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.ServerNotInitialized, "server not initialized"))
+	}
+	if s.isShuttingDown() {
+		return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.InvalidRequest, "server is shutting down"))
+	}
+
+	result, err := s.completion(ctx, &params)
+	return reply(ctx, result, err)
+}
+
+func (s *Server) handleHover(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
+	var params protocol.HoverParams
+	if err := decodeParams(req.Params(), &params); err != nil {
+		return reply(ctx, nil, fmt.Errorf("%s: %w", jsonrpc2.ErrParse, err))
+	}
+	if !s.isInitialized() {
+		return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.ServerNotInitialized, "server not initialized"))
+	}
+	if s.isShuttingDown() {
+		return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.InvalidRequest, "server is shutting down"))
+	}
+
+	result, err := s.hover(ctx, &params)
+	return reply(ctx, result, err)
+}
+
+func (s *Server) handleDefinition(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
+	var params protocol.DefinitionParams
+	if err := decodeParams(req.Params(), &params); err != nil {
+		return reply(ctx, nil, fmt.Errorf("%s: %w", jsonrpc2.ErrParse, err))
+	}
+	if !s.isInitialized() {
+		return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.ServerNotInitialized, "server not initialized"))
+	}
+	if s.isShuttingDown() {
+		return reply(ctx, nil, jsonrpc2.NewError(jsonrpc2.InvalidRequest, "server is shutting down"))
+	}
+
+	result, err := s.definition(ctx, &params)
+	return reply(ctx, result, err)
 }
 
 func (s *Server) isInitialized() bool {

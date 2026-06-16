@@ -52,6 +52,15 @@ func TestRunInitializeShutdownExit(t *testing.T) {
 	if syncOptions["openClose"] != true || syncOptions["change"] != float64(protocol.TextDocumentSyncKindFull) {
 		t.Fatalf("expected full-document open/close sync, got %+v", syncOptions)
 	}
+	if result.Capabilities.CompletionProvider == nil {
+		t.Fatalf("expected completion capability to be advertised")
+	}
+	if result.Capabilities.HoverProvider != true {
+		t.Fatalf("expected hover capability to be advertised, got %+v", result.Capabilities.HoverProvider)
+	}
+	if result.Capabilities.DefinitionProvider != true {
+		t.Fatalf("expected definition capability to be advertised, got %+v", result.Capabilities.DefinitionProvider)
+	}
 	if result.Capabilities.Workspace == nil || result.Capabilities.Workspace.WorkspaceFolders == nil || !result.Capabilities.Workspace.WorkspaceFolders.Supported {
 		t.Fatalf("expected workspace folder capability to be advertised, got %+v", result.Capabilities.Workspace)
 	}
