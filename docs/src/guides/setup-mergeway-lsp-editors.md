@@ -21,10 +21,13 @@ Example workspace settings:
 
 ```json
 {
-  "mergeway.lsp.path": "/absolute/path/to/mergeway-lsp",
+  "mergeway.lsp.path": "${workspaceFolder}/bin/mergeway-lsp",
   "mergeway.lsp.trace.server": "off"
 }
 ```
+
+`${workspaceFolder}` expands to the first open workspace folder before the extension validates the configured path.
+You can also use a plain absolute path instead.
 
 The extension activates only when the opened workspace contains `mergeway.yaml` or `mergeway.yml`.
 

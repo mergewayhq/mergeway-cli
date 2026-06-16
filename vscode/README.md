@@ -10,9 +10,12 @@ Example workspace setting:
 
 ```json
 {
-  "mergeway.lsp.path": "/absolute/path/to/mergeway-lsp"
+  "mergeway.lsp.path": "${workspaceFolder}/bin/mergeway-lsp"
 }
 ```
+
+`${workspaceFolder}` expands to the first open workspace folder before the extension validates the path.
+You can also use a plain absolute path.
 
 The extension activates only when the opened workspace contains `mergeway.yaml` or `mergeway.yml`.
 
@@ -62,7 +65,7 @@ Make sure the opened workspace contains either:
 Check that `mergeway.lsp.path`:
 
 - is configured
-- is an absolute path
+- resolves to an absolute path
 - points to an existing file
 
 ### The LSP starts but behaves strangely

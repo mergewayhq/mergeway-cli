@@ -161,7 +161,11 @@ function getConfiguredLspPath(): string | undefined {
   }
 
   const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : undefined;
+  if (trimmed.length === 0) {
+    return undefined;
+  }
+
+  return expandWorkspaceFolder(trimmed);
 }
 
 async function validateConfiguredLspPath(): Promise<string | undefined> {
@@ -258,4 +262,18 @@ function requireOutputChannel(): vscode.OutputChannel {
   }
 
   return outputChannel;
+}
+
+function expandWorkspaceFolder(value: string): string {
+  if (!value.includes("${workspaceFolder}")) {
+    return value;
+  }
+
+  const folder = vscode.workspace.workspaceFolders?.[0];
+  if (!folder) {
+    return value;
+  }
+
+  const normalizedPath = folder.uri.fsPath;
+  return value.split("${workspaceFolder}").join(normalizedPath);
 }
