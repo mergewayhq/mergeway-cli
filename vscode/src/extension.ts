@@ -6,7 +6,6 @@ import {
   LanguageClientOptions,
   ServerOptions,
   Trace,
-  TransportKind,
 } from "vscode-languageclient/node";
 
 let client: LanguageClient | undefined;
@@ -83,11 +82,9 @@ async function startLanguageServer(): Promise<void> {
   const serverOptions: ServerOptions = {
     run: {
       command: lspPath,
-      transport: TransportKind.stdio,
     },
     debug: {
       command: lspPath,
-      transport: TransportKind.stdio,
       options: {
         env: {
           ...process.env,
