@@ -10,7 +10,7 @@ builds:
     binary: mergeway-cli
     env:
       - CGO_ENABLED=0
-    main: .
+    main: ./cmd/mergeway-cli
     goos:
       - linux
       - windows

@@ -10,6 +10,11 @@
 
 ```
 repo-root/
+  cmd/
+    mergeway-cli/
+      main.go
+    mergeway-lsp/
+      main.go
   internal/
     config/
     data/
@@ -18,10 +23,10 @@ repo-root/
   pkg/                # optional for exported APIs if external consumption becomes necessary
   go.mod
   go.sum
-  main.go
 ```
 
-- Keep the top-level `main.go` minimal—parse flags and hand off to internal packages.
+- Keep `cmd/mergeway-cli/main.go` minimal and push behavior into internal packages.
+- Reserve sibling `cmd/` directories for additional binaries instead of adding new root-level entrypoints.
 - Group core logic under `internal/` by domain (configuration loading, storage, validation pipeline, command orchestration).
 - Add `pkg/` only when symbols need to be consumed by other modules; otherwise prefer `internal/` for encapsulation.
 
@@ -31,7 +36,7 @@ Use first-party Go commands (no Makefile wrappers expected):
 
 - Format: `go fmt ./...`
 - Static analysis: `golangci-lint run` (configured to enable `staticcheck` and other desired linters).
-- Build: `go build .`
+- Build: `go build ./...`
 - Dependency hygiene: `go mod tidy` before committing changes that affect dependencies.
 
 Document these commands in the README so contributors follow the canonical workflow.

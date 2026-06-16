@@ -47,7 +47,8 @@ Install the prerequisites manually:
 
 ## Project Layout
 
-- `main.go` is the CLI entrypoint that wires flags into internal packages
+- `cmd/mergeway-cli/main.go` is the CLI entrypoint that wires flags into internal packages
+- `cmd/mergeway-lsp/main.go` is reserved for the future language server binary
 - `internal/` contains shared packages that power metadata handling and integrity checks
 - `pkg/` contains public packages
 - `examples/` stores sample configuration and data for demos and local tests
@@ -75,8 +76,8 @@ Install the prerequisites manually:
 
 ### Building
 
-- `make build` produces `bin/mergeway-cli` with the semantic version embedded from `internal/version/VERSION`
-- The build includes Git commit hash and build timestamp via `-ldflags`
+- `make build` produces `bin/mergeway-cli` and `bin/mergeway-lsp`
+- The CLI build includes Git commit hash and build timestamp via `-ldflags`
 
 ### Documentation
 

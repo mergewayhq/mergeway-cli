@@ -10,7 +10,7 @@ INPUT_DIR="$ROOT_DIR/e2e_test/state/input"
 mkdir -p "$BIN_DIR"
 
 echo "Building mergeway-cli CLI..."
-go build -o "$MW_BIN" "$ROOT_DIR"
+go build -o "$MW_BIN" "$ROOT_DIR/cmd/mergeway-cli"
 
 if [ -d "$STATE_DIR" ]; then
   echo "Removing existing state..."

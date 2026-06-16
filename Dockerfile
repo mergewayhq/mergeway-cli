@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
       -trimpath \
       -ldflags="-s -w -X github.com/mergewayhq/mergeway-cli/internal/version.Commit=${COMMIT} -X github.com/mergewayhq/mergeway-cli/internal/version.BuildDate=${BUILD_DATE}" \
       -o /out/mergeway-cli \
-      .
+      ./cmd/mergeway-cli
 
 FROM scratch
 
