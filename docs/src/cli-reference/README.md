@@ -1,7 +1,7 @@
 ---
 title: "CLI Reference"
 linkTitle: "CLI Reference"
-description: "Reference for Mergeway CLI commands, global flags, and usage."
+description: "Reference for Mergeway CLI commands plus the standalone mergeway-diff tool."
 weight: 30
 ---
 
@@ -38,10 +38,13 @@ For more information on the schema, please consult the [Schema Format](../gettin
 - [`list`](list.md)
 - [`files`](files.md)
 - [`get`](get.md)
-- [`diff`](diff.md)
 - [`create`](create.md)
 - [`update`](update.md)
 - [`delete`](delete.md)
 - [`export`](export.md)
+
+## Semantic snapshots
+
+- [`mergeway-diff`](diff.md)
 
 Need a refresher on terminology? See the [Basic Concepts](../getting-started/README.md) page.

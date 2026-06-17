@@ -1,6 +1,6 @@
 # Mergeway CLI
 
-`mergeway-cli` is a command-line toolkit for keeping metadata in version control. It stores YAML and JSON objects on disk, validates their schemas, and verifies the integrity of relationships between those objects so your automation stays trustworthy. This repository also ships `mergeway-lsp`, a stdio language server for editor integrations.
+`mergeway-cli` is a command-line toolkit for keeping metadata in version control. It stores YAML and JSON objects on disk, validates their schemas, and verifies the integrity of relationships between those objects so your automation stays trustworthy. This repository also ships `mergeway-diff` for semantic repository snapshots and `mergeway-lsp`, a stdio language server for editor integrations.
 
 For full product and documentation coverage, visit:
 
@@ -68,9 +68,10 @@ nix run github:mergewayhq/mergeway-cli -- help
 
 ### Download a Release Binary
 
-Each GitHub release publishes macOS, Linux, and Windows assets for `amd64` and `arm64`, covering both `mergeway-cli` and `mergeway-lsp`.
+Each GitHub release publishes macOS, Linux, and Windows assets for `amd64` and `arm64`, covering `mergeway-cli`, `mergeway-diff`, and `mergeway-lsp`.
 
 - Put `mergeway-cli` on `PATH` for CLI use.
+- Put `mergeway-diff` on `PATH` for semantic diff workflows.
 - Put `mergeway-lsp` on `PATH` for editor integration.
 - The published container image remains CLI-only.
 
@@ -81,8 +82,19 @@ git clone https://github.com/mergewayhq/mergeway-cli.git
 cd mergeway-cli
 make build
 ./bin/mergeway-cli version
+./bin/mergeway-diff --help
 ./bin/mergeway-lsp --log-stderr --log-level=debug
 ```
+
+## Semantic Diff
+
+`mergeway-diff` compares Mergeway-managed records between logical repository snapshots.
+
+- Build it locally with `make build` or extract it from a release archive.
+- Use `--format json` for machine-readable semantic diff output.
+- Snapshot modes and reporting workflow are documented here:
+  - [mergeway-diff reference](docs/src/cli-reference/diff.md)
+  - [Communicate Repository Changes with mergeway-diff](docs/src/guides/communicate-changes-with-diff.md)
 
 ## Language Server
 

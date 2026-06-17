@@ -48,6 +48,7 @@ Install the prerequisites manually:
 ## Project Layout
 
 - `cmd/mergeway-cli/main.go` is the CLI entrypoint that wires flags into internal packages
+- `cmd/mergeway-diff/main.go` is the semantic diff entrypoint
 - `cmd/mergeway-lsp/main.go` is the stdio language server entrypoint
 - `internal/` contains shared packages that power metadata handling and integrity checks
 - `pkg/` contains public packages
@@ -92,9 +93,9 @@ If you add an editor-facing feature, prefer extending shared workspace/index hel
 
 ### Building
 
-- `make build` produces `bin/mergeway-cli` and `bin/mergeway-lsp`
+- `make build` produces `bin/mergeway-cli`, `bin/mergeway-diff`, and `bin/mergeway-lsp`
 - The CLI build includes Git commit hash and build timestamp via `-ldflags`
-- GoReleaser release assets cover both binaries for each supported platform
+- GoReleaser release assets cover all three binaries for each supported platform
 
 ### Documentation
 
@@ -130,8 +131,8 @@ The project uses [GoReleaser](https://goreleaser.com/) for automated releases:
    git push origin vX.Y.Z
    ```
 4. GitHub Actions automatically:
-   - Builds `mergeway-cli` and `mergeway-lsp` for Linux, macOS, and Windows on `amd64` and `arm64`
-   - Creates release assets (`.tar.gz` for Unix, `.zip` for Windows) for both binaries
+   - Builds `mergeway-cli`, `mergeway-diff`, and `mergeway-lsp` for Linux, macOS, and Windows on `amd64` and `arm64`
+   - Creates release assets (`.tar.gz` for Unix, `.zip` for Windows) for all three binaries
    - Generates checksums
    - Publishes the release with all assets
    - Builds and publishes the CLI-only GHCR image

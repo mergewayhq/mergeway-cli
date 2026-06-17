@@ -1,4 +1,4 @@
-package cli
+package diffcmd
 
 import (
 	"bytes"
@@ -15,7 +15,7 @@ func TestDiffAcceptsZeroArgs(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	code := Run([]string{"--root", repo.Root, "diff"}, stdout, stderr)
+	code := Run([]string{"--root", repo.Root}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("expected diff with zero args to succeed, exit %d stderr %s", code, stderr.String())
 	}
@@ -30,7 +30,7 @@ func TestDiffAcceptsOneArg(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	code := Run([]string{"--root", repo.Root, "diff", left}, stdout, stderr)
+	code := Run([]string{"--root", repo.Root, left}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("expected diff with one arg to succeed, exit %d stderr %s", code, stderr.String())
 	}
@@ -46,7 +46,7 @@ func TestDiffAcceptsTwoArgs(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	code := Run([]string{"--root", repo.Root, "diff", left, right}, stdout, stderr)
+	code := Run([]string{"--root", repo.Root, left, right}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("expected diff with two args to succeed, exit %d stderr %s", code, stderr.String())
 	}
@@ -66,7 +66,7 @@ func TestDiffRejectsThreeArgs(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	code := Run([]string{"--root", repo.Root, "diff", "a", "b", "c"}, stdout, stderr)
+	code := Run([]string{"--root", repo.Root, "a", "b", "c"}, stdout, stderr)
 	if code == 0 {
 		t.Fatalf("expected diff with three args to fail")
 	}
@@ -86,7 +86,7 @@ func TestDiffRejectsInvalidRevision(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	code := Run([]string{"--root", repo.Root, "diff", "does-not-exist"}, stdout, stderr)
+	code := Run([]string{"--root", repo.Root, "does-not-exist"}, stdout, stderr)
 	if code == 0 {
 		t.Fatalf("expected diff with invalid revision to fail")
 	}
@@ -102,7 +102,7 @@ func TestDiffHelpMentionsDataOnlyDiffing(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	code := Run([]string{"diff", "--help"}, stdout, stderr)
+	code := Run([]string{"--help"}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("expected diff help to succeed, exit %d stderr %s", code, stderr.String())
 	}
@@ -115,7 +115,7 @@ func TestDiffHelpMentionsConfigurationIsExcluded(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	code := Run([]string{"diff", "--help"}, stdout, stderr)
+	code := Run([]string{"--help"}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("expected diff help to succeed, exit %d stderr %s", code, stderr.String())
 	}
@@ -124,13 +124,13 @@ func TestDiffHelpMentionsConfigurationIsExcluded(t *testing.T) {
 	}
 }
 
-func TestDiffUsesGlobalFormatFlagForJSONOutput(t *testing.T) {
+func TestDiffUsesFormatFlagForJSONOutput(t *testing.T) {
 	repo := newGitRepoFixture(t)
 	repo.CommitDataChange(t, "data/users/user-bob.yaml", "id: User-Bob\nname: Bob Changed\nemail: bob@example.com\n")
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := Run([]string{"--root", repo.Root, "--format", "json", "diff", "HEAD~1", "HEAD"}, stdout, stderr)
+	code := Run([]string{"--root", repo.Root, "--format", "json", "HEAD~1", "HEAD"}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("expected json diff to succeed, exit %d stderr %s", code, stderr.String())
 	}
@@ -149,7 +149,7 @@ func TestDiffRejectsLegacyJSONFlag(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
-	code := Run([]string{"--root", repo.Root, "diff", "--json"}, stdout, stderr)
+	code := Run([]string{"--root", repo.Root, "--json"}, stdout, stderr)
 	if code == 0 {
 		t.Fatalf("expected legacy --json flag to fail")
 	}

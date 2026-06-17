@@ -1,7 +1,7 @@
 ---
-title: "Communicate Repository Changes with mergeway-cli diff"
+title: "Communicate Repository Changes with mergeway-diff"
 linkTitle: "Communicate changes"
-description: "Use mergeway-cli diff with a time-based Git baseline to explain semantic data changes over time."
+description: "Use mergeway-diff with a time-based Git baseline to explain semantic data changes over time."
 weight: 30
 ---
 
@@ -12,7 +12,7 @@ We will keep using the fictional GrainBox Market repository from the other guide
 ## Prerequisites
 
 - The repository is already initialized as a Git repository and contains a valid Mergeway workspace.
-- `mergeway-cli` is installed and available on your `PATH`.
+- `mergeway-diff` is installed and available on your `PATH`.
 - You know the reporting window you want to communicate, such as the last 7 days.
 
 ## 1. Pick a Baseline Commit from a Time Offset
@@ -34,10 +34,10 @@ If `BASELINE` is empty, your repository may not have any commits that old yet. I
 For a report you want to share broadly, compare two revisions explicitly:
 
 ```bash
-mergeway-cli diff "$BASELINE" HEAD
+mergeway-diff "$BASELINE" HEAD
 ```
 
-This produces a semantic, data-only diff between the baseline commit and the current `HEAD` commit. Unlike a raw Git diff, `mergeway-cli diff` groups changes by Mergeway object identity and field values, so the result is easier to explain to non-specialists.
+This produces a semantic, data-only diff between the baseline commit and the current `HEAD` commit. Unlike a raw Git diff, `mergeway-diff` groups changes by Mergeway object identity and field values, so the result is easier to explain to non-specialists.
 
 Example output:
 
@@ -56,13 +56,13 @@ This is usually the right mode for weekly or monthly updates because it ignores 
 
 ## 3. Know When to Include the Working Tree
 
-`mergeway-cli diff` has three useful snapshot modes:
+`mergeway-diff` has three useful snapshot modes:
 
-- `mergeway-cli diff` compares `HEAD` against unstaged changes only.
-- `mergeway-cli diff "$BASELINE"` compares the baseline revision against your full current working tree, including staged and unstaged changes.
-- `mergeway-cli diff "$BASELINE" HEAD` compares two revisions and ignores local worktree noise.
+- `mergeway-diff` compares `HEAD` against unstaged changes only.
+- `mergeway-diff "$BASELINE"` compares the baseline revision against your full current working tree, including staged and unstaged changes.
+- `mergeway-diff "$BASELINE" HEAD` compares two revisions and ignores local worktree noise.
 
-For communication with a broader audience, prefer `mergeway-cli diff "$BASELINE" HEAD`. Use `mergeway-cli diff "$BASELINE"` only when you intentionally want to preview in-progress changes before they are committed.
+For communication with a broader audience, prefer `mergeway-diff "$BASELINE" HEAD`. Use `mergeway-diff "$BASELINE"` only when you intentionally want to preview in-progress changes before they are committed.
 
 ## 4. Validate Before You Share the Diff
 
@@ -70,7 +70,7 @@ Run validation first so your report is based on a clean, parseable dataset:
 
 ```bash
 mergeway-cli validate
-mergeway-cli diff "$BASELINE" HEAD
+mergeway-diff "$BASELINE" HEAD
 ```
 
 If the workspace contains invalid YAML, duplicate identifiers, or broken references, fix those issues before publishing the summary. That keeps the diff focused on real data changes instead of repository problems.
@@ -80,7 +80,7 @@ If the workspace contains invalid YAML, duplicate identifiers, or broken referen
 If you want to feed the result into a script, dashboard, or release-note generator, use JSON output:
 
 ```bash
-mergeway-cli --format json diff "$BASELINE" HEAD > weekly-diff.json
+mergeway-diff --format json "$BASELINE" HEAD > weekly-diff.json
 ```
 
 This is useful when the Data Platform team wants to post the same weekly change set into Slack, an internal changelog, or a reporting pipeline.
@@ -98,7 +98,7 @@ CURRENT="$(git rev-parse HEAD)"
   echo "Baseline: $BASELINE"
   echo "Current:  $CURRENT"
   echo
-  mergeway-cli diff "$BASELINE" HEAD
+  mergeway-diff "$BASELINE" HEAD
 } > weekly-data-update.md
 ```
 
@@ -106,6 +106,6 @@ The resulting file gives stakeholders a compact summary of what changed over the
 
 ## Next Steps
 
-- Review the [`mergeway-cli diff` reference](../cli-reference/diff.md) for the exact snapshot rules and output modes.
+- Review the [`mergeway-diff` reference](../cli-reference/diff.md) for the exact snapshot rules and output modes.
 - Pair this workflow with [`mergeway-cli validate`](../cli-reference/validate.md) in CI if you want every published change summary to come from a valid repository state.
 - If you want teams to review the underlying changes before the summary is shared, combine this guide with [Set up Mergeway with GitHub Actions](setup-mergeway-github.md).

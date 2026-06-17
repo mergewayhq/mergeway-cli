@@ -23,6 +23,23 @@ builds:
       - -X github.com/mergewayhq/mergeway-cli/internal/version.Number={{.Version}}
       - -X github.com/mergewayhq/mergeway-cli/internal/version.Commit={{.Commit}}
       - -X github.com/mergewayhq/mergeway-cli/internal/version.BuildDate={{.Date}}
+  - id: diff
+    binary: mergeway-diff
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/mergeway-diff
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/mergewayhq/mergeway-cli/internal/version.Number={{.Version}}
+      - -X github.com/mergewayhq/mergeway-cli/internal/version.Commit={{.Commit}}
+      - -X github.com/mergewayhq/mergeway-cli/internal/version.BuildDate={{.Date}}
   - id: lsp
     binary: mergeway-lsp
     env:

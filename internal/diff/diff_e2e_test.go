@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	cli "github.com/mergewayhq/mergeway-cli/internal/cli"
+	diffcmd "github.com/mergewayhq/mergeway-cli/internal/diffcmd"
 )
 
 func TestDiffFailsOutsideGitRepository(t *testing.T) {
@@ -16,7 +16,7 @@ func TestDiffFailsOutsideGitRepository(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", root, "diff"}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", root}, stdout, stderr)
 	if code == 0 {
 		t.Fatalf("expected diff to fail outside a git repository")
 	}
@@ -37,7 +37,7 @@ func TestDiffShowsUnstagedDataChange(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "diff"}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", repo.Root}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("diff exit %d stderr %s", code, stderr.String())
 	}
@@ -55,7 +55,7 @@ func TestDiffIgnoresConfigOnlyUnstagedChange(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "diff"}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", repo.Root}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("diff exit %d stderr %s", code, stderr.String())
 	}
@@ -70,7 +70,7 @@ func TestDiffIgnoresStagedOnlyDataChange(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "diff"}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", repo.Root}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("diff exit %d stderr %s", code, stderr.String())
 	}
@@ -86,7 +86,7 @@ func TestDiffRevisionIncludesUnstagedDataChange(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "diff", left}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", repo.Root, left}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("diff exit %d stderr %s", code, stderr.String())
 	}
@@ -103,7 +103,7 @@ func TestDiffRevisionIncludesStagedAndUnstagedCurrentState(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "diff", left}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", repo.Root, left}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("diff exit %d stderr %s", code, stderr.String())
 	}
@@ -123,7 +123,7 @@ func TestDiffRevisionToRevisionIgnoresWorkingTreeChanges(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "diff", left, right}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", repo.Root, left, right}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("diff exit %d stderr %s", code, stderr.String())
 	}
@@ -141,7 +141,7 @@ func TestDiffReturnsReadableErrorForUnparseableData(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "diff"}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", repo.Root}, stdout, stderr)
 	if code == 0 {
 		t.Fatalf("expected diff to fail for invalid data")
 	}
@@ -165,7 +165,7 @@ func TestDiffFailsCleanlyForDuplicateLogicalIDs(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "diff"}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", repo.Root}, stdout, stderr)
 	if code == 0 {
 		t.Fatalf("expected diff to fail for duplicate logical ids")
 	}
@@ -187,7 +187,7 @@ func TestDiffReturnsClearErrorWhenConfigIsMissing(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "diff"}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", repo.Root}, stdout, stderr)
 	if code == 0 {
 		t.Fatalf("expected diff to fail when config is missing")
 	}
@@ -217,7 +217,7 @@ entities:
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "diff"}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", repo.Root}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("diff exit %d stderr %s", code, stderr.String())
 	}
@@ -238,7 +238,7 @@ func TestDiffSurfacesWorkingTreeReadFailuresWithoutPanic(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "diff"}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", repo.Root}, stdout, stderr)
 	if code == 0 {
 		t.Fatalf("expected diff to fail for unreadable working tree entry")
 	}
@@ -258,7 +258,7 @@ func TestDiffEmptySemanticDiffUsesClearOutput(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "diff", repo.Revision(t, "HEAD")}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", repo.Root, repo.Revision(t, "HEAD")}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("diff exit %d stderr %s", code, stderr.String())
 	}
@@ -273,7 +273,7 @@ func TestDiffJSONOutputIsStable(t *testing.T) {
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := cli.Run([]string{"--root", repo.Root, "--format", "json", "diff"}, stdout, stderr)
+	code := diffcmd.Run([]string{"--root", repo.Root, "--format", "json"}, stdout, stderr)
 	if code != 0 {
 		t.Fatalf("diff --format json exit %d stderr %s", code, stderr.String())
 	}

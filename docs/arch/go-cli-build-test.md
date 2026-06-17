@@ -13,6 +13,8 @@ repo-root/
   cmd/
     mergeway-cli/
       main.go
+    mergeway-diff/
+      main.go
     mergeway-lsp/
       main.go
   internal/

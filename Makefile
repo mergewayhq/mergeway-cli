@@ -11,7 +11,7 @@ LDFLAGS := -X $(PKG)/internal/version.Commit=$(GIT_COMMIT) -X $(PKG)/internal/ve
 
 GOFILES := $(shell find . -type f -name '*.go' -not -path './.git/*' -not -path './.cache/*')
 
-.PHONY: check-go build build-cli build-lsp fmt fmt-check lint test race coverage ci clean release docs-build docs-serve
+.PHONY: check-go build build-cli build-diff build-lsp fmt fmt-check lint test race coverage ci clean release docs-build docs-serve
 
 check-go:
 	@command -v $(GO) >/dev/null 2>&1 || { \
@@ -19,11 +19,15 @@ check-go:
 		exit 1; \
 	}
 
-build: build-cli build-lsp
+build: build-cli build-diff build-lsp
 
 build-cli: check-go
 	mkdir -p bin
 	$(GORUN) build -ldflags "$(LDFLAGS)" -o bin/mergeway-cli ./cmd/mergeway-cli
+
+build-diff: check-go
+	mkdir -p bin
+	$(GORUN) build -ldflags "$(LDFLAGS)" -o bin/mergeway-diff ./cmd/mergeway-diff
 
 build-lsp: check-go
 	mkdir -p bin

@@ -32,6 +32,19 @@ func TestRunHandlesUnknownCommand(t *testing.T) {
 	}
 }
 
+func TestRunNoLongerExposesDiffCommand(t *testing.T) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"diff"}, stdout, stderr)
+	if code == 0 {
+		t.Fatalf("expected diff subcommand to be unavailable")
+	}
+	if !strings.Contains(stderr.String(), `unknown command "diff"`) {
+		t.Fatalf("expected unknown diff command error, got %s", stderr.String())
+	}
+}
+
 func TestRunHelpFlag(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
