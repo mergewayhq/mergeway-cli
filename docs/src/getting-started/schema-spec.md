@@ -33,6 +33,7 @@ mergeway:
 entities:
   Post:
     description: Blog posts surfaced on the marketing site
+    extends: Content
     identifier: id
     include:
       - data/posts/*.yaml
@@ -111,14 +112,51 @@ entities:
 
 Strings remain a shorthand for `path` with no `selector`; Mergeway then reads the entire file as a single object (or uses the `items:` array if present).
 
+### Inheritance
+
+Entities may optionally declare `extends` to inherit from exactly one parent entity:
+
+```yaml
+mergeway:
+  version: 1
+
+entities:
+  Content:
+    identifier: id
+    fields:
+      id: string
+      title:
+        type: string
+        required: true
+  Post:
+    extends: Content
+    identifier: id
+    include:
+      - data/posts/*.yaml
+    fields:
+      body: string
+```
+
+When inheritance is used:
+
+- Base entities may be schema-only and can omit `include` and inline `data`.
+- Children inherit all parent fields and append child-defined fields after them.
+- Children may not redefine inherited field names or the identifier definition.
+- Identifier values must be unique across the whole parent/descendant hierarchy.
+- Querying a parent entity includes descendant objects.
+- References declared as `type: Parent` accept identifiers from the parent or any descendant.
+
+`extends` only supports single inheritance. It is not supported for `json_schema`-backed entities in the first version.
+
 ### Required Sections
 
 | Key           | Description                                                                                                                                                                                                                                                                                                                                                                  |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `identifier`  | Identifier source for each record. Provide either a string field name (for example `id`), the reserved `$path` value to use the workspace-relative file path, or a mapping with `field`, optional `generated`, and `pattern`. Field-based identifiers can be strings, integers, or numbers. `$path` identifiers are strings and require one object per file. The `generated` flag is advisory for tooling; the CLI still expects identifiers to be supplied inline or via `--id` when creating objects. |
-| `include`     | List of data sources. Each entry can be a glob string (shorthand) or a mapping with `path` and optional `selector` property. Omit only when you rely exclusively on inline `data`. Without a selector, Mergeway treats the whole file as a single object.                                                                                                                    |
+| `extends`     | Optional parent entity name. Use this when the entity should inherit fields and identifier rules from one parent. Only single inheritance is supported, and `extends` cannot be combined with `json_schema` in the first version.                                                                                                                                         |
+| `include`     | List of data sources. Each entry can be a glob string (shorthand) or a mapping with `path` and optional `selector` property. Omit only when you rely exclusively on inline `data`, or when the entity is a schema-only base entity meant to be extended by children. Without a selector, Mergeway treats the whole file as a single object.                                  |
 | `fields`      | Map of field definitions. Use either the shorthand `field: type` (defaults to optional) or the expanded mapping for advanced options. Provide either `fields` or `json_schema` for each entity.                                                                                                                                                                              |
-| `json_schema` | Path to a JSON Schema (draft 2020-12) file relative to the schema that declares the entity. When present, Mergeway derives field definitions from the JSON Schema and you can omit the `fields` block.                                                                                                                                                                     |
+| `json_schema` | Path to a JSON Schema (draft 2020-12) file relative to the schema that declares the entity. When present, Mergeway derives field definitions from the JSON Schema and you can omit the `fields` block. `extends` is not supported on these entities in the first version.                                                                                               |
 | `data`        | Optional array of inline records. Each entry needs to contain the identifier field and follows the same schema rules as external data files. This block cannot be used when `identifier: $path` because inline records do not have file paths.                                                                                                                                                                         |
 
 Fields can also declare a read-only `source` that derives values from the backing file path:
@@ -202,6 +240,7 @@ When `json_schema` is present, omit the `fields` map. Mergeway parses the JSON S
 - `$ref` segments are resolved within the same JSON Schema file (e.g., `#/$defs/...`).
 - Custom references to other entities use the same `x-reference-type` property emitted by `mergeway-cli config export`.
 - Reference unions such as `User | Team` are only supported in native `fields:` definitions. They are not supported in `json_schema` entities.
+- `extends` is not supported for `json_schema` entities in the first version of inheritance support.
 
 See `examples/json-schema` for a runnable workspace that demonstrates this flow end-to-end.
 

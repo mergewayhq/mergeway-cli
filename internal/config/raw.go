@@ -19,6 +19,7 @@ type rawMergewaySection struct {
 
 type rawTypeSpec struct {
 	Identifier  rawIdentifierSpec     `yaml:"identifier"`
+	Extends     string                `yaml:"extends"`
 	Include     []rawIncludeDirective `yaml:"include"`
 	Fields      rawFieldMap           `yaml:"fields"`
 	JSONSchema  string                `yaml:"json_schema"`

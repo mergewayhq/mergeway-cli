@@ -139,6 +139,7 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		Name:        rawType.Name,
 		Source:      rawType.Source,
 		Description: spec.Description,
+		Extends:     strings.TrimSpace(spec.Extends),
 		JSONSchema:  jsonSchemaPath,
 		Identifier: IdentifierDefinition{
 			Field:     spec.Identifier.Field,

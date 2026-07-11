@@ -31,6 +31,7 @@ mergeway:
 entities:
   <TypeName>:
     description: Optional human-readable summary
+    extends: <TypeName>
     identifier: <IdentifierDefinition|string>
     include:
       - <glob>
@@ -42,6 +43,7 @@ entities:
 
 - `mergeway.version`: configuration schema version (always equals `1`).
 - `entities`: map keyed by type identifiers (start with an uppercase letter and otherwise follow identifier constraints outlined in `database-requirements.md`). Each entity may offer an optional `description` for tooling and documentation.
+- Entities may also declare optional `extends` metadata to inherit from exactly one parent entity. Schema-only base entities are allowed when they exist to be extended by children.
 - Field definitions accept an optional `description` to clarify usage in downstream tooling.
 
 ## Entity Definition
@@ -86,9 +88,13 @@ entities:
 
 `identifier` accepts either a plain string field name (for example `identifier: id`), the reserved `$path` value to use the workspace-relative file path as the identifier, or a mapping with `field`, optional `generated`, and `pattern` keys when you need additional behavior. The `generated` flag is advisory for tooling; the CLI still expects identifiers to be supplied (inline or via `--id`). `$path` identifiers require one object per file and cannot be combined with inline `data`. Field entries also accept the shorthand `field: type` when no other metadata is needed; these default to optional fields.
 
+Inheritance is optional and uses a single `extends` value that names exactly one parent entity. A child inherits all parent fields, appends its own fields after the parent field order, and may not redefine inherited field names or the parent identifier. Identifier values must be unique across the full parent/descendant hierarchy. Querying a parent entity includes descendant objects, and references declared as `type: Parent` accept identifiers from the parent or any descendant type.
+
 Field definitions may also declare a read-only `source` to derive values from the backing file path. Supported selectors are `path: true`, `path_segment: <n>`, and `path_segment_rev: <n>`. These values are exposed during reads and exports but are not persisted into the underlying files, and they are not available for inline records.
 
 Inline records declared under `data` are optional and most useful for tiny lookup sets or bootstrapping demos without creating separate files. Types that use `identifier: $path` cannot declare inline data because the identifier is derived from the backing file path.
+
+`extends` is not supported for `json_schema`-backed entities in the first version of inheritance support.
 
 ### Field Specification
 
@@ -158,6 +164,6 @@ items:
 
 - Format validation uses `type`, `format`, and `enum` metadata.
 - Schema validation leverages `required`, `repeated`, `properties`, and `unique`.
-- Referential integrity ensures that fields whose `type` matches another defined type reference existing identifiers. For reference unions, a value must resolve in exactly one referenced type set.
+- Referential integrity ensures that fields whose `type` matches another defined type reference existing identifiers. Parent references accept descendant identifiers. For reference unions, a value must resolve in exactly one referenced type set.
 
 This specification provides the foundation for building linting, code generation, and future schema evolution features while remaining human-editable.

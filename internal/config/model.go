@@ -18,6 +18,9 @@ type TypeDefinition struct {
 	Name        string
 	Source      string
 	Description string
+	Extends     string
+	Ancestors   []string
+	Descendants []string
 	JSONSchema  string
 	Identifier  IdentifierDefinition
 	Include     []IncludeDefinition
@@ -120,6 +123,71 @@ func (d *FieldDefinition) ReferenceLabel() string {
 		return d.Type
 	}
 	return strings.Join(d.ReferenceTypes, " | ")
+}
+
+// IsA reports whether child is the same as or inherits from parent.
+func (c *Config) IsA(child, parent string) bool {
+	if c == nil || child == "" || parent == "" {
+		return false
+	}
+	if c.Types == nil {
+		return false
+	}
+	if _, ok := c.Types[child]; !ok {
+		return false
+	}
+	if _, ok := c.Types[parent]; !ok {
+		return false
+	}
+	if child == parent {
+		return true
+	}
+
+	seen := map[string]struct{}{child: {}}
+	current := c.Types[child]
+	for current != nil && current.Extends != "" {
+		next := current.Extends
+		if next == parent {
+			return true
+		}
+		if _, ok := seen[next]; ok {
+			return false
+		}
+		seen[next] = struct{}{}
+		current = c.Types[next]
+	}
+
+	return false
+}
+
+// AssignableTypes returns the named type followed by any descendants.
+func (c *Config) AssignableTypes(typeName string) []string {
+	if c == nil || typeName == "" || c.Types[typeName] == nil {
+		return nil
+	}
+
+	assignable := []string{typeName}
+	assignable = append(assignable, c.DescendantTypes(typeName)...)
+	return assignable
+}
+
+// DescendantTypes returns the names of all descendants for the given type.
+func (c *Config) DescendantTypes(typeName string) []string {
+	if c == nil || typeName == "" || c.Types[typeName] == nil {
+		return nil
+	}
+
+	descendants := make([]string, 0)
+	for candidate := range c.Types {
+		if candidate == typeName {
+			continue
+		}
+		if c.IsA(candidate, typeName) {
+			descendants = append(descendants, candidate)
+		}
+	}
+	sort.Strings(descendants)
+	return descendants
 }
 
 // String returns a string representation for debugging purposes.

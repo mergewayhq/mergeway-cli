@@ -550,6 +550,81 @@ func TestConfigStringAndSources(t *testing.T) {
 	}
 }
 
+func TestLoadStoresExtends(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  Animal:
+    identifier: id
+    data:
+      - id: animal-1
+    fields:
+      id: string
+  Dog:
+    extends: Animal
+    identifier: id
+    data:
+      - id: dog-1
+    fields:
+      id: string
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load returned error: %v", err)
+	}
+
+	dog := cfg.Types["Dog"]
+	if dog == nil {
+		t.Fatalf("expected Dog type")
+	}
+	if dog.Extends != "Animal" {
+		t.Fatalf("expected Dog to extend Animal, got %q", dog.Extends)
+	}
+}
+
+func TestConfigHierarchyHelpers(t *testing.T) {
+	cfg := &Config{
+		Types: map[string]*TypeDefinition{
+			"Animal":     {Name: "Animal"},
+			"Dog":        {Name: "Dog", Extends: "Animal"},
+			"WorkingDog": {Name: "WorkingDog", Extends: "Dog"},
+			"Cat":        {Name: "Cat", Extends: "Animal"},
+		},
+	}
+
+	if !cfg.IsA("Animal", "Animal") {
+		t.Fatalf("expected Animal to be assignable to itself")
+	}
+	if !cfg.IsA("Dog", "Animal") {
+		t.Fatalf("expected Dog to inherit from Animal")
+	}
+	if !cfg.IsA("WorkingDog", "Animal") {
+		t.Fatalf("expected WorkingDog to inherit from Animal transitively")
+	}
+	if cfg.IsA("Animal", "Dog") {
+		t.Fatalf("did not expect Animal to inherit from Dog")
+	}
+	if cfg.IsA("Missing", "Animal") {
+		t.Fatalf("did not expect unknown child type to match")
+	}
+
+	if got := cfg.DescendantTypes("Animal"); !reflect.DeepEqual(got, []string{"Cat", "Dog", "WorkingDog"}) {
+		t.Fatalf("unexpected Animal descendants: %v", got)
+	}
+	if got := cfg.AssignableTypes("Dog"); !reflect.DeepEqual(got, []string{"Dog", "WorkingDog"}) {
+		t.Fatalf("unexpected Dog assignable types: %v", got)
+	}
+	if got := cfg.AssignableTypes("Missing"); got != nil {
+		t.Fatalf("expected nil assignable types for unknown type, got %v", got)
+	}
+}
+
 func TestLoadUnsupportedConfigVersion(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "mergeway.yaml")
 	content := []byte(`mergeway:
