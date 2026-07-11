@@ -15,6 +15,16 @@ mergeway-diff [flags] <left> <right>
 mergeway-diff --format json [<left>] [<right>]
 ```
 
+`mergeway-diff` is a standalone binary. It does not accept `mergeway-cli` subcommands.
+
+## Flags
+
+| Flag       | Description                                                            |
+| ---------- | ---------------------------------------------------------------------- |
+| `--root`   | Path to the workspace (defaults to `.`).                               |
+| `--config` | Explicit path to `mergeway.yaml` (defaults to `<root>/mergeway.yaml`). |
+| `--format` | Output format (`yaml` or `json`, default `yaml`).                      |
+
 This command is a data-only diff. It compares Mergeway-managed records across the repository and excludes configuration entirely.
 
 Snapshot interpretation:
@@ -25,15 +35,32 @@ Snapshot interpretation:
 
 Passing more than two positional arguments is an error.
 
+## Examples
+
+Compare the current `HEAD` data against unstaged local changes:
+
+```bash
+mergeway-diff
+```
+
+Compare an earlier revision against the full current working tree:
+
+```bash
+mergeway-diff HEAD~1
+```
+
+Emit machine-readable output for automation:
+
+```bash
+mergeway-diff --format json HEAD~1 HEAD
+```
+
 ## Notes
 
 - The command reports semantic record changes, not path-based Git file diffs.
 - Output is intentionally simple for now and may be refined in a later phase.
-- Pass `--format json` to emit a machine-readable semantic diff document.
-- Supported flags:
-  - `--root` sets the workspace root and defaults to `.`
-  - `--config` sets an explicit `mergeway.yaml`
-  - `--format` chooses `yaml` or `json`
+- `mergeway-diff <left>` includes both staged and unstaged working tree changes on the right-hand side.
+- `mergeway-diff <left> <right>` compares two explicit revisions and ignores local working tree noise.
 
 ## Related Commands
 

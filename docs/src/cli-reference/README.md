@@ -1,11 +1,13 @@
 ---
-title: "CLI Reference"
-linkTitle: "CLI Reference"
-description: "Reference for Mergeway CLI commands plus the standalone mergeway-diff tool."
+title: "mergeway-cli Reference"
+linkTitle: "mergeway-cli Reference"
+description: "Reference for the mergeway-cli binary."
 weight: 30
 ---
 
-Every command shares a set of global flags (use `--long-name`; single-dash long flags like `-root` are not supported). Global flags can appear before or after the command name.
+`mergeway-cli` is the primary workspace-management binary. It handles repository setup, schema inspection, validation, formatting, and object operations.
+
+Use `--long-name`; single-dash long flags like `-root` are not supported. Global flags can appear before or after the command name.
 
 | Flag          | Description                                                            |
 | ------------- | ---------------------------------------------------------------------- |
@@ -16,13 +18,13 @@ Every command shares a set of global flags (use `--long-name`; single-dash long 
 | `--yes`       | Auto-confirm prompts (useful for `delete`).                            |
 | `--verbose`   | Emit additional logging.                                               |
 
-## Repository setup
+## `mergeway-cli` Repository Setup
 
 - [`init`](init.md)
 - [`validate`](validate.md)
 - [`version`](version.md)
 
-## Schema utilities
+## `mergeway-cli` Schema Utilities
 
 - [`entity list`](entity-list.md)
 - [`entity show`](entity-show.md)
@@ -33,7 +35,7 @@ Every command shares a set of global flags (use `--long-name`; single-dash long 
 
 For more information on the schema, please consult the [Schema Format](../getting-started/schema-spec.md)
 
-## Object operations
+## `mergeway-cli` Object Operations
 
 - [`list`](list.md)
 - [`files`](files.md)
@@ -43,8 +45,4 @@ For more information on the schema, please consult the [Schema Format](../gettin
 - [`delete`](delete.md)
 - [`export`](export.md)
 
-## Semantic snapshots
-
-- [`mergeway-diff`](diff.md)
-
-Need a refresher on terminology? See the [Basic Concepts](../getting-started/README.md) page.
+For the other binaries, see [mergeway-diff Reference](diff.md) and [mergeway-lsp Reference](lsp.md). Need a refresher on terminology? See the [Basic Concepts](../getting-started/README.md) page.

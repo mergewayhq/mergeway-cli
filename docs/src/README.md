@@ -36,7 +36,10 @@ By storing metadata as code, changes become a simple patch.
 1. [Install Mergeway](getting-started/installation.md) (or build from source).
 2. Follow the [Workspace set-up](getting-started/workspace-setup.md).
 3. Review the [Basic Concepts](getting-started/README.md) and [Schema Format](getting-started/schema-spec.md) when you define entities.
-4. Browse through the [CLI Reference](cli-reference/README.md) for command syntax.
+4. Browse the binary references:
+   [mergeway-cli](cli-reference/README.md),
+   [mergeway-diff](cli-reference/diff.md),
+   and [mergeway-lsp](cli-reference/lsp.md).
 
 Updates land in the [Changelog](https://github.com/mergewayhq/mergeway-cli/releases). File GitHub issues for questions, bugs, or requests.
 

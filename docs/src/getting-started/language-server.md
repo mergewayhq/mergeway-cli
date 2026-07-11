@@ -54,6 +54,8 @@ Equivalent environment variables:
 
 Keep stdout protocol-only. Human-readable logging on stdout will break editor integration.
 
+For a concise flag and environment-variable reference, see [`mergeway-lsp`](../cli-reference/lsp.md).
+
 ## Current Capabilities
 
 - workspace-aware diagnostics backed by the same validation core as `mergeway-cli validate`
