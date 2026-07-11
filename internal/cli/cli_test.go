@@ -62,6 +62,35 @@ func TestGet(t *testing.T) {
 	}
 }
 
+func TestListAndGetParentTypeIncludeDescendants(t *testing.T) {
+	repo := cliInheritanceRepo(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "list", "--type", "Animal"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("list exit %d stderr %s", code, stderr.String())
+	}
+	lines := strings.Fields(stdout.String())
+	expected := []string{"animal-1", "dog-1"}
+	if !reflect.DeepEqual(lines, expected) {
+		t.Fatalf("expected IDs %v, got %v", expected, lines)
+	}
+
+	stdout.Reset()
+	stderr.Reset()
+	code = Run([]string{"--root", repo, "--format", "json", "get", "--type", "Animal", "dog-1"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("get exit %d stderr %s", code, stderr.String())
+	}
+	if !strings.Contains(stdout.String(), "\"breed\": \"collie\"") {
+		t.Fatalf("expected child fields in parent get output, got %s", stdout.String())
+	}
+	if !strings.Contains(stdout.String(), "\"name\": \"Fido\"") {
+		t.Fatalf("expected inherited fields in parent get output, got %s", stdout.String())
+	}
+}
+
 func TestListFilterSupportsDeclaredPathDerivedFields(t *testing.T) {
 	repo := pathSegmentsRepo(t)
 	stdout := &bytes.Buffer{}
@@ -1056,6 +1085,24 @@ func TestEntityShowCommand(t *testing.T) {
 	}
 }
 
+func TestEntityShowInheritedSchema(t *testing.T) {
+	repo := cliInheritanceRepo(t)
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+
+	code := Run([]string{"--root", repo, "entity", "show", "Dog"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("entity show exit %d stderr %s", code, stderr.String())
+	}
+	out := stdout.String()
+	if !strings.Contains(out, "extends: Animal") {
+		t.Fatalf("expected extends metadata, got %s", out)
+	}
+	if !strings.Contains(out, "name:") || !strings.Contains(out, "breed:") {
+		t.Fatalf("expected inherited and local fields, got %s", out)
+	}
+}
+
 func TestEntityShowUnknown(t *testing.T) {
 	repo := copyFixture(t)
 	stdout := &bytes.Buffer{}
@@ -1088,6 +1135,45 @@ func TestInitCommandScaffoldsConfig(t *testing.T) {
 	if !strings.Contains(string(body), "mergeway:") {
 		t.Fatalf("expected default config contents, got %s", string(body))
 	}
+}
+
+func cliInheritanceRepo(t *testing.T) string {
+	t.Helper()
+	root := t.TempDir()
+	cfg := `mergeway:
+  version: 1
+
+entities:
+  Animal:
+    identifier: id
+    include:
+      - data/animals/*.yaml
+    fields:
+      id: string
+      name: string
+  Dog:
+    extends: Animal
+    include:
+      - data/dogs/*.yaml
+    fields:
+      breed: string
+`
+	if err := os.WriteFile(filepath.Join(root, "mergeway.yaml"), []byte(cfg), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(root, "data", "animals"), 0o755); err != nil {
+		t.Fatalf("mkdir animals: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(root, "data", "dogs"), 0o755); err != nil {
+		t.Fatalf("mkdir dogs: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "data", "animals", "animal.yaml"), []byte("id: animal-1\nname: Generic\n"), 0o644); err != nil {
+		t.Fatalf("write animal: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "data", "dogs", "dog.yaml"), []byte("id: dog-1\nname: Fido\nbreed: collie\n"), 0o644); err != nil {
+		t.Fatalf("write dog: %v", err)
+	}
+	return root
 }
 
 func TestInitCommandRejectsArgs(t *testing.T) {

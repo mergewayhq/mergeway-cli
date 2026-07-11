@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"os"
 	"path/filepath"
 	"reflect"
 	"sort"
@@ -50,6 +51,28 @@ func TestLoadBuildsWorkspaceIndex(t *testing.T) {
 	}
 	if post[0].File != expectedPostFile {
 		t.Fatalf("expected indexed post file, got %q", post[0].File)
+	}
+}
+
+func TestLoadSupportsAncestorLookups(t *testing.T) {
+	root := workspaceInheritanceRepo(t)
+
+	ws, err := Load(root, "")
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+
+	animals := ws.Objects("Animal")
+	if got := len(animals); got != 2 {
+		t.Fatalf("expected 2 Animal objects including descendants, got %d", got)
+	}
+
+	dog := ws.Find("Animal", "dog-1")
+	if len(dog) != 1 {
+		t.Fatalf("expected one ancestor lookup result, got %d", len(dog))
+	}
+	if dog[0].Type != "Dog" {
+		t.Fatalf("expected concrete Dog object, got %s", dog[0].Type)
 	}
 }
 
@@ -112,4 +135,44 @@ func sortedErrors(errs []validation.Error) []validation.Error {
 		return left.Message < right.Message
 	})
 	return cloned
+}
+
+func workspaceInheritanceRepo(t *testing.T) string {
+	t.Helper()
+
+	root := t.TempDir()
+	cfg := `mergeway:
+  version: 1
+
+entities:
+  Animal:
+    identifier: id
+    include:
+      - data/animals/*.yaml
+    fields:
+      id: string
+      name: string
+  Dog:
+    extends: Animal
+    include:
+      - data/dogs/*.yaml
+    fields:
+      breed: string
+`
+	if err := os.WriteFile(filepath.Join(root, "mergeway.yaml"), []byte(cfg), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(root, "data", "animals"), 0o755); err != nil {
+		t.Fatalf("mkdir animals: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(root, "data", "dogs"), 0o755); err != nil {
+		t.Fatalf("mkdir dogs: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "data", "animals", "animal.yaml"), []byte("id: animal-1\nname: Generic\n"), 0o644); err != nil {
+		t.Fatalf("write animal: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "data", "dogs", "dog.yaml"), []byte("id: dog-1\nname: Fido\nbreed: collie\n"), 0o644); err != nil {
+		t.Fatalf("write dog: %v", err)
+	}
+	return root
 }

@@ -99,6 +99,7 @@ func (s *Server) workspaceSymbols(ctx context.Context, params *protocol.Workspac
 	rootPaths := sortedRootPaths(snapshot.Roots)
 
 	var symbols []protocol.SymbolInformation
+	seenSymbols := make(map[string]struct{})
 	for _, rootPath := range rootPaths {
 		root := snapshot.Roots[rootPath]
 		cfg := validationConfig(root)
@@ -110,6 +111,12 @@ func (s *Server) workspaceSymbols(ctx context.Context, params *protocol.Workspac
 			for _, obj := range root.Workspace.Objects(typeName) {
 				if !workspaceSymbolMatches(query, typeName, obj) {
 					continue
+				}
+				if symbolKey := workspaceSymbolObjectKey(root, obj); symbolKey != "" {
+					if _, ok := seenSymbols[symbolKey]; ok {
+						continue
+					}
+					seenSymbols[symbolKey] = struct{}{}
 				}
 
 				targetRange, ok := s.objectIdentifierRange(root, obj)
@@ -152,7 +159,7 @@ func resolveReferenceTarget(analysis *documentAnalysis) *referenceTarget {
 	}
 
 	if analysis.data.fieldName == analysis.data.typeDef.Identifier.Field {
-		typeNames := []string{analysis.data.typeDef.Name}
+		typeNames := referenceableTypeNames(analysis.cfg, analysis.data.typeDef.Name)
 		declarations := workspaceObjectsForFile(analysis.root, analysis.data.typeDef.Name, analysis.path, analysis.data.currentValue)
 		if len(declarations) == 0 && analysis.root.Workspace != nil {
 			declarations = analysis.root.Workspace.Find(analysis.data.typeDef.Name, analysis.data.currentValue)
@@ -174,7 +181,7 @@ func resolveReferenceTarget(analysis *documentAnalysis) *referenceTarget {
 	if len(declarations) > 0 {
 		typeNames = nil
 		for _, obj := range declarations {
-			typeNames = append(typeNames, obj.Type)
+			typeNames = append(typeNames, referenceableTypeNames(analysis.cfg, obj.Type)...)
 		}
 		typeNames = uniqueStrings(typeNames)
 	}
@@ -625,6 +632,13 @@ func workspaceSymbolContainer(root *workspace.RootRuntime, obj *data.Object) str
 	return container
 }
 
+func workspaceSymbolObjectKey(root *workspace.RootRuntime, obj *data.Object) string {
+	if root == nil || obj == nil {
+		return ""
+	}
+	return fmt.Sprintf("%s\x00%s\x00%s\x00%s", root.Index.Root, obj.Type, obj.ID, obj.File)
+}
+
 func objectPrimaryText(obj *data.Object) string {
 	if obj == nil {
 		return ""
@@ -659,6 +673,22 @@ func uniqueStrings(values []string) []string {
 	}
 	sort.Strings(result)
 	return result
+}
+
+func referenceableTypeNames(cfg *config.Config, typeName string) []string {
+	if cfg == nil || typeName == "" {
+		if typeName == "" {
+			return nil
+		}
+		return []string{typeName}
+	}
+
+	typeDef := cfg.Types[typeName]
+	if typeDef == nil {
+		return []string{typeName}
+	}
+	names := append([]string{typeName}, typeDef.Ancestors...)
+	return uniqueStrings(names)
 }
 
 func sortedRootPaths(roots map[string]*workspace.RootRuntime) []string {

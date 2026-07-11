@@ -1,6 +1,7 @@
 package lsp
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -53,6 +54,35 @@ func TestHandleReferencesUsesSemanticTargets(t *testing.T) {
 			{path: userPath, rng: declarationRange},
 			{path: postPath, rng: usageRange},
 		})
+	})
+}
+
+func TestHandleReferencesIncludeParentTypedUsagesForDescendants(t *testing.T) {
+	server, root := initializeInheritanceServer(t)
+	dogPath := filepath.Join(root, "data", "dogs", "dog.yaml")
+	dogContent := readFile(t, dogPath)
+	kennelPath := filepath.Join(root, "data", "kennels", "kennel.yaml")
+	kennelContent := readFile(t, kennelPath)
+
+	referencePosition := positionInContent(t, dogContent, "dog-1")
+	declarationRange := scalarFieldValueRange(t, dogContent, "id")
+	usageRange := scalarFieldValueRange(t, kennelContent, "resident")
+
+	var result []protocol.Location
+	callServer(t, server, protocol.MethodTextDocumentReferences, 5, &protocol.ReferenceParams{
+		TextDocumentPositionParams: protocol.TextDocumentPositionParams{
+			TextDocument: protocol.TextDocumentIdentifier{URI: protocol.DocumentURI(uri.File(dogPath))},
+			Position:     referencePosition,
+		},
+		Context: protocol.ReferenceContext{IncludeDeclaration: true},
+	}, &result)
+
+	if len(result) != 2 {
+		t.Fatalf("expected declaration and parent-typed usage, got %d", len(result))
+	}
+	expectLocations(t, result, []expectedLocation{
+		{path: dogPath, rng: declarationRange},
+		{path: kennelPath, rng: usageRange},
 	})
 }
 
@@ -145,6 +175,22 @@ func TestHandleWorkspaceSymbolFindsByNameAndKeepsRootsSeparate(t *testing.T) {
 			t.Fatalf("expected root-qualified containers, got %q and %q", result[0].ContainerName, result[1].ContainerName)
 		}
 	})
+
+	t.Run("deduplicate descendant symbols", func(t *testing.T) {
+		server, _ := initializeInheritanceServer(t)
+
+		var result []protocol.SymbolInformation
+		callServer(t, server, protocol.MethodWorkspaceSymbol, 6, &protocol.WorkspaceSymbolParams{
+			Query: "dog-1",
+		}, &result)
+
+		if len(result) != 1 {
+			t.Fatalf("expected one symbol for dog-1, got %d", len(result))
+		}
+		if result[0].Name != "dog-1" {
+			t.Fatalf("expected symbol dog-1, got %q", result[0].Name)
+		}
+	})
 }
 
 type expectedLocation struct {
@@ -171,6 +217,57 @@ func initializeMultiRootServer(t *testing.T) (*Server, string, string) {
 	}, (*protocol.InitializeResult)(nil))
 
 	return server, rootA, rootB
+}
+
+func initializeInheritanceServer(t *testing.T) (*Server, string) {
+	t.Helper()
+
+	root := t.TempDir()
+	cfg := `mergeway:
+  version: 1
+
+entities:
+  Animal:
+    identifier: id
+    fields:
+      id: string
+      name: string
+  Dog:
+    extends: Animal
+    include:
+      - data/dogs/*.yaml
+    fields:
+      breed: string
+  Kennel:
+    identifier: id
+    include:
+      - data/kennels/*.yaml
+    fields:
+      id: string
+      resident:
+        type: Animal
+`
+	if err := os.WriteFile(filepath.Join(root, "mergeway.yaml"), []byte(cfg), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(root, "data", "dogs"), 0o755); err != nil {
+		t.Fatalf("mkdir dogs: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(root, "data", "kennels"), 0o755); err != nil {
+		t.Fatalf("mkdir kennels: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "data", "dogs", "dog.yaml"), []byte("id: dog-1\nname: Fido\nbreed: collie\n"), 0o644); err != nil {
+		t.Fatalf("write dog: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "data", "kennels", "kennel.yaml"), []byte("id: kennel-1\nresident: dog-1\n"), 0o644); err != nil {
+		t.Fatalf("write kennel: %v", err)
+	}
+
+	server := NewServer(Options{Logger: testLogger()})
+	callServer(t, server, protocol.MethodInitialize, 1, map[string]any{
+		"rootUri": string(uri.File(root)),
+	}, (*protocol.InitializeResult)(nil))
+	return server, root
 }
 
 func expectLocation(t *testing.T, location protocol.Location, path string, rng protocol.Range) {
