@@ -1,0 +1,40 @@
+mergeway:
+  version: 1
+
+entities:
+  Animal:
+    description: Schema-only base entity for animals.
+    identifier: id
+    fields:
+      id:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true
+
+  Dog:
+    description: Concrete animal type that inherits from Animal.
+    extends: Animal
+    include:
+      - data/dogs/*.yaml
+    fields:
+      breed:
+        type: string
+        required: true
+
+  Kennel:
+    description: Stores a resident reference typed as the parent entity.
+    identifier: id
+    include:
+      - data/kennels/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      label:
+        type: string
+        required: true
+      resident:
+        type: Animal
+        required: true

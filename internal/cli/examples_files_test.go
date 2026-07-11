@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -25,6 +26,45 @@ func TestFilesExamplesJSON(t *testing.T) {
 				t.Fatalf("expected json output, got parse error: %v\nbody:\n%s", err, stdout.String())
 			}
 		})
+	}
+}
+
+func TestInheritanceExampleCommands(t *testing.T) {
+	root, err := filepath.Abs(filepath.Join("..", "..", "examples", "inheritance"))
+	if err != nil {
+		t.Fatalf("abs path: %v", err)
+	}
+
+	validateOut := &bytes.Buffer{}
+	validateErr := &bytes.Buffer{}
+	code := Run([]string{"--root", root, "validate"}, validateOut, validateErr)
+	if code != 0 {
+		t.Fatalf("validate inheritance example exit %d stdout %s stderr %s", code, validateOut.String(), validateErr.String())
+	}
+
+	listOut := &bytes.Buffer{}
+	listErr := &bytes.Buffer{}
+	code = Run([]string{"--root", root, "list", "--type", "Animal"}, listOut, listErr)
+	if code != 0 {
+		t.Fatalf("list inheritance example exit %d stdout %s stderr %s", code, listOut.String(), listErr.String())
+	}
+	if got := strings.Fields(listOut.String()); !reflect.DeepEqual(got, []string{"dog-1"}) {
+		t.Fatalf("expected inherited parent list [dog-1], got %v", got)
+	}
+
+	getOut := &bytes.Buffer{}
+	getErr := &bytes.Buffer{}
+	code = Run([]string{"--root", root, "--format", "json", "get", "--type", "Animal", "dog-1"}, getOut, getErr)
+	if code != 0 {
+		t.Fatalf("get inheritance example exit %d stdout %s stderr %s", code, getOut.String(), getErr.String())
+	}
+
+	var payload map[string]any
+	if err := json.Unmarshal(getOut.Bytes(), &payload); err != nil {
+		t.Fatalf("expected json output, got parse error: %v\nbody:\n%s", err, getOut.String())
+	}
+	if payload["breed"] != "collie" || payload["name"] != "Fido" {
+		t.Fatalf("expected inherited get payload, got %v", payload)
 	}
 }
 

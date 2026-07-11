@@ -82,6 +82,32 @@ func TestLoadValidConfig(t *testing.T) {
 	}
 }
 
+func TestLoadInheritanceFixture(t *testing.T) {
+	path := filepath.Join("testdata", "inheritance", "mergeway.yaml")
+
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load returned error: %v", err)
+	}
+
+	dog := cfg.Types["Dog"]
+	if dog == nil {
+		t.Fatalf("expected Dog type")
+	}
+	if dog.Extends != "Animal" {
+		t.Fatalf("expected Dog to extend Animal, got %q", dog.Extends)
+	}
+	if !reflect.DeepEqual(dog.FieldOrder, []string{"id", "name", "breed"}) {
+		t.Fatalf("expected flattened field order, got %v", dog.FieldOrder)
+	}
+	if !reflect.DeepEqual(dog.Ancestors, []string{"Animal"}) {
+		t.Fatalf("expected Dog ancestors [Animal], got %v", dog.Ancestors)
+	}
+	if got := cfg.Types["Animal"].Descendants; !reflect.DeepEqual(got, []string{"Dog"}) {
+		t.Fatalf("expected Animal descendants [Dog], got %v", got)
+	}
+}
+
 func TestLoadRepeatedUniqueError(t *testing.T) {
 	path := filepath.Join("testdata", "repeated_unique", "mergeway.yaml")
 	_, err := Load(path)

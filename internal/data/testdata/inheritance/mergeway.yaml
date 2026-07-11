@@ -1,0 +1,24 @@
+mergeway:
+  version: 1
+
+entities:
+  Animal:
+    identifier: id
+    include:
+      - data/animals/*.yaml
+    fields:
+      id:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true
+
+  Dog:
+    extends: Animal
+    include:
+      - data/dogs/*.yaml
+    fields:
+      breed:
+        type: string
+        required: true

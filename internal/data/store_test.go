@@ -51,6 +51,29 @@ func TestStoreListAndGet(t *testing.T) {
 	}
 }
 
+func TestStoreInheritanceFixture(t *testing.T) {
+	store, _ := setupStore(t, "inheritance")
+
+	ids, err := store.List("Animal")
+	if err != nil {
+		t.Fatalf("List returned error: %v", err)
+	}
+	if !reflect.DeepEqual(ids, []string{"animal-1", "dog-1"}) {
+		t.Fatalf("expected inherited list output, got %v", ids)
+	}
+
+	obj, err := store.Get("Animal", "dog-1")
+	if err != nil {
+		t.Fatalf("Get returned error: %v", err)
+	}
+	if obj.Type != "Dog" {
+		t.Fatalf("expected concrete Dog object, got %s", obj.Type)
+	}
+	if obj.Fields["breed"] != "collie" {
+		t.Fatalf("expected breed collie, got %v", obj.Fields["breed"])
+	}
+}
+
 func TestStoreCreateUpdateDelete(t *testing.T) {
 	store, repo := setupStore(t, "repo")
 

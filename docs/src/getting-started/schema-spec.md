@@ -148,6 +148,8 @@ When inheritance is used:
 
 `extends` only supports single inheritance. It is not supported for `json_schema`-backed entities in the first version.
 
+See `examples/inheritance` for a runnable workspace that combines a schema-only base entity, inherited fields, parent queries, and parent-typed references to descendants.
+
 ### Required Sections
 
 | Key           | Description                                                                                                                                                                                                                                                                                                                                                                  |

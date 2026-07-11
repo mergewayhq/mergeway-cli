@@ -14,7 +14,7 @@ mergeway-cli [global flags] list --type <type> [--filter key=value]
 
 | Flag       | Description                                                                                                                    |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `--type`   | Required. Type identifier to query.                                                                                            |
+| `--type`   | Required. Type identifier to query. When the type has descendants, the list also includes objects from those descendant types. |
 | `--filter` | Optional `key=value` string used to filter objects before listing their IDs. The comparison is a simple string equality check. Declared read-only fields derived from file paths can also be used here. |
 
 ## Example
@@ -51,6 +51,18 @@ Filter by a declared path-derived field:
 
 ```bash
 mergeway-cli list --type Page --filter 'section=guides'
+```
+
+For inherited entities, querying the parent includes descendant objects:
+
+```bash
+mergeway-cli --root examples/inheritance list --type Animal
+```
+
+Output:
+
+```
+dog-1
 ```
 
 ## Related Commands

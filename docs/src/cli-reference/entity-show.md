@@ -14,6 +14,8 @@ mergeway-cli [global flags] entity show <entity>
 
 No additional flags. Use `--format json` if you prefer JSON output, and add the global `--root` flag when working outside the workspace root.
 
+For inherited entities, the output shows the effective flattened schema, including inherited fields. The normalized output also preserves `extends` metadata so the inheritance chain remains visible.
+
 ## Example
 
 Show the `Post` entity in YAML form:

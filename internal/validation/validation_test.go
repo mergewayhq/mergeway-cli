@@ -38,6 +38,20 @@ func TestValidateJSONPathIncludes(t *testing.T) {
 	}
 }
 
+func TestValidateInheritanceFixture(t *testing.T) {
+	root := fixturePath(t, "inheritance")
+	cfg := loadConfig(t, root)
+
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+
+	if len(res.Errors) != 0 {
+		t.Fatalf("expected no errors, got %v", res.Errors)
+	}
+}
+
 func TestValidateFormatError(t *testing.T) {
 	root := fixturePath(t, "format_error")
 	cfg := loadConfig(t, root)

@@ -14,7 +14,7 @@ mergeway-cli [global flags] get --type <type> <id>
 
 | Flag     | Description                                                      |
 | -------- | ---------------------------------------------------------------- |
-| `--type` | Required. Type identifier that owns the object.                  |
+| `--type` | Required. Type identifier that owns the object. Parent types can also resolve descendant objects. |
 | `<id>`   | Required positional argument representing the object identifier. For entities that use `identifier: $path`, this is the relative file path ID, which may include `../...` for records loaded from outside the workspace root. |
 
 Use `--format json` if you prefer JSON output.
@@ -51,6 +51,12 @@ External-root `$path` records work the same way:
 
 ```bash
 mergeway-cli --format yaml get --type Product ../secondary/products/widget.yaml
+```
+
+Inherited entities also work through the parent type:
+
+```bash
+mergeway-cli --root examples/inheritance --format yaml get --type Animal dog-1
 ```
 
 ## Related Commands
