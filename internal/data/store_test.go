@@ -108,6 +108,74 @@ func TestStoreCreateUpdateDelete(t *testing.T) {
 	}
 }
 
+func TestStoreInheritanceParentReads(t *testing.T) {
+	store, _ := setupInheritanceStore(t, false)
+
+	ids, err := store.List("Animal")
+	if err != nil {
+		t.Fatalf("List returned error: %v", err)
+	}
+
+	expectedIDs := []string{"animal-1", "dog-1"}
+	if !reflect.DeepEqual(ids, expectedIDs) {
+		t.Fatalf("expected IDs %v, got %v", expectedIDs, ids)
+	}
+
+	objects, err := store.LoadAll("Animal")
+	if err != nil {
+		t.Fatalf("LoadAll returned error: %v", err)
+	}
+	if len(objects) != 2 {
+		t.Fatalf("expected 2 objects, got %d", len(objects))
+	}
+
+	gotTypes := []string{objects[0].Type, objects[1].Type}
+	if !reflect.DeepEqual(gotTypes, []string{"Animal", "Dog"}) {
+		t.Fatalf("expected concrete types [Animal Dog], got %v", gotTypes)
+	}
+
+	obj, err := store.Get("Animal", "dog-1")
+	if err != nil {
+		t.Fatalf("Get returned error: %v", err)
+	}
+	if obj.Type != "Dog" {
+		t.Fatalf("expected concrete type Dog, got %s", obj.Type)
+	}
+	if obj.Fields["name"] != "Fido" {
+		t.Fatalf("expected inherited field name Fido, got %v", obj.Fields["name"])
+	}
+	if obj.Fields["breed"] != "collie" {
+		t.Fatalf("expected dog breed collie, got %v", obj.Fields["breed"])
+	}
+}
+
+func TestStoreInheritanceRejectsDuplicateHierarchyIdentifiers(t *testing.T) {
+	store, _ := setupInheritanceStore(t, true)
+
+	_, err := store.List("Animal")
+	if err == nil || !strings.Contains(err.Error(), "duplicate identifier across assignable hierarchy") {
+		t.Fatalf("expected hierarchy duplicate error, got %v", err)
+	}
+
+	_, err = store.Get("Animal", "shared-1")
+	if err == nil || !strings.Contains(err.Error(), "duplicate identifier across assignable hierarchy") {
+		t.Fatalf("expected hierarchy duplicate error from Get, got %v", err)
+	}
+}
+
+func TestStoreCreateRejectsHierarchyIdentifierReuse(t *testing.T) {
+	store, _ := setupInheritanceStore(t, false)
+
+	_, err := store.Create("Dog", map[string]any{
+		"id":    "animal-1",
+		"name":  "Buddy",
+		"breed": "beagle",
+	})
+	if err == nil || !strings.Contains(err.Error(), `Dog "animal-1" already exists`) {
+		t.Fatalf("expected create duplicate error, got %v", err)
+	}
+}
+
 func TestStoreJSONPathIncludes(t *testing.T) {
 	store, repo := setupStore(t, "jsonpath")
 
@@ -586,6 +654,66 @@ entities:
 	body := "slug: guide-install\ntitle: Install Mergeway\nkind: guide\n"
 	if err := os.WriteFile(filepath.Join(repo, "data", "library", "guides", "install.yaml"), []byte(body), 0o644); err != nil {
 		t.Fatalf("write data: %v", err)
+	}
+
+	cfg, err := config.Load(filepath.Join(repo, "mergeway.yaml"))
+	if err != nil {
+		t.Fatalf("load config: %v", err)
+	}
+	store, err := NewStore(repo, cfg)
+	if err != nil {
+		t.Fatalf("new store: %v", err)
+	}
+	return store, repo
+}
+
+func setupInheritanceStore(t *testing.T, duplicate bool) (*Store, string) {
+	t.Helper()
+	repo := t.TempDir()
+	cfgBody := `mergeway:
+  version: 1
+
+entities:
+  Animal:
+    identifier: id
+    include:
+      - data/animals/*.yaml
+    fields:
+      id: string
+      name:
+        type: string
+        required: true
+  Dog:
+    extends: Animal
+    include:
+      - data/dogs/*.yaml
+    fields:
+      breed:
+        type: string
+        required: true
+`
+	if err := os.WriteFile(filepath.Join(repo, "mergeway.yaml"), []byte(cfgBody), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(repo, "data", "animals"), 0o755); err != nil {
+		t.Fatalf("mkdir animals: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(repo, "data", "dogs"), 0o755); err != nil {
+		t.Fatalf("mkdir dogs: %v", err)
+	}
+
+	animalID := "animal-1"
+	dogID := "dog-1"
+	if duplicate {
+		animalID = "shared-1"
+		dogID = "shared-1"
+	}
+
+	if err := os.WriteFile(filepath.Join(repo, "data", "animals", "animal.yaml"), []byte("id: "+animalID+"\nname: Generic\n"), 0o644); err != nil {
+		t.Fatalf("write animal: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(repo, "data", "dogs", "dog.yaml"), []byte("id: "+dogID+"\nname: Fido\nbreed: collie\n"), 0o644); err != nil {
+		t.Fatalf("write dog: %v", err)
 	}
 
 	cfg, err := config.Load(filepath.Join(repo, "mergeway.yaml"))

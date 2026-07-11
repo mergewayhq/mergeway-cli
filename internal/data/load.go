@@ -15,6 +15,32 @@ type includeMatch struct {
 }
 
 func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
+	typeDefs := s.assignableTypeDefs(typeDef)
+	seenIDs := make(map[string]*Object)
+	var objects []*Object
+
+	for _, concreteType := range typeDefs {
+		loaded, err := s.loadExactAll(concreteType)
+		if err != nil {
+			return nil, err
+		}
+		for _, obj := range loaded {
+			if existing := seenIDs[obj.ID]; existing != nil {
+				if existing.Type != obj.Type {
+					return nil, duplicateHierarchyError(typeDef.Name, obj.ID, existing, obj)
+				}
+				objects = append(objects, obj)
+				continue
+			}
+			seenIDs[obj.ID] = obj
+			objects = append(objects, obj)
+		}
+	}
+
+	return objects, nil
+}
+
+func (s *Store) loadExactAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 	matches, err := s.resolveIncludeMatches(typeDef)
 	if err != nil {
 		return nil, err
@@ -99,6 +125,36 @@ func (s *Store) loadAll(typeDef *config.TypeDefinition) ([]*Object, error) {
 }
 
 func (s *Store) findObject(typeDef *config.TypeDefinition, id string) (*objectLocation, error) {
+	return s.findObjectInTypes(s.assignableTypeDefs(typeDef), typeDef.Name, id)
+}
+
+func (s *Store) findExactObject(typeDef *config.TypeDefinition, id string) (*objectLocation, error) {
+	return s.findObjectInTypes([]*config.TypeDefinition{typeDef}, typeDef.Name, id)
+}
+
+func (s *Store) findHierarchyObject(typeDef *config.TypeDefinition, id string) (*objectLocation, error) {
+	return s.findObjectInTypes(s.hierarchyTypeDefs(typeDef), typeDef.Name, id)
+}
+
+func (s *Store) findObjectInTypes(typeDefs []*config.TypeDefinition, queryTypeName, id string) (*objectLocation, error) {
+	var found *objectLocation
+	for _, typeDef := range typeDefs {
+		loc, err := s.findObjectInType(typeDef, id)
+		if err != nil {
+			return nil, err
+		}
+		if loc == nil {
+			continue
+		}
+		if found != nil {
+			return nil, duplicateHierarchyLocationError(queryTypeName, id, found, loc)
+		}
+		found = loc
+	}
+	return found, nil
+}
+
+func (s *Store) findObjectInType(typeDef *config.TypeDefinition, id string) (*objectLocation, error) {
 	matches, err := s.resolveIncludeMatches(typeDef)
 	if err != nil {
 		return nil, err
@@ -183,6 +239,60 @@ func (s *Store) findObject(typeDef *config.TypeDefinition, id string) (*objectLo
 	}
 
 	return nil, nil
+}
+
+func (s *Store) assignableTypeDefs(typeDef *config.TypeDefinition) []*config.TypeDefinition {
+	if s == nil || s.config == nil || typeDef == nil {
+		return nil
+	}
+	names := s.config.AssignableTypes(typeDef.Name)
+	typeDefs := make([]*config.TypeDefinition, 0, len(names))
+	for _, name := range names {
+		if concreteType := s.config.Types[name]; concreteType != nil {
+			typeDefs = append(typeDefs, concreteType)
+		}
+	}
+	return typeDefs
+}
+
+func (s *Store) hierarchyTypeDefs(typeDef *config.TypeDefinition) []*config.TypeDefinition {
+	if s == nil || s.config == nil || typeDef == nil {
+		return nil
+	}
+
+	rootName := typeDef.Name
+	if len(typeDef.Ancestors) > 0 {
+		rootName = typeDef.Ancestors[0]
+	}
+	rootType := s.config.Types[rootName]
+	if rootType == nil {
+		return []*config.TypeDefinition{typeDef}
+	}
+	return s.assignableTypeDefs(rootType)
+}
+
+func duplicateHierarchyError(queryTypeName, id string, first, second *Object) error {
+	return fmt.Errorf(
+		"data: duplicate identifier across assignable hierarchy for %s %q; defined by %s in %s and %s in %s",
+		queryTypeName,
+		id,
+		first.Type,
+		first.File,
+		second.Type,
+		second.File,
+	)
+}
+
+func duplicateHierarchyLocationError(queryTypeName, id string, first, second *objectLocation) error {
+	return fmt.Errorf(
+		"data: duplicate identifier across assignable hierarchy for %s %q; defined by %s in %s and %s in %s",
+		queryTypeName,
+		id,
+		first.TypeName,
+		first.FilePath,
+		second.TypeName,
+		second.FilePath,
+	)
 }
 
 func (s *Store) resolveIncludeMatches(typeDef *config.TypeDefinition) ([]includeMatch, error) {

@@ -52,7 +52,11 @@ func (s *Store) Get(typeName, id string) (*Object, error) {
 	}
 
 	obj := loc.cloneObject()
-	fields, err := s.fieldsWithDerivedValues(typeDef, obj.File, obj.Fields)
+	concreteType, err := s.requireType(loc.TypeName)
+	if err != nil {
+		return nil, err
+	}
+	fields, err := s.fieldsWithDerivedValues(concreteType, obj.File, obj.Fields)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +95,7 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 		return nil, fmt.Errorf("data: %s create: %w", typeName, err)
 	}
 
-	if loc, err := s.findObject(typeDef, idValue); err != nil {
+	if loc, err := s.findHierarchyObject(typeDef, idValue); err != nil {
 		return nil, err
 	} else if loc != nil {
 		return nil, fmt.Errorf("data: %s %q already exists", typeName, idValue)
@@ -173,7 +177,7 @@ func (s *Store) Update(typeName, id string, fields map[string]any, merge bool) (
 		return nil, err
 	}
 
-	loc, err := s.findObject(typeDef, id)
+	loc, err := s.findExactObject(typeDef, id)
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +263,7 @@ func (s *Store) Delete(typeName, id string) error {
 		return err
 	}
 
-	loc, err := s.findObject(typeDef, id)
+	loc, err := s.findExactObject(typeDef, id)
 	if err != nil {
 		return err
 	}
