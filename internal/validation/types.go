@@ -46,5 +46,6 @@ type typeObjects struct {
 }
 
 type schemaIndex struct {
-	byType map[string]map[string]*rawObject
+	byType       map[string]map[string]*rawObject
+	byAssignable map[string]map[string][]*rawObject
 }

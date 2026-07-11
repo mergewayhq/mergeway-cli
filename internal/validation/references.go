@@ -10,7 +10,8 @@ import (
 func validateReferences(all map[string]*typeObjects, index *schemaIndex, cfg *config.Config) []Error {
 	var errs []Error
 
-	for typeName, typeDef := range cfg.Types {
+	for _, typeName := range sortedTypeNames(cfg) {
+		typeDef := cfg.Types[typeName]
 		objects := all[typeName]
 		if objects == nil {
 			continue
@@ -32,7 +33,7 @@ func validateReferences(all map[string]*typeObjects, index *schemaIndex, cfg *co
 				}
 
 				for _, refID := range targets {
-					matches := resolveReferenceTypes(index, field.ReferenceTypes, refID)
+					matches := resolveReferenceTypes(index, cfg, field.ReferenceTypes, refID)
 					if len(matches) == 0 {
 						errs = append(errs, Error{
 							Phase:   PhaseReferences,
@@ -60,11 +61,14 @@ func validateReferences(all map[string]*typeObjects, index *schemaIndex, cfg *co
 	return errs
 }
 
-func resolveReferenceTypes(index *schemaIndex, refTypes []string, refID string) []string {
+func resolveReferenceTypes(index *schemaIndex, cfg *config.Config, refTypes []string, refID string) []string {
 	var matches []string
 	for _, refType := range refTypes {
-		targetTypeIndex := index.byType[refType]
-		if targetTypeIndex == nil || targetTypeIndex[refID] == nil {
+		if cfg == nil || len(cfg.AssignableTypes(refType)) == 0 {
+			continue
+		}
+		targetTypeIndex := index.byAssignable[refType]
+		if targetTypeIndex == nil || len(targetTypeIndex[refID]) == 0 {
 			continue
 		}
 		matches = append(matches, refType)

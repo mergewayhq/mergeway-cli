@@ -3,15 +3,21 @@ package validation
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
 )
 
 func validateSchema(all map[string]*typeObjects, cfg *config.Config) (*schemaIndex, []Error) {
-	index := &schemaIndex{byType: make(map[string]map[string]*rawObject)}
+	index := &schemaIndex{
+		byType:       make(map[string]map[string]*rawObject),
+		byAssignable: make(map[string]map[string][]*rawObject),
+	}
 	var errs []Error
 
-	for typeName, typeDef := range cfg.Types {
+	typeNames := sortedTypeNames(cfg)
+	for _, typeName := range typeNames {
+		typeDef := cfg.Types[typeName]
 		objects := all[typeName]
 		if objects == nil {
 			continue
@@ -20,6 +26,8 @@ func validateSchema(all map[string]*typeObjects, cfg *config.Config) (*schemaInd
 		typeErrs := validateTypeSchema(objects.objects, typeDef, index)
 		errs = append(errs, typeErrs...)
 	}
+
+	errs = append(errs, buildAssignableIndex(index, cfg)...)
 
 	return index, errs
 }
@@ -137,6 +145,73 @@ func validateTypeSchema(objects []*rawObject, typeDef *config.TypeDefinition, in
 	}
 
 	return errs
+}
+
+func buildAssignableIndex(index *schemaIndex, cfg *config.Config) []Error {
+	if index == nil || cfg == nil {
+		return nil
+	}
+
+	var errs []Error
+	typeNames := sortedTypeNames(cfg)
+	for _, typeName := range typeNames {
+		typeIndex := index.byType[typeName]
+		if len(typeIndex) == 0 {
+			continue
+		}
+
+		ids := make([]string, 0, len(typeIndex))
+		for id := range typeIndex {
+			ids = append(ids, id)
+		}
+		sort.Strings(ids)
+
+		for _, id := range ids {
+			obj := typeIndex[id]
+			if obj == nil || obj.typeDef == nil {
+				continue
+			}
+
+			assignableTo := append([]string{obj.typeDef.Name}, obj.typeDef.Ancestors...)
+			var conflict *rawObject
+			for _, queryType := range assignableTo {
+				if matches := index.byAssignable[queryType][id]; len(matches) > 0 {
+					conflict = matches[0]
+					break
+				}
+			}
+			if conflict != nil {
+				errs = append(errs, Error{
+					Phase:   PhaseSchema,
+					Type:    obj.typeDef.Name,
+					ID:      id,
+					File:    objectLocation(obj),
+					Message: fmt.Sprintf("duplicate identifier across assignable hierarchy; already defined as %s in %s", conflict.typeDef.Name, objectLocation(conflict)),
+				})
+			}
+
+			for _, queryType := range assignableTo {
+				if index.byAssignable[queryType] == nil {
+					index.byAssignable[queryType] = make(map[string][]*rawObject)
+				}
+				index.byAssignable[queryType][id] = append(index.byAssignable[queryType][id], obj)
+			}
+		}
+	}
+
+	return errs
+}
+
+func sortedTypeNames(cfg *config.Config) []string {
+	if cfg == nil {
+		return nil
+	}
+	names := make([]string, 0, len(cfg.Types))
+	for name := range cfg.Types {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return names
 }
 
 func normalizedUniqueKey(value any) string {

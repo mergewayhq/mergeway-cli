@@ -165,6 +165,170 @@ func TestValidateReferenceUnionAmbiguous(t *testing.T) {
 	}
 }
 
+func TestValidateInheritanceReferenceAcceptsDescendant(t *testing.T) {
+	root := t.TempDir()
+	writeValidationFile(t, filepath.Join(root, "mergeway.yaml"), `mergeway:
+  version: 1
+
+entities:
+  Animal:
+    identifier: id
+    fields:
+      id: string
+      name:
+        type: string
+        required: true
+  Dog:
+    extends: Animal
+    include:
+      - data/dogs/*.yaml
+    fields:
+      breed: string
+  Kennel:
+    identifier: id
+    include:
+      - data/kennels/*.yaml
+    fields:
+      id: string
+      resident:
+        type: Animal
+        required: true
+`)
+	writeValidationFile(t, filepath.Join(root, "data", "dogs", "dog-1.yaml"), "id: dog-1\nname: Fido\nbreed: collie\n")
+	writeValidationFile(t, filepath.Join(root, "data", "kennels", "kennel-1.yaml"), "id: kennel-1\nresident: dog-1\n")
+
+	cfg := loadConfig(t, root)
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+	if len(res.Errors) != 0 {
+		t.Fatalf("expected no errors, got %v", res.Errors)
+	}
+}
+
+func TestValidateInheritanceMissingInheritedRequiredField(t *testing.T) {
+	root := t.TempDir()
+	writeValidationFile(t, filepath.Join(root, "mergeway.yaml"), `mergeway:
+  version: 1
+
+entities:
+  Animal:
+    identifier: id
+    fields:
+      id: string
+      name:
+        type: string
+        required: true
+  Dog:
+    extends: Animal
+    include:
+      - data/dogs/*.yaml
+    fields:
+      breed: string
+`)
+	writeValidationFile(t, filepath.Join(root, "data", "dogs", "dog-1.yaml"), "id: dog-1\nbreed: collie\n")
+
+	cfg := loadConfig(t, root)
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+	if len(res.Errors) != 1 {
+		t.Fatalf("expected 1 error, got %v", res.Errors)
+	}
+	if res.Errors[0].Phase != PhaseSchema {
+		t.Fatalf("expected schema error, got %s", res.Errors[0].Phase)
+	}
+	if !strings.Contains(res.Errors[0].Message, "missing required field \"name\"") {
+		t.Fatalf("expected inherited required field error, got %v", res.Errors[0])
+	}
+}
+
+func TestValidateRejectsDuplicateIdentifiersAcrossAssignableHierarchy(t *testing.T) {
+	root := t.TempDir()
+	writeValidationFile(t, filepath.Join(root, "mergeway.yaml"), `mergeway:
+  version: 1
+
+entities:
+  Animal:
+    identifier: id
+    include:
+      - data/animals/*.yaml
+    fields:
+      id: string
+      name: string
+  Dog:
+    extends: Animal
+    include:
+      - data/dogs/*.yaml
+    fields:
+      breed: string
+`)
+	writeValidationFile(t, filepath.Join(root, "data", "animals", "animal-1.yaml"), "id: shared-1\nname: Generic\n")
+	writeValidationFile(t, filepath.Join(root, "data", "dogs", "dog-1.yaml"), "id: shared-1\nname: Fido\nbreed: collie\n")
+
+	cfg := loadConfig(t, root)
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+	if len(res.Errors) != 1 {
+		t.Fatalf("expected 1 error, got %v", res.Errors)
+	}
+	if res.Errors[0].Phase != PhaseSchema {
+		t.Fatalf("expected schema error, got %s", res.Errors[0].Phase)
+	}
+	if !strings.Contains(res.Errors[0].Message, "duplicate identifier across assignable hierarchy") {
+		t.Fatalf("expected assignable hierarchy duplicate error, got %v", res.Errors[0])
+	}
+}
+
+func TestValidateReferenceUnionWithDescendant(t *testing.T) {
+	root := t.TempDir()
+	writeValidationFile(t, filepath.Join(root, "mergeway.yaml"), `mergeway:
+  version: 1
+
+entities:
+  User:
+    identifier: id
+    include:
+      - data/users/*.yaml
+    fields:
+      id: string
+  Team:
+    identifier: id
+    fields:
+      id: string
+  DeliveryTeam:
+    extends: Team
+    include:
+      - data/teams/*.yaml
+    fields:
+      service: string
+  Activity:
+    identifier: id
+    include:
+      - data/activities/*.yaml
+    fields:
+      id: string
+      owner:
+        type: User | Team
+`)
+	writeValidationFile(t, filepath.Join(root, "data", "users", "user-1.yaml"), "id: user-1\n")
+	writeValidationFile(t, filepath.Join(root, "data", "teams", "team-1.yaml"), "id: team-1\nservice: delivery\n")
+	writeValidationFile(t, filepath.Join(root, "data", "activities", "activity-1.yaml"), "id: activity-1\nowner: team-1\n")
+
+	cfg := loadConfig(t, root)
+	res, err := Validate(root, cfg, Options{})
+	if err != nil {
+		t.Fatalf("Validate returned error: %v", err)
+	}
+	if len(res.Errors) != 0 {
+		t.Fatalf("expected no errors, got %v", res.Errors)
+	}
+}
+
 func TestValidateFailFast(t *testing.T) {
 	root := fixturePath(t, "schema_error")
 	cfg := loadConfig(t, root)
@@ -437,4 +601,14 @@ entities:
 	}
 
 	return root
+}
+
+func writeValidationFile(t *testing.T, path, content string) {
+	t.Helper()
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		t.Fatalf("mkdir %s: %v", path, err)
+	}
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatalf("write %s: %v", path, err)
+	}
 }
