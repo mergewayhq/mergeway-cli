@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -29,12 +30,42 @@ func normalizeAggregate(agg *aggregateConfig) (*Config, error) {
 		},
 	}
 
+	graph, err := buildInheritanceGraph(agg.Entities)
+	if err != nil {
+		return nil, err
+	}
+	if err := validateInheritanceCycles(graph); err != nil {
+		return nil, err
+	}
+
+	names := make([]string, 0, len(agg.Entities))
 	for name, rawType := range agg.Entities {
 		if !isValidTypeName(name) {
 			return nil, fmt.Errorf("config: invalid type identifier %q in %s", name, rawType.Source)
 		}
+		names = append(names, name)
+	}
+	sort.Strings(names)
 
-		typeDef, err := normalizeTypeDefinition(rawType)
+	resolved := make(map[string]*TypeDefinition, len(agg.Entities))
+	var resolve func(string) (*TypeDefinition, error)
+	resolve = func(name string) (*TypeDefinition, error) {
+		if typeDef := resolved[name]; typeDef != nil {
+			return typeDef, nil
+		}
+
+		rawType := agg.Entities[name]
+		parentName := graph.parent[name]
+		var parentDef *TypeDefinition
+		if parentName != "" {
+			var err error
+			parentDef, err = resolve(parentName)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		typeDef, err := normalizeTypeDefinition(rawType, parentDef, len(graph.children[name]) > 0)
 		if err != nil {
 			return nil, err
 		}
@@ -43,8 +74,23 @@ func normalizeAggregate(agg *aggregateConfig) (*Config, error) {
 			Template: DefaultWriteTemplate,
 			Format:   WriteFormatYAML,
 		}
+		if parentDef != nil {
+			typeDef.Ancestors = append(append([]string(nil), parentDef.Ancestors...), parentDef.Name)
+		}
 
 		result.Types[name] = typeDef
+		resolved[name] = typeDef
+		return typeDef, nil
+	}
+
+	for _, name := range names {
+		if _, err := resolve(name); err != nil {
+			return nil, err
+		}
+	}
+
+	for _, name := range names {
+		result.Types[name].Descendants = result.DescendantTypes(name)
 	}
 
 	if err := validateFieldReferences(result.Types); err != nil {
@@ -54,8 +100,103 @@ func normalizeAggregate(agg *aggregateConfig) (*Config, error) {
 	return result, nil
 }
 
-func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error) {
+type inheritanceGraph struct {
+	parent   map[string]string
+	children map[string][]string
+}
+
+func buildInheritanceGraph(types map[string]rawTypeWithSource) (*inheritanceGraph, error) {
+	graph := &inheritanceGraph{
+		parent:   make(map[string]string, len(types)),
+		children: make(map[string][]string, len(types)),
+	}
+
+	for name := range types {
+		graph.children[name] = nil
+	}
+
+	for name, rawType := range types {
+		parent := strings.TrimSpace(rawType.Spec.Extends)
+		if parent == "" {
+			continue
+		}
+		if !isValidTypeName(parent) {
+			return nil, fmt.Errorf("config: type %q has invalid parent type %q", name, parent)
+		}
+		if _, ok := types[parent]; !ok {
+			return nil, fmt.Errorf("config: type %q extends unknown type %q", name, parent)
+		}
+		graph.parent[name] = parent
+		graph.children[parent] = append(graph.children[parent], name)
+	}
+
+	for name := range graph.children {
+		sort.Strings(graph.children[name])
+	}
+
+	return graph, nil
+}
+
+func validateInheritanceCycles(graph *inheritanceGraph) error {
+	if graph == nil {
+		return nil
+	}
+
+	const (
+		statePending = iota
+		stateVisiting
+		stateDone
+	)
+
+	state := make(map[string]int, len(graph.children))
+	stack := make([]string, 0, len(graph.children))
+
+	var visit func(string) error
+	visit = func(name string) error {
+		switch state[name] {
+		case stateDone:
+			return nil
+		case stateVisiting:
+			cycleStart := 0
+			for idx, item := range stack {
+				if item == name {
+					cycleStart = idx
+					break
+				}
+			}
+			cycle := append(append([]string(nil), stack[cycleStart:]...), name)
+			return fmt.Errorf("config: cyclic inheritance detected: %s", strings.Join(cycle, " -> "))
+		}
+
+		state[name] = stateVisiting
+		stack = append(stack, name)
+		if parent := graph.parent[name]; parent != "" {
+			if err := visit(parent); err != nil {
+				return err
+			}
+		}
+		stack = stack[:len(stack)-1]
+		state[name] = stateDone
+		return nil
+	}
+
+	names := make([]string, 0, len(graph.children))
+	for name := range graph.children {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		if err := visit(name); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func normalizeTypeDefinition(rawType rawTypeWithSource, parentDef *TypeDefinition, hasChildren bool) (*TypeDefinition, error) {
 	spec := rawType.Spec
+	extends := strings.TrimSpace(spec.Extends)
 
 	jsonSchemaPath := strings.TrimSpace(spec.JSONSchema)
 	fieldCount := len(spec.Fields.Entries)
@@ -63,23 +204,24 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 	switch {
 	case jsonSchemaPath != "" && fieldCount > 0:
 		return nil, fmt.Errorf("config: type %q cannot define both fields and json_schema", rawType.Name)
-	case jsonSchemaPath == "" && fieldCount == 0:
+	case parentDef == nil && jsonSchemaPath == "" && fieldCount == 0:
 		return nil, fmt.Errorf("config: type %q must define fields or json_schema", rawType.Name)
 	}
 
-	if !spec.Identifier.set || spec.Identifier.Field == "" {
-		return nil, fmt.Errorf("config: type %q missing identifier in %s", rawType.Name, rawType.Source)
+	if jsonSchemaPath != "" && (extends != "" || hasChildren) {
+		return nil, fmt.Errorf("config: type %q cannot use json_schema with inheritance", rawType.Name)
 	}
 
-	if !isValidIdentifierField(spec.Identifier.Field) {
-		return nil, fmt.Errorf("config: type %q has invalid identifier field %q", rawType.Name, spec.Identifier.Field)
+	identifier, err := normalizeIdentifierDefinition(rawType, parentDef)
+	if err != nil {
+		return nil, err
 	}
 
-	if spec.Identifier.Field == PathIdentifierField && len(spec.Data) > 0 {
+	if identifier.IsPath() && len(spec.Data) > 0 {
 		return nil, fmt.Errorf("config: type %q cannot use identifier %q with inline data", rawType.Name, PathIdentifierField)
 	}
 
-	if len(spec.Include) == 0 && len(spec.Data) == 0 {
+	if len(spec.Include) == 0 && len(spec.Data) == 0 && !hasChildren {
 		return nil, fmt.Errorf("config: type %q must declare at least one include or provide inline data", rawType.Name)
 	}
 
@@ -128,9 +270,14 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		if len(spec.Data) > 0 {
 			return nil, fmt.Errorf("config: type %q cannot use field %q source with inline data", rawType.Name, name)
 		}
-		if spec.Identifier.Field == name {
+		if identifier.Field == name {
 			return nil, fmt.Errorf("config: type %q identifier field %q cannot derive its value from field source", rawType.Name, name)
 		}
+	}
+
+	fields, fieldOrder, err = mergeInheritedFields(rawType.Name, parentDef, fields, fieldOrder)
+	if err != nil {
+		return nil, err
 	}
 
 	inlineData := cloneInlineData(spec.Data)
@@ -139,18 +286,120 @@ func normalizeTypeDefinition(rawType rawTypeWithSource) (*TypeDefinition, error)
 		Name:        rawType.Name,
 		Source:      rawType.Source,
 		Description: spec.Description,
-		Extends:     strings.TrimSpace(spec.Extends),
+		Extends:     extends,
 		JSONSchema:  jsonSchemaPath,
-		Identifier: IdentifierDefinition{
+		Identifier:  identifier,
+		Include:     normalizeIncludeDirectives(spec.Include),
+		Fields:      fields,
+		FieldOrder:  fieldOrder,
+		InlineData:  inlineData,
+	}, nil
+}
+
+func normalizeIdentifierDefinition(rawType rawTypeWithSource, parentDef *TypeDefinition) (IdentifierDefinition, error) {
+	spec := rawType.Spec
+	if parentDef == nil {
+		if !spec.Identifier.set || spec.Identifier.Field == "" {
+			return IdentifierDefinition{}, fmt.Errorf("config: type %q missing identifier in %s", rawType.Name, rawType.Source)
+		}
+		if !isValidIdentifierField(spec.Identifier.Field) {
+			return IdentifierDefinition{}, fmt.Errorf("config: type %q has invalid identifier field %q", rawType.Name, spec.Identifier.Field)
+		}
+		return IdentifierDefinition{
 			Field:     spec.Identifier.Field,
 			Generated: spec.Identifier.Generated,
 			Pattern:   spec.Identifier.Pattern,
-		},
-		Include:    normalizeIncludeDirectives(spec.Include),
-		Fields:     fields,
-		FieldOrder: fieldOrder,
-		InlineData: inlineData,
-	}, nil
+		}, nil
+	}
+
+	if !spec.Identifier.set {
+		return parentDef.Identifier, nil
+	}
+	if !isValidIdentifierField(spec.Identifier.Field) {
+		return IdentifierDefinition{}, fmt.Errorf("config: type %q has invalid identifier field %q", rawType.Name, spec.Identifier.Field)
+	}
+
+	childIdentifier := IdentifierDefinition{
+		Field:     spec.Identifier.Field,
+		Generated: spec.Identifier.Generated,
+		Pattern:   spec.Identifier.Pattern,
+	}
+	if childIdentifier != parentDef.Identifier {
+		return IdentifierDefinition{}, fmt.Errorf("config: type %q cannot override inherited identifier from %q", rawType.Name, parentDef.Name)
+	}
+
+	return parentDef.Identifier, nil
+}
+
+func mergeInheritedFields(typeName string, parentDef *TypeDefinition, localFields map[string]*FieldDefinition, localOrder []string) (map[string]*FieldDefinition, []string, error) {
+	if parentDef == nil {
+		return localFields, localOrder, nil
+	}
+
+	mergedFields := cloneFieldMap(parentDef.Fields)
+	if mergedFields == nil {
+		mergedFields = make(map[string]*FieldDefinition)
+	}
+	mergedOrder := append([]string(nil), parentDef.FieldOrder...)
+
+	for _, fieldName := range localOrder {
+		if _, ok := mergedFields[fieldName]; ok {
+			return nil, nil, fmt.Errorf("config: type %q cannot redefine inherited field %q", typeName, fieldName)
+		}
+		mergedFields[fieldName] = cloneFieldDefinition(localFields[fieldName])
+		mergedOrder = append(mergedOrder, fieldName)
+	}
+
+	return mergedFields, mergedOrder, nil
+}
+
+func cloneFieldMap(fields map[string]*FieldDefinition) map[string]*FieldDefinition {
+	if len(fields) == 0 {
+		return nil
+	}
+
+	cloned := make(map[string]*FieldDefinition, len(fields))
+	for name, field := range fields {
+		cloned[name] = cloneFieldDefinition(field)
+	}
+	return cloned
+}
+
+func cloneFieldDefinition(field *FieldDefinition) *FieldDefinition {
+	if field == nil {
+		return nil
+	}
+
+	cloned := &FieldDefinition{
+		Name:           field.Name,
+		Type:           field.Type,
+		ReferenceTypes: append([]string(nil), field.ReferenceTypes...),
+		Required:       field.Required,
+		Repeated:       field.Repeated,
+		Format:         field.Format,
+		Enum:           append([]string(nil), field.Enum...),
+		Default:        cloneInlineValue(field.Default),
+		Properties:     cloneFieldMap(field.Properties),
+		Unique:         field.Unique,
+		Pattern:        field.Pattern,
+		Description:    field.Description,
+		PropertyOrder:  append([]string(nil), field.PropertyOrder...),
+	}
+	if field.Source != nil {
+		cloned.Source = &FieldSourceDefinition{
+			Path: field.Source.Path,
+		}
+		if field.Source.PathSegment != nil {
+			value := *field.Source.PathSegment
+			cloned.Source.PathSegment = &value
+		}
+		if field.Source.PathSegmentRev != nil {
+			value := *field.Source.PathSegmentRev
+			cloned.Source.PathSegmentRev = &value
+		}
+	}
+
+	return cloned
 }
 
 func normalizeFieldDefinition(name string, raw rawFieldDefinition, typeName string) (*FieldDefinition, error) {

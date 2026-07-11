@@ -564,11 +564,11 @@ entities:
       id: string
   Dog:
     extends: Animal
-    identifier: id
     data:
       - id: dog-1
+        breed: collie
     fields:
-      id: string
+      breed: string
 `)
 	if err := os.WriteFile(path, content, 0o644); err != nil {
 		t.Fatalf("failed to write config: %v", err)
@@ -585,6 +585,12 @@ entities:
 	}
 	if dog.Extends != "Animal" {
 		t.Fatalf("expected Dog to extend Animal, got %q", dog.Extends)
+	}
+	if dog.Identifier.Field != "id" {
+		t.Fatalf("expected Dog to inherit identifier field id, got %q", dog.Identifier.Field)
+	}
+	if _, ok := dog.Fields["id"]; !ok {
+		t.Fatalf("expected Dog to inherit field id")
 	}
 }
 
@@ -622,6 +628,291 @@ func TestConfigHierarchyHelpers(t *testing.T) {
 	}
 	if got := cfg.AssignableTypes("Missing"); got != nil {
 		t.Fatalf("expected nil assignable types for unknown type, got %v", got)
+	}
+}
+
+func TestLoadFlattensInheritedFields(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  User:
+    identifier: id
+    data:
+      - id: user-1
+    fields:
+      id: string
+  Content:
+    identifier: id
+    fields:
+      id: string
+      owner:
+        type: User
+        required: true
+  Post:
+    extends: Content
+    data:
+      - id: post-1
+        owner: user-1
+        body: hello
+    fields:
+      body: string
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load returned error: %v", err)
+	}
+
+	post := cfg.Types["Post"]
+	if post == nil {
+		t.Fatalf("expected Post type")
+	}
+	if !reflect.DeepEqual(post.FieldOrder, []string{"id", "owner", "body"}) {
+		t.Fatalf("unexpected field order: %v", post.FieldOrder)
+	}
+	if post.Identifier.Field != "id" {
+		t.Fatalf("expected inherited identifier id, got %q", post.Identifier.Field)
+	}
+	if owner := post.Fields["owner"]; owner == nil {
+		t.Fatalf("expected inherited owner field")
+	} else if !reflect.DeepEqual(owner.ReferenceTypes, []string{"User"}) {
+		t.Fatalf("expected inherited owner reference types, got %v", owner.ReferenceTypes)
+	}
+	if !reflect.DeepEqual(post.Ancestors, []string{"Content"}) {
+		t.Fatalf("unexpected ancestors: %v", post.Ancestors)
+	}
+	contentType := cfg.Types["Content"]
+	if contentType == nil {
+		t.Fatalf("expected Content type")
+	}
+	if !reflect.DeepEqual(contentType.Descendants, []string{"Post"}) {
+		t.Fatalf("unexpected descendants: %v", contentType.Descendants)
+	}
+}
+
+func TestLoadRejectsUnknownParent(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  Dog:
+    extends: Animal
+    identifier: id
+    data:
+      - id: dog-1
+    fields:
+      id: string
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected error for unknown parent")
+	}
+	if got := err.Error(); !strings.Contains(got, "extends unknown type") {
+		t.Fatalf("expected unknown parent error, got %q", got)
+	}
+}
+
+func TestLoadRejectsDirectInheritanceCycle(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  Animal:
+    extends: Animal
+    identifier: id
+    fields:
+      id: string
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected cycle error")
+	}
+	if got := err.Error(); !strings.Contains(got, "cyclic inheritance detected") {
+		t.Fatalf("expected cycle error, got %q", got)
+	}
+}
+
+func TestLoadRejectsMultiHopInheritanceCycle(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  Animal:
+    extends: Dog
+    identifier: id
+    fields:
+      id: string
+  Dog:
+    extends: Mammal
+    identifier: id
+    fields:
+      breed: string
+  Mammal:
+    extends: Animal
+    identifier: id
+    fields:
+      warm_blooded: boolean
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected cycle error")
+	}
+	if got := err.Error(); !strings.Contains(got, "cyclic inheritance detected") {
+		t.Fatalf("expected cycle error, got %q", got)
+	}
+}
+
+func TestLoadRejectsInheritedFieldRedefinition(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  Animal:
+    identifier: id
+    fields:
+      id: string
+      name: string
+  Dog:
+    extends: Animal
+    data:
+      - id: dog-1
+        name: spot
+    fields:
+      name: string
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected inherited field redefinition error")
+	}
+	if got := err.Error(); !strings.Contains(got, "cannot redefine inherited field") {
+		t.Fatalf("expected inherited field error, got %q", got)
+	}
+}
+
+func TestLoadRejectsInheritedIdentifierOverride(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  Animal:
+    identifier: id
+    fields:
+      id: string
+  Dog:
+    extends: Animal
+    identifier: slug
+    data:
+      - id: dog-1
+        slug: dog-1
+    fields:
+      slug: string
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected inherited identifier override error")
+	}
+	if got := err.Error(); !strings.Contains(got, "cannot override inherited identifier") {
+		t.Fatalf("expected identifier override error, got %q", got)
+	}
+}
+
+func TestLoadAllowsSchemaOnlyBaseEntity(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  Animal:
+    identifier: id
+    fields:
+      id: string
+  Mammal:
+    extends: Animal
+    fields:
+      warm_blooded: boolean
+  Dog:
+    extends: Mammal
+    data:
+      - id: dog-1
+        warm_blooded: true
+        breed: collie
+    fields:
+      breed: string
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load returned error: %v", err)
+	}
+
+	if got := cfg.Types["Animal"].Descendants; !reflect.DeepEqual(got, []string{"Dog", "Mammal"}) {
+		t.Fatalf("unexpected Animal descendants: %v", got)
+	}
+	if got := cfg.Types["Mammal"].Descendants; !reflect.DeepEqual(got, []string{"Dog"}) {
+		t.Fatalf("unexpected Mammal descendants: %v", got)
+	}
+}
+
+func TestLoadRejectsJSONSchemaInheritance(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mergeway.yaml")
+	content := []byte(`mergeway:
+  version: 1
+
+entities:
+  CatalogItem:
+    identifier: id
+    fields:
+      id: string
+  Product:
+    extends: CatalogItem
+    identifier: id
+    json_schema: schemas/product.json
+    include:
+      - data/products/*.yaml
+`)
+	if err := os.WriteFile(path, content, 0o644); err != nil {
+		t.Fatalf("failed to write config: %v", err)
+	}
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatalf("expected json_schema inheritance error")
+	}
+	if got := err.Error(); !strings.Contains(got, "cannot use json_schema with inheritance") {
+		t.Fatalf("expected json_schema inheritance error, got %q", got)
 	}
 }
 
