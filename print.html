@@ -1,0 +1,2176 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Mergeway Documentation</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="Developer and operator documentation for the Mergeway CLI.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="favicon-8114d1fc.png">
+        <link rel="stylesheet" href="css/variables-8adf115d.css">
+        <link rel="stylesheet" href="css/general-2459343d.css">
+        <link rel="stylesheet" href="css/chrome-ae938929.css">
+        <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex-6da5ad72.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc-c5faa954.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Mergeway Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/mergewayhq/mergeway-cli" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="overview"><a href="#overview" class="header">Overview</a></h1>
+<p><a href="https://mergewayhq.github.io">Mergeway</a>’s goal is to make metadata a commodity putting it in the open and treating it as code.
+Instead of juggling spreadsheets or custom scripts, you describe entities in YAML/JSON, run a quick validation, and catch broken references before they reach production.
+By storing metadata as code, changes become a simple patch.</p>
+<h2 id="what-the-cli-does"><a class="header" href="#what-the-cli-does">What the CLI Does</a></h2>
+<ul>
+<li>Stores entity definitions and relationships in version-controlled files.</li>
+<li>Validates schemas and records so required fields and references stay consistent.</li>
+<li>Generates simple reports you can attach to pull requests or issues.</li>
+</ul>
+<h2 id="key-features"><a class="header" href="#key-features">Key Features</a></h2>
+<ul>
+<li><strong>Workspace scaffolding</strong>: <code>mergeway-cli init</code> writes a starter <code>mergeway.yaml</code> into your working directory so you can begin defining entities immediately.</li>
+<li><strong>Dual schema sources</strong>: Author entity fields inline in YAML or reference existing JSON Schema documents (<code>json_schema</code>) so teams can reuse specs.</li>
+<li><strong>Object lifecycle commands</strong>: <code>list</code>, <code>get</code>, <code>create</code>, <code>update</code>, and <code>delete</code> operate on local YAML/JSON files, respecting schema-defined identifiers whether they come from record fields or the special <code>$path</code> file-path mode.</li>
+<li><strong>Deterministic formatting</strong>: <code>mergeway-cli fmt</code> emits canonical structure and rewrites files in place (use <code>--stdout</code> to preview changes) to keep diffs clean.</li>
+<li><strong>Layered validation</strong>: Format, schema, and reference phases catch structural, typing, and cross-entity errors before they land in main.</li>
+<li><strong>Schema introspection</strong>: <code>mergeway-cli entity show</code> and <code>mergeway-cli config export</code> surface normalized schemas or derived JSON Schema for documentation and automation.</li>
+</ul>
+<h2 id="why-teams-use-mergeway"><a class="header" href="#why-teams-use-mergeway">Why Teams Use Mergeway</a></h2>
+<ul>
+<li><strong>Fast feedback:</strong> One command surfaces missing fields, enum mismatches, or invalid references.</li>
+<li><strong>Git-native:</strong> Changes live in branches and pull requests, making reviews trivial.</li>
+<li><strong>Lightweight:</strong> No server component—just a binary that runs locally or in CI.</li>
+</ul>
+<h2 id="where-to-go-next"><a class="header" href="#where-to-go-next">Where to Go Next</a></h2>
+<ol>
+<li><a href="#installation">Install Mergeway</a> (or build from source).</li>
+<li>Follow the <a href="#workspace-setup">Workspace set-up</a>.</li>
+<li>Review the <a href="getting-started/README.html">Basic Concepts</a> and <a href="#schema-format">Schema Format</a> when you define entities.</li>
+<li>Browse the binary references:
+<a href="cli-reference/README.html">mergeway-cli</a>,
+<a href="#mergeway-diff-reference">mergeway-diff</a>,
+<a href="#mergeway-lsp-reference">mergeway-lsp</a>,
+and <a href="#mergeway-mcp-reference">mergeway-mcp</a>.</li>
+</ol>
+<p>Updates land in the <a href="https://github.com/mergewayhq/mergeway-cli/releases">Changelog</a>. File GitHub issues for questions, bugs, or requests.</p>
+<p>For a more general introduction to Mergeway, <a href="https://mergewayhq.github.io">visit the homepage</a></p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="getting-started"><a href="#getting-started" class="header">Getting Started</a></h1>
+<p>This guide introduces the basic concepts and structure of a Mergeway workspace.
+It is intended for new users who want to understand how to set up and use Mergeway effectively.
+For runnable sample workspaces, see the <a href="https://github.com/mergewayhq/mergeway-cli/tree/main/examples">examples directory</a> in the GitHub repository.</p>
+<p>If you need installation help first, start with <a href="#installation">Installation</a>. If you are here for editor integration, continue with <a href="#run-mergeway-lsp-manually">Run mergeway-lsp manually</a>.</p>
+<p>A Mergeway workspace is just a folder with a few predictable parts. Knowing the vocabulary makes the CLI output easier to read.</p>
+<h2 id="building-blocks"><a class="header" href="#building-blocks">Building Blocks</a></h2>
+<ul>
+<li><strong>Workspace:</strong> Folder tracked in Git that contains <code>mergeway.yaml</code>, schemas, and optional objects. All commands run from here.</li>
+<li><strong>Schema:</strong> YAML/JSON that defines fields and references. Each file describes one entity.</li>
+<li><strong>Object:</strong> Optional data instances stored under <code>data/</code>.</li>
+<li><strong>Reference:</strong> A link from one schema or field to another (<code>type: ref</code>). Mergeway validates referential integrity.</li>
+</ul>
+<h2 id="validation-flow"><a class="header" href="#validation-flow">Validation Flow</a></h2>
+<ol>
+<li>Mergeway loads <code>mergeway.yaml</code> to locate schemas and records.</li>
+<li>Schemas are parsed and checked for required fields, types, and references.</li>
+<li>Records (if present) are validated against their schemas.</li>
+</ol>
+<p>For field syntax and configuration options, see the <a href="#schema-format">Schema Format</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="installation"><a href="#installation" class="header">Installation</a></h1>
+<p>Use one of the installation paths below depending on whether you need only <code>mergeway-cli</code> or the wider toolset.</p>
+<h2 id="option-1-download-a-release-archive"><a class="header" href="#option-1-download-a-release-archive">Option 1: Download a Release Archive</a></h2>
+<p>GitHub releases publish platform assets for:</p>
+<ul>
+<li>Linux, macOS, and Windows</li>
+<li><code>amd64</code> and <code>arm64</code></li>
+<li><code>mergeway-cli</code>, <code>mergeway-diff</code>, <code>mergeway-lsp</code>, and <code>mergeway-mcp</code></li>
+</ul>
+<p>Download the asset or assets for your platform from the latest release page, then install the extracted binaries you need:</p>
+<pre><code class="language-bash">install -m 0755 mergeway-cli /usr/local/bin/mergeway-cli
+install -m 0755 mergeway-diff /usr/local/bin/mergeway-diff
+install -m 0755 mergeway-lsp /usr/local/bin/mergeway-lsp
+install -m 0755 mergeway-mcp /usr/local/bin/mergeway-mcp
+</code></pre>
+<p>Put <code>mergeway-cli</code> on <code>PATH</code> for terminal use, <code>mergeway-diff</code> on <code>PATH</code> for semantic snapshot workflows, <code>mergeway-lsp</code> on <code>PATH</code> for editor integration, and <code>mergeway-mcp</code> on <code>PATH</code> for MCP client integrations.</p>
+<h2 id="option-2-docker"><a class="header" href="#option-2-docker">Option 2: Docker</a></h2>
+<p>The published container image is useful for CLI-only workflows:</p>
+<pre><code class="language-bash">docker run --rm ghcr.io/mergewayhq/mergeway-cli version
+</code></pre>
+<p>To run against the workspace in your current directory:</p>
+<pre><code class="language-bash">docker run --rm \
+  -v "$PWD:/work" \
+  ghcr.io/mergewayhq/mergeway-cli validate
+</code></pre>
+<p>The container image does <strong>not</strong> include <code>mergeway-diff</code>, <code>mergeway-lsp</code>, or <code>mergeway-mcp</code>.</p>
+<h2 id="option-3-go-install"><a class="header" href="#option-3-go-install">Option 3: Go Install</a></h2>
+<pre><code class="language-bash">go install github.com/mergewayhq/mergeway-cli@latest
+</code></pre>
+<p>This installs <code>mergeway-cli</code>. Install the other binaries separately if needed:</p>
+<pre><code class="language-bash">go install github.com/mergewayhq/mergeway-cli/cmd/mergeway-diff@latest
+go install github.com/mergewayhq/mergeway-cli/cmd/mergeway-lsp@latest
+go install github.com/mergewayhq/mergeway-cli/cmd/mergeway-mcp@latest
+</code></pre>
+<h2 id="option-4-nix"><a class="header" href="#option-4-nix">Option 4: Nix</a></h2>
+<p>Install the CLI with Nix:</p>
+<pre><code class="language-bash">nix profile install github:mergewayhq/mergeway-cli
+</code></pre>
+<p>Or run it directly:</p>
+<pre><code class="language-bash">nix run github:mergewayhq/mergeway-cli -- help
+</code></pre>
+<p>The flake path is currently oriented around the CLI. Use a release archive or a local source build if you also need <code>mergeway-diff</code>, <code>mergeway-lsp</code>, or <code>mergeway-mcp</code>.</p>
+<h2 id="option-5-build-from-source"><a class="header" href="#option-5-build-from-source">Option 5: Build from Source</a></h2>
+<pre><code class="language-bash">git clone https://github.com/mergewayhq/mergeway-cli.git
+cd mergeway-cli
+make build
+./bin/mergeway-cli version
+./bin/mergeway-diff --help
+./bin/mergeway-lsp --log-stderr --log-level=debug
+./bin/mergeway-mcp --help
+</code></pre>
+<p><code>make build</code> produces all four binaries under <code>bin/</code>.</p>
+<h2 id="supported-platforms"><a class="header" href="#supported-platforms">Supported Platforms</a></h2>
+<ul>
+<li>Release archives support Linux, macOS, and Windows.</li>
+<li>Each release includes <code>amd64</code> and <code>arm64</code> builds.</li>
+<li>The container image is Linux-only and CLI-only.</li>
+</ul>
+<h2 id="verify-the-installation"><a class="header" href="#verify-the-installation">Verify the Installation</a></h2>
+<pre><code class="language-bash">mergeway-cli version
+mergeway-diff --help
+mergeway-lsp --log-stderr --log-level=debug
+mergeway-mcp --help
+</code></pre>
+<p>If the language server starts successfully, it waits for LSP input on stdin. Stop it with <code>Ctrl+C</code>.</p>
+<p>If the MCP server starts successfully in stdio mode, it waits for MCP traffic on stdin and reserves stdout for protocol messages. Stop it with <code>Ctrl+C</code>.</p>
+<p>For manual startup and editor wiring, continue with <a href="#run-mergeway-lsp-manually">Run mergeway-lsp manually</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="run-mergeway-lsp-manually"><a href="#run-mergeway-lsp-manually" class="header">Run mergeway-lsp manually</a></h1>
+<p><code>mergeway-lsp</code> is a Language Server Protocol server that communicates over stdio. In normal use, your editor starts it for you and keeps stdout reserved for protocol traffic.</p>
+<h2 id="install-or-build-the-binary"><a class="header" href="#install-or-build-the-binary">Install or Build the Binary</a></h2>
+<p>Use one of these paths:</p>
+<ul>
+<li>extract <code>mergeway-lsp</code> from a release archive</li>
+<li>run <code>make build</code> and use <code>./bin/mergeway-lsp</code></li>
+</ul>
+<p>The published Docker image does not include the language server.</p>
+<h2 id="start-the-server-manually"><a class="header" href="#start-the-server-manually">Start the Server Manually</a></h2>
+<p>If <code>mergeway-lsp</code> is on your <code>PATH</code>:</p>
+<pre><code class="language-bash">mergeway-lsp
+</code></pre>
+<p>From a local source checkout:</p>
+<pre><code class="language-bash">./bin/mergeway-lsp
+</code></pre>
+<p>The process will wait for framed LSP messages on stdin.</p>
+<h2 id="enable-debug-logging"><a class="header" href="#enable-debug-logging">Enable Debug Logging</a></h2>
+<p>Use stderr logging while testing locally:</p>
+<pre><code class="language-bash">mergeway-lsp --log-stderr --log-level=debug
+</code></pre>
+<p>Or write logs to a file:</p>
+<pre><code class="language-bash">mergeway-lsp --log-file /tmp/mergeway-lsp.log --log-level=debug
+</code></pre>
+<p>Equivalent environment variables:</p>
+<ul>
+<li><code>MERGEWAY_LSP_LOG_STDERR=1</code></li>
+<li><code>MERGEWAY_LSP_LOG_FILE=/tmp/mergeway-lsp.log</code></li>
+<li><code>MERGEWAY_LSP_LOG_LEVEL=debug</code></li>
+</ul>
+<p>Keep stdout protocol-only. Human-readable logging on stdout will break editor integration.</p>
+<p>For a concise flag and environment-variable reference, see <a href="#mergeway-lsp-reference"><code>mergeway-lsp</code></a>.</p>
+<h2 id="current-capabilities"><a class="header" href="#current-capabilities">Current Capabilities</a></h2>
+<ul>
+<li>workspace-aware diagnostics backed by the same validation core as <code>mergeway-cli validate</code></li>
+<li>completion for fields, entity references, and close enum values</li>
+<li>hover, go-to-definition, find references, document symbols, and workspace symbols</li>
+<li>conservative quick fixes for a small set of unambiguous schema and data mistakes</li>
+</ul>
+<h2 id="current-limitations"><a class="header" href="#current-limitations">Current Limitations</a></h2>
+<ul>
+<li>The VS Code extension still requires manual configuration of the local <code>mergeway-lsp</code> binary path.</li>
+<li>The server currently uses full-document sync.</li>
+<li>Missing-required-field quick fixes are limited to YAML and YML files.</li>
+<li>Features only apply to files owned by a detected Mergeway root.</li>
+</ul>
+<p>For editor configuration examples, see <a href="#set-up-mergeway-lsp-in-vs-code-and-neovim">Set up mergeway-lsp in VS Code and Neovim</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="workspace-setup"><a href="#workspace-setup" class="header">Workspace setup</a></h1>
+<p>Goal: scaffold a workspace, define an entity, evolve the layout as requirements grow, and learn the core Mergeway commands end-to-end.</p>
+<blockquote>
+<p>All commands assume the <code>mergeway-cli</code> binary is on your <code>PATH</code>.</p>
+</blockquote>
+<h2 id="1-scaffold-a-workspace-with-inline-data"><a class="header" href="#1-scaffold-a-workspace-with-inline-data">1. Scaffold a Workspace with Inline Data</a></h2>
+<pre><code class="language-bash">mkdir farmers-market
+cd farmers-market
+mergeway-cli init
+</code></pre>
+<p><code>mergeway-cli init</code> creates a <code>mergeway.yaml</code> entry file. Replace its contents with an inline entity that also carries a few inline records:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  Category:
+    description: Simple lookup table for product groupings
+    identifier: slug
+    fields:
+      slug:
+        type: string
+        required: true
+      label:
+        type: string
+        required: true
+    data:
+      - slug: produce
+        label: Fresh Produce
+      - slug: pantry
+        label: Pantry Staples
+</code></pre>
+<p>Try a few commands:</p>
+<pre><code class="language-bash">mergeway-cli entity list
+mergeway-cli entity show Category
+mergeway-cli list --type Category
+mergeway-cli validate
+</code></pre>
+<p>At this stage everything lives in a single file—perfect for tiny datasets.</p>
+<h2 id="2-move-records-into-external-yaml-files"><a class="header" href="#2-move-records-into-external-yaml-files">2. Move Records into External YAML Files</a></h2>
+<p>As the table grows, shift the data into dedicated files. Create a folder for category data and move the records there:</p>
+<pre><code class="language-bash">mkdir -p data/categories
+cat &lt;&lt;'YAML' &gt; data/categories/categories.yaml
+items:
+  - slug: produce
+    label: Fresh Produce
+  - slug: pantry
+    label: Pantry Staples
+  - slug: beverages
+    label: Beverages
+YAML
+</code></pre>
+<p>Update <code>mergeway.yaml</code> so <code>Category</code> reads from the new file:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  Category:
+    description: Simple lookup table for product groupings
+    identifier: slug
+    include:
+      - data/categories/*.yaml
+    fields:
+      slug:
+        type: string
+        required: true
+      label:
+        type: string
+        required: true
+</code></pre>
+<p>Re-run the commands to see the effect:</p>
+<pre><code class="language-bash">mergeway-cli list --type Category
+mergeway-cli get --type Category beverages
+mergeway-cli validate
+</code></pre>
+<h2 id="3-split-schema-definitions-and-add-json-data"><a class="header" href="#3-split-schema-definitions-and-add-json-data">3. Split Schema Definitions and Add JSON Data</a></h2>
+<p>Larger workspaces benefit from keeping schemas in their own files. Create an <code>entities/</code> folder for additional definitions:</p>
+<pre><code class="language-bash">mkdir -p entities
+</code></pre>
+<p>Add a new <code>Product</code> entity that pulls from a JSON file using a JSONPath selector:</p>
+<pre><code class="language-bash">cat &lt;&lt;'YAML' &gt; entities/Product.yaml
+mergeway:
+  version: 1
+
+entities:
+  Product:
+    description: Market products with category references
+    identifier: sku
+    include:
+      - path: data/products.json
+        selector: "$.items[*]"
+    fields:
+      sku:
+        type: string
+        required: true
+      name:
+        type: string
+        required: true
+      category:
+        type: Category
+        required: true
+      price:
+        type: number
+        required: true
+YAML
+</code></pre>
+<p>Create the JSON data file the schema expects. Notice that one product references a <code>household</code> category that we haven’t defined yet:</p>
+<pre><code class="language-bash">cat &lt;&lt;'JSON' &gt; data/products.json
+{
+  "items": [
+    {"sku": "apple-001", "name": "Honeycrisp Apple", "category": "produce", "price": 1.25},
+    {"sku": "oat-500", "name": "Rolled Oats", "category": "pantry", "price": 4.99},
+    {"sku": "soap-010", "name": "Castile Soap", "category": "household", "price": 6.75}
+  ]
+}
+JSON
+</code></pre>
+<p>Finally, have <code>mergeway.yaml</code> pull in any external schemas:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+include:
+  - entities/*.yaml
+
+entities:
+  Category:
+    description: Simple lookup table for product groupings
+    identifier: slug
+    include:
+      - data/categories/*.yaml
+    fields:
+      slug:
+        type: string
+        required: true
+      label:
+        type: string
+        required: true
+</code></pre>
+<p>Explore the richer workspace:</p>
+<pre><code class="language-bash">mergeway-cli entity list
+mergeway-cli entity show Product
+mergeway-cli list --type Product
+mergeway-cli validate
+</code></pre>
+<p><code>mergeway-cli validate</code> now reports a broken reference because the <code>household</code> category doesn’t exist yet:</p>
+<pre><code>phase: references
+type: Product
+id: soap-010
+file: data/products.json
+message: referenced Category "household" not found
+</code></pre>
+<p>Add the missing category to the YAML file and validate again:</p>
+<pre><code class="language-bash">cat &lt;&lt;'YAML' &gt;&gt; data/categories/categories.yaml
+- slug: household
+  label: Household Goods
+YAML
+
+mergeway-cli validate
+</code></pre>
+<p>With the additional category in place, validation succeeds and both entities are in sync.</p>
+<h2 id="4-export-everything-as-json"><a class="header" href="#4-export-everything-as-json">4. Export Everything as JSON</a></h2>
+<p>Collect the full dataset into a single snapshot:</p>
+<pre><code class="language-bash">mergeway-cli export --format json --output market-snapshot.json
+cat market-snapshot.json
+</code></pre>
+<h2 id="keep-the-workflow-running-smoothly"><a class="header" href="#keep-the-workflow-running-smoothly">Keep the Workflow Running Smoothly</a></h2>
+<p>Once the basics feel comfortable, automate formatting and reviews so the workspace stays healthy:</p>
+<ul>
+<li><a href="#set-up-mergeway-with-github">Set Up Mergeway with GitHub</a> to enforce <code>mergeway-cli fmt --lint</code> in Actions and route reviews through CODEOWNERS.</li>
+<li><a href="#enforce-mergeway-formatting-with-pre-commit">Enforce Mergeway Formatting with pre-commit</a> so contributors run <code>mergeway-cli fmt</code> locally before every commit.</li>
+</ul>
+<h2 id="youre-done"><a class="header" href="#youre-done">You’re Done!</a></h2>
+<p>Nice work—you’ve defined entities inline, moved data to YAML, added JSON-backed entities, and exercised the key Mergeway commands. You’re ready to scale the workspace to your team’s needs.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="schema-format"><a href="#schema-format" class="header">Schema Format</a></h1>
+<p>Schemas can live entirely inside <code>mergeway.yaml</code> or be split across additional include files (for example under an <code>entities/</code> folder) for readability. Likewise, object data may be defined inline or stored under <code>data/</code>. Pick the mix that matches your editing workflow—comments below highlight conventions for modular repositories without requiring them.</p>
+<h2 id="configuration-entry-mergewayyaml"><a class="header" href="#configuration-entry-mergewayyaml">Configuration Entry (<code>mergeway.yaml</code>)</a></h2>
+<p>The workspace entry file declares the schema version and the files to load:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+include:
+  - entities/*.yaml
+</code></pre>
+<ul>
+<li><code>mergeway.version</code> tracks breaking changes in the configuration format (keep it at <code>1</code>).</li>
+<li><code>include</code> is a list of glob patterns. Each matching file is merged into the configuration. Patterns need to resolve to at least one file; otherwise Mergeway reports an error.</li>
+</ul>
+<h2 id="schema-files-optional-includes"><a class="header" href="#schema-files-optional-includes">Schema Files (optional includes)</a></h2>
+<p>A schema file declares one or more entity definitions. Store them in whichever folder makes sense for your workflow (many teams use <code>entities/</code>); the location has no semantic impact. The example below defines a <code>Post</code> entity:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  Post:
+    description: Blog posts surfaced on the marketing site
+    extends: Content
+    identifier: id
+    include:
+      - data/posts/*.yaml
+    fields:
+      id: string
+      title:
+        type: string
+        required: true
+        description: Human readable title
+      body: string
+      author:
+        type: User
+        required: true
+    data:
+      - id: post-inline
+        title: Inline Example
+        author: user-alice
+        body: Inline data lives in the schema file.
+</code></pre>
+<p>For advanced scenarios you can expand <code>identifier</code> into a mapping:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  Post:
+    description: Blog posts surfaced on the marketing site
+    identifier:
+      field: id
+      generated: true
+    include:
+      - data/posts/*.yaml
+    fields:
+      # ...
+</code></pre>
+<p><code>generated: true</code> is an advisory hint for downstream automation (code generators, UI scaffolding). The CLI still expects inline identifiers or an explicit <code>--id</code> flag when creating objects.</p>
+<p>If you want the file path itself to be the identifier, use the reserved <code>$path</code> value:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  Note:
+    identifier: $path
+    include:
+      - data/notes/*.yaml
+    fields:
+      title:
+        type: string
+        required: true
+</code></pre>
+<p>In that mode, Mergeway uses the workspace-relative path (for example <code>data/notes/alpha.yaml</code>) as the object ID. <code>$path</code> only works for one-object-per-file sources. Inline <code>data</code>, <code>items:</code> arrays, and selectors that return multiple objects from the same file are rejected because they would produce duplicate identifiers.</p>
+<p>When several objects live in one file, provide a JSONPath selector to extract them:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  User:
+    description: Directory of account holders sourced from JSON
+    identifier: id
+    include:
+      - path: data/users.json
+        selector: "$.users[*]"
+    fields:
+      # ...
+</code></pre>
+<p>Strings remain a shorthand for <code>path</code> with no <code>selector</code>; Mergeway then reads the entire file as a single object (or uses the <code>items:</code> array if present).</p>
+<h3 id="inheritance"><a class="header" href="#inheritance">Inheritance</a></h3>
+<p>Entities may optionally declare <code>extends</code> to inherit from exactly one parent entity:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  Content:
+    identifier: id
+    fields:
+      id: string
+      title:
+        type: string
+        required: true
+  Post:
+    extends: Content
+    identifier: id
+    include:
+      - data/posts/*.yaml
+    fields:
+      body: string
+</code></pre>
+<p>When inheritance is used:</p>
+<ul>
+<li>Base entities may be schema-only and can omit <code>include</code> and inline <code>data</code>.</li>
+<li>Children inherit all parent fields and append child-defined fields after them.</li>
+<li>Children may not redefine inherited field names or the identifier definition.</li>
+<li>Identifier values must be unique across the whole parent/descendant hierarchy.</li>
+<li>Querying a parent entity includes descendant objects.</li>
+<li>References declared as <code>type: Parent</code> accept identifiers from the parent or any descendant.</li>
+</ul>
+<p><code>extends</code> only supports single inheritance. It is not supported for <code>json_schema</code>-backed entities in the first version.</p>
+<p>See <code>examples/inheritance</code> for a runnable workspace that combines a schema-only base entity, inherited fields, parent queries, and parent-typed references to descendants.</p>
+<h3 id="required-sections"><a class="header" href="#required-sections">Required Sections</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Key</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>identifier</code></td><td>Identifier source for each record. Provide either a string field name (for example <code>id</code>), the reserved <code>$path</code> value to use the workspace-relative file path, or a mapping with <code>field</code>, optional <code>generated</code>, and <code>pattern</code>. Field-based identifiers can be strings, integers, or numbers. <code>$path</code> identifiers are strings and require one object per file. The <code>generated</code> flag is advisory for tooling; the CLI still expects identifiers to be supplied inline or via <code>--id</code> when creating objects.</td></tr>
+<tr><td><code>extends</code></td><td>Optional parent entity name. Use this when the entity should inherit fields and identifier rules from one parent. Only single inheritance is supported, and <code>extends</code> cannot be combined with <code>json_schema</code> in the first version.</td></tr>
+<tr><td><code>include</code></td><td>List of data sources. Each entry can be a glob string (shorthand) or a mapping with <code>path</code> and optional <code>selector</code> property. Omit only when you rely exclusively on inline <code>data</code>, or when the entity is a schema-only base entity meant to be extended by children. Without a selector, Mergeway treats the whole file as a single object.</td></tr>
+<tr><td><code>fields</code></td><td>Map of field definitions. Use either the shorthand <code>field: type</code> (defaults to optional) or the expanded mapping for advanced options. Provide either <code>fields</code> or <code>json_schema</code> for each entity.</td></tr>
+<tr><td><code>json_schema</code></td><td>Path to a JSON Schema (draft 2020-12) file relative to the schema that declares the entity. When present, Mergeway derives field definitions from the JSON Schema and you can omit the <code>fields</code> block. <code>extends</code> is not supported on these entities in the first version.</td></tr>
+<tr><td><code>data</code></td><td>Optional array of inline records. Each entry needs to contain the identifier field and follows the same schema rules as external data files. This block cannot be used when <code>identifier: $path</code> because inline records do not have file paths.</td></tr>
+</tbody>
+</table>
+</div>
+<p>Fields can also declare a read-only <code>source</code> that derives values from the backing file path:</p>
+<pre><code class="language-yaml">fields:
+  section:
+    type: string
+    source:
+      path_segment: 2
+  filename:
+    type: string
+    source:
+      path_segment_rev: 0
+  relative_path:
+    type: string
+    source:
+      path: true
+</code></pre>
+<p>Exactly one source selector may be set per field. <code>path_segment</code> counts from the workspace root downward, <code>path_segment_rev</code> counts backward from the filename, and <code>path: true</code> exposes the full normalized relative file path. These fields are available in <code>get</code>, <code>list --filter</code>, and <code>export</code>, but they are not written back into source files. Path-derived fields require file-backed records and therefore cannot be used with inline <code>data</code>.</p>
+<p>Add <code>description</code> anywhere you need extra context. Entities accept it alongside <code>identifier</code>, and each field definition supports its own <code>description</code> value.</p>
+<h3 id="inline-data"><a class="header" href="#inline-data">Inline Data</a></h3>
+<p>Inline data is helpful for tiny lookup tables or bootstrapping a demo without creating additional files. Define records directly inside the entity specification:</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  Person:
+    description: Lightweight profile objects
+    identifier: id
+    include:
+      - data/people/*.yaml
+    fields:
+      id: string
+      name:
+        type: string
+        required: true
+        description: Preferred display name
+      age: integer
+    data:
+      - id: person-1
+        name: Alice
+        age: 30
+      - id: person-2
+        name: Bob
+        age: 42
+</code></pre>
+<p>Inline records are loaded alongside file-based data. If a record with the same identifier exists both inline and on disk, the file wins. Inline records are read-only at runtime—<code>mergeway-cli data update</code> and <code>mergeway-cli data delete</code> target files only. Types that use <code>identifier: $path</code> cannot declare inline data.</p>
+<h3 id="field-shorthand"><a class="header" href="#field-shorthand">Field Shorthand</a></h3>
+<p>When a field only needs a type, map entries can use the compact <code>field: type</code> syntax. These fields default to <code>required: false</code> and behave identically to the expanded form otherwise. Switch to the full mapping whenever you need attributes like <code>required</code>, <code>repeated</code>, or <code>format</code>.</p>
+<h3 id="field-attributes"><a class="header" href="#field-attributes">Field Attributes</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Attribute</th><th>Example</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>type</code></td><td><code>string</code>, <code>number</code>, <code>boolean</code>, <code>list[string]</code>, <code>User</code>, `User</td><td>Team`</td></tr>
+<tr><td><code>required</code></td><td><code>true</code> / <code>false</code></td><td>Required fields appear in every record.</td></tr>
+<tr><td><code>repeated</code></td><td><code>true</code> / <code>false</code></td><td>Indicates an array field.</td></tr>
+<tr><td><code>description</code></td><td><code>Service owner team</code></td><td>Optional but recommended.</td></tr>
+<tr><td><code>enum</code></td><td><code>[draft, active, retired]</code></td><td>Allowed values.</td></tr>
+<tr><td><code>default</code></td><td>Any scalar</td><td>Value injected when the field is missing.</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="json-schema-entities"><a class="header" href="#json-schema-entities">JSON Schema Entities</a></h3>
+<p>For larger teams it can be convenient to author schemas once and consume them in multiple places. Entities now support a <code>json_schema</code> property that points to an on-disk JSON Schema document (draft 2020-12). The path is resolved relative to the file that declares the entity and needs to live inside the repository—external <code>$ref</code> documents and network lookups are rejected.</p>
+<p>When <code>json_schema</code> is present, omit the <code>fields</code> map. Mergeway parses the JSON Schema and converts to its native field definitions:</p>
+<ul>
+<li><code>type: object</code> becomes nested field groups, preserving <code>required</code> entries for each level.</li>
+<li><code>type: array</code> sets <code>repeated: true</code> and uses the <code>items</code> schema to determine the element type.</li>
+<li><code>enum</code>, <code>const</code>, or <code>oneOf</code> blocks translate into Mergeway enums (string values only).</li>
+<li><code>$ref</code> segments are resolved within the same JSON Schema file (e.g., <code>#/$defs/...</code>).</li>
+<li>Custom references to other entities use the same <code>x-reference-type</code> property emitted by <code>mergeway-cli config export</code>.</li>
+<li>Reference unions such as <code>User | Team</code> are only supported in native <code>fields:</code> definitions. They are not supported in <code>json_schema</code> entities.</li>
+<li><code>extends</code> is not supported for <code>json_schema</code> entities in the first version of inheritance support.</li>
+</ul>
+<p>See <code>examples/json-schema</code> for a runnable workspace that demonstrates this flow end-to-end.</p>
+<p>Keep schema files small and focused—one entity per file is the easiest to maintain.</p>
+<h2 id="data-files"><a class="header" href="#data-files">Data Files</a></h2>
+<p>Each data file provides the fields required by its entity definition. Declaring a <code>type</code> at the top is optional—the CLI infers it from the entity that referenced the file (through <code>include</code>/<code>selector</code>) and only errors when a conflicting <code>type</code> value is present. Keeping it in the file can still be helpful for humans who open an arbitrary YAML document.</p>
+<pre><code class="language-yaml">type: Post # optional; falls back to the entity that included this file
+id: post-001
+title: Launch Day
+author: user-alice
+body: |
+  We are excited to announce the product launch.
+</code></pre>
+<p>You can store one object per file (as above) or provide an <code>items:</code> array to keep several objects together. Mergeway removes any top-level <code>type</code> key before validating the record, so referencing the same file from multiple entities requires the selector approach described below. If a type uses <code>identifier: $path</code>, each file must contain exactly one object; <code>items:</code> arrays are rejected.</p>
+<p>For <code>$path</code> identifiers, Mergeway normally derives IDs relative to the workspace root, for example <code>data/notes/alpha.yaml</code>. If an entity include points outside the workspace root, the derived ID may contain <code>../...</code>, for example <code>../secondary/products/widget.yaml</code>. Those external-root records can still be listed, fetched, validated, and exported, but <code>create</code>, <code>update</code>, and <code>delete</code> remain limited to files inside the workspace root.</p>
+<p>JSONPath selectors let you extract objects from nested structures—handy when you need to read a subset of a larger document. For example, <code>selector: "$.users[*]"</code> walks through the <code>users</code> array in a JSON file and emits one record per element. Mergeway validates that the selector returns objects; any other shape triggers a format error.</p>
+<p>Identifier fields accept numeric payloads as well. For example, the following record is valid when the schema marks <code>id</code> as an <code>integer</code>:</p>
+<pre><code class="language-yaml">id: 42
+name: Numeric Identifier
+</code></pre>
+<h2 id="good-practices"><a class="header" href="#good-practices">Good Practices</a></h2>
+<ul>
+<li>Prefer references (<code>type: User</code>) over duplicating identifiers.</li>
+<li>Use reference unions sparingly. <code>type: User | Team</code> is valid, but validation requires each referenced identifier to resolve in exactly one target set. If the same identifier exists in both sets, validation fails as ambiguous.</li>
+<li>Group files in predictable folders (<code>data/posts/</code>, <code>data/users/</code>, etc.).</li>
+<li>Run <code>mergeway-cli validate</code> after every change to catch problems immediately.</li>
+</ul>
+<p>See <code>examples/reference-union</code> for a minimal runnable workspace that demonstrates <code>User | Team</code>.
+See <code>examples/external-root-path</code> for a minimal runnable workspace that demonstrates external-root <code>$path</code> identifiers.</p>
+<p>Need more context? Return to the <a href="getting-started/README.html">Basic Concepts</a> page for the bigger picture.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="how-to-guides"><a href="#how-to-guides" class="header">How-to Guides</a></h1>
+<p>The how-to guides capture focused, task-oriented recipes for Mergeway users. Each guide assumes you already understand the core concepts and need a concrete sequence of steps to accomplish a specific outcome, such as enforcing formatting in CI or wiring Mergeway into deployment automation.</p>
+<p>For editor integration, start with <a href="#set-up-mergeway-lsp-in-vs-code-and-neovim">Set up mergeway-lsp in VS Code and Neovim</a>.</p>
+<p>For MCP client setup, see <a href="#use-mergeway-mcp-with-claude-and-codex">Use mergeway-mcp with Claude and Codex</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="getting-started-with-mergeway-cli-using-the-example-repository"><a href="#getting-started-with-mergeway-cli-using-the-example-repository" class="header">Getting Started with Mergeway CLI Using the Example Repository</a></h1>
+<p>Mergeway is a command‑line tool that helps teams describe and validate structured data alongside their code. The <a href="https://github.com/mergewayhq/mergeway-example-repo">mergeway‑example‑repo</a> demonstrates how the CLI can enforce schemas, format YAML/JSON files and generate relationship diagrams using a minimal blog dataset. This guide shows how to set up Mergeway, explore the example repository and add automation so contributors always follow the rules.</p>
+<h2 id="1-cloning-the-example-repository-and-installing-the-cli"><a class="header" href="#1-cloning-the-example-repository-and-installing-the-cli">1. Cloning the example repository and installing the CLI</a></h2>
+<p>Start by cloning the example repository and moving into it:</p>
+<pre><code class="language-bash">git clone git@github.com:mergewayhq/mergeway-example-repo.git
+cd mergeway-example-repo
+</code></pre>
+<p>The repository’s <strong>Getting started</strong> section explains two ways to access the CLI:</p>
+<ul>
+<li><strong>Use your own install.</strong> Follow the official installation instructions to install <code>mergeway‑cli</code>. Once installed you can run commands directly in the repo.</li>
+<li><strong>Use the provided dev shell.</strong> If you use <a href="https://nixos.org/">Nix</a> and optionally <a href="https://direnv.net/">direnv</a>, you can run <code>nix develop</code> from the root. This builds <code>mergeway‑cli</code> from source and sets up pre‑commit hooks and validation for you.</li>
+</ul>
+<p>With the CLI available, try printing the version and usage information:</p>
+<pre><code class="language-bash">mergeway-cli --help    # show usage information
+mergeway-cli version   # print the CLI version
+</code></pre>
+<h2 id="2-understanding-the-repository-structure"><a class="header" href="#2-understanding-the-repository-structure">2. Understanding the repository structure</a></h2>
+<p>The example repository models a simple blog with four entities: <code>User</code>, <code>Tag</code>, <code>Post</code> and <code>Comment</code>. Each entity stores its schema in <code>entities/</code> and the corresponding records in <code>data/</code>. The top‑level <code>mergeway.yaml</code> file ties everything together and tells Mergeway where to find schemas and data.</p>
+<p><strong>Directory overview</strong>:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Folder</th><th>Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td><code>entities/</code></td><td>Contains YAML schemas for each entity (<code>User.yaml</code>, <code>Tag.yaml</code>, <code>Post.yaml</code>, <code>Comment.yaml</code>).</td></tr>
+<tr><td><code>data/</code></td><td>Holds YAML or JSON files with records. The subfolders (<code>users/</code>, <code>tags/</code>, <code>posts/</code>, <code>comments/</code>) mirror the entities.</td></tr>
+<tr><td><code>mergeway.yaml</code></td><td>Top‑level configuration referencing entity schemas and data globs.</td></tr>
+</tbody>
+</table>
+</div>
+<p>To see the contents of the dataset, you can run:</p>
+<pre><code class="language-bash">mergeway-cli entity list          # list all entity types
+mergeway-cli entity show User     # inspect the User schema
+mergeway-cli list --type Post     # list all post records
+mergeway-cli get --type User 1    # fetch a single user by id
+mergeway-cli validate             # validate schemas, data and references
+</code></pre>
+<p>These commands read <code>mergeway.yaml</code>, load each entity definition under <code>entities/</code>, and then validate all records under <code>data/</code>. Validation errors are printed in a structured format with the phase (format, schema or references) and the offending file and message.</p>
+<h2 id="3-exploring-and-extending-a-workspace"><a class="header" href="#3-exploring-and-extending-a-workspace">3. Exploring and extending a workspace</a></h2>
+<p>You are not limited to the blog dataset. The Mergeway workspace guide demonstrates how to scaffold a brand‑new workspace, move inline records into separate files and add JSON sources:</p>
+<ol>
+<li><strong>Create a workspace.</strong> Make a directory and run <code>mergeway-cli init</code> to create a new <code>mergeway.yaml</code>. The file starts with an inline entity definition; you can customise it to match your data model.</li>
+<li><strong>Use CLI commands.</strong> List entities, show schemas, list records and validate the workspace.</li>
+<li><strong>Externalise data.</strong> As the table grows, move records into files under <code>data/</code> and update the <code>include</code> globs in <code>mergeway.yaml</code>. Re‑run <code>mergeway-cli list</code> and <code>mergeway-cli validate</code> to see the effect.</li>
+<li><strong>Split schemas and add JSON.</strong> Create an <code>entities/</code> directory and define additional entities (e.g. <code>Product</code>) that pull from JSON via JSONPath selectors. Add the JSON file under <code>data/</code> and include external schemas using the <code>include</code> key in <code>mergeway.yaml</code>.</li>
+<li><strong>Fix reference errors.</strong> When validation reports missing references (e.g. a <code>Product</code> record refers to a non‑existent category), update the relevant data file and re‑validate to ensure consistency.</li>
+<li><strong>Export a snapshot.</strong> Use <code>mergeway-cli export --format json --output &lt;file&gt;</code> to collect the full dataset into a single JSON snapshot.</li>
+</ol>
+<p>By following these steps you can evolve the example repository or build your own dataset from scratch while preserving referential integrity.</p>
+<h2 id="4-automating-formatting-and-reviews-with-github-actions"><a class="header" href="#4-automating-formatting-and-reviews-with-github-actions">4. Automating formatting and reviews with GitHub Actions</a></h2>
+<p>To keep data formatted and ensure the right people review changes, configure a GitHub Actions workflow and CODEOWNERS. The <strong>Set up Mergeway with GitHub Actions</strong> guide recommends adding a workflow file called <code>.github/workflows/mergeway-fmt.yml</code>:</p>
+<pre><code class="language-yaml">name: Mergeway Formatting
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "**/*.yaml"
+      - "**/*.yml"
+      - mergeway.yaml
+  push:
+    branches: [main]
+
+jobs:
+  mergeway-cli-fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Go toolchain
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install Mergeway CLI
+        run: go install github.com/mergewayhq/mergeway-cli@latest
+
+      - name: Lint Mergeway formatting
+        run: mergeway-cli fmt --lint
+</code></pre>
+<p>This workflow runs on every pull request and push to <code>main</code>. It checks out the code, installs Go and Mergeway, then runs <code>mergeway-cli fmt --lint</code> to lint YAML and JSON files. Adjust the <code>paths</code> filters if your data lives outside of YAML files. To ensure only valid PRs are merged, add a <strong>CODEOWNERS</strong> file that assigns responsibility for specific paths. For example:</p>
+<pre><code># mergeway schema is owned by the Data Platform team
+mergeway.yaml @myorg/data-platform
+
+# Data files are split by operational team
+data/users/ @myorg/inventory
+data/posts/ @myorg/content
+</code></pre>
+<p>GitHub will automatically request reviews from the specified teams when a pull request touches those files. Pinning a version of the CLI (e.g. <code>@v0.11.0</code>) or caching the binary makes CI runs reproducible.</p>
+<h2 id="5-enforcing-formatting-locally-with-precommit"><a class="header" href="#5-enforcing-formatting-locally-with-precommit">5. Enforcing formatting locally with pre‑commit</a></h2>
+<p>Developers can catch formatting issues before pushing by using <a href="https://pre-commit.com/">pre‑commit</a>. The <strong>Pre‑commit integration</strong> guide outlines the steps:</p>
+<ol>
+<li>
+<p><strong>Install pre‑commit</strong> once per workstation using <code>pipx install pre-commit</code>, <code>pip install pre-commit</code> or <code>brew install pre-commit</code>.</p>
+</li>
+<li>
+<p><strong>Add a configuration file</strong> <code>.pre-commit-config.yaml</code> with a local hook that runs <code>mergeway-cli fmt</code> on your data directories:</p>
+<pre><code class="language-yaml">repos:
+  - repo: local
+    hooks:
+      - id: mergeway-fmt
+        name: mergeway fmt
+        entry: mergeway-cli fmt
+        language: system
+        pass_filenames: false
+        files: ^data/(users|tags|posts|comments)/.*\.(ya?ml|json)$
+</code></pre>
+<p>The <code>entry</code> runs <code>mergeway-cli fmt</code> to rewrite any out‑of‑format records, <code>pass_filenames: false</code> tells Mergeway to discover files via <code>mergeway.yaml</code>, and the <code>files</code> regex limits the hook to data directories.</p>
+</li>
+<li>
+<p><strong>Install the hook</strong> into your Git repository:</p>
+<pre><code class="language-bash">pre-commit install --hook-type pre-commit
+# optionally also install a pre‑push hook
+pre-commit install --hook-type pre-push
+</code></pre>
+</li>
+<li>
+<p><strong>Test the hook</strong> by running it against all tracked files:</p>
+<pre><code class="language-bash">pre-commit run mergeway-fmt --all-files
+</code></pre>
+</li>
+</ol>
+<p>If the dataset already follows Mergeway’s canonical layout, the hook passes silently; otherwise it rewrites offending files or fails when using <code>--lint</code> mode. This keeps data consistent even before it reaches CI.</p>
+<h2 id="6-next-steps"><a class="header" href="#6-next-steps">6. Next steps</a></h2>
+<p>With the example repository and these guides you can experiment with Mergeway, extend the schema to reflect your own domain and automate formatting and validation. Use Mergeway’s other subcommands—such as <code>mergeway-cli gen-erd</code> to generate an entity relationship diagram and <code>mergeway-cli export</code> to snapshot the dataset—to further explore the capabilities. For deeper reference, consult the CLI documentation for commands like <code>mergeway-cli init</code>, <code>mergeway-cli list</code>, <code>mergeway-cli validate</code> and others.</p>
+<p>Mergeway encourages teams to treat their data like code: schemas live alongside source files, relationships are validated automatically and collaboration workflows ensure the right reviewers approve every change. Using the example repository as a starting point, you can adapt these patterns to your own projects.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="using-json-schema--jsonpath-in-mergeway"><a href="#using-json-schema--jsonpath-in-mergeway" class="header">Using JSON Schema &amp; JSONPath in Mergeway</a></h1>
+<p>Mergeway’s CLI lets you organize data from multiple sources into well‑typed entities.  While simple projects can define fields inline, larger teams often prefer to <strong>re‑use existing JSON Schemas</strong> or load many records from a single JSON document.  This guide shows how to install the CLI, author a JSON Schema‑backed entity, and leverage JSONPath selectors to extract multiple objects from a JSON file.</p>
+<h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
+<p>Make sure you have the latest Mergeway CLI installed before working with schemas. Review the <a href="#installation">installation instructions</a> for more details.</p>
+<h2 id="why-json-schema"><a class="header" href="#why-json-schema">Why JSON Schema?</a></h2>
+<p>A Mergeway entity typically lists fields manually, but this can become repetitive if you already maintain JSON Schemas elsewhere.  Mergeway supports a <code>json_schema</code> property that points at an on‑disk JSON Schema document.  The path is resolved relative to the file that declares the entity and must live inside the repository—external <code>$ref</code> documents are disallowed.  When <code>json_schema</code> is present you omit the <code>fields</code> map; Mergeway parses the schema and derives fields automatically.  Arrays become repeated fields, objects produce nested groups, and enumerations translate into enum types.  Keep schema files small and focus on one entity per file.</p>
+<h2 id="example-customer-entity-backed-by-json-schema"><a class="header" href="#example-customer-entity-backed-by-json-schema">Example: Customer Entity Backed by JSON Schema</a></h2>
+<ol>
+<li>
+<p><strong>Define a JSON Schema.</strong>  Create <code>schemas/customer.json</code> describing the shape of a customer record.  The sample below shows required fields (<code>id</code>, <code>name</code>, <code>tier</code>), enumerates allowed billing tiers (<code>trial</code>, <code>starter</code>, <code>enterprise</code>), and defines an array of <code>contacts</code> with email validation.</p>
+<pre><code class="language-jsonc">{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Customer metadata defined with JSON Schema",
+  "required": ["id", "name", "tier"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "tier": {
+      "oneOf": [
+        { "const": "trial" },
+        { "const": "starter" },
+        { "const": "enterprise" }
+      ]
+    },
+    "contacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "email"],
+        "properties": {
+          "label": { "type": "string" },
+          "email": { "type": "string", "format": "email" }
+        }
+      }
+    }
+  }
+}
+</code></pre>
+</li>
+<li>
+<p><strong>Reference the schema in your workspace.</strong>  Create a <code>mergeway.yaml</code> that declares a <code>Customer</code> entity and points at the schema file.  The <code>include</code> pattern tells Mergeway where to find customer records.</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  Customer:
+    description: Customers defined via a JSON Schema file.
+    identifier: id
+    include:
+      - data/customers/*.yaml
+    json_schema: schemas/customer.json
+</code></pre>
+</li>
+<li>
+<p><strong>Add data files.</strong>  Each YAML file under <code>data/customers/</code> should match the schema.  For example:</p>
+<pre><code class="language-yaml"># data/customers/customer-001.yaml
+id: cust-001
+name: Example Industries
+tier: enterprise
+contacts:
+  - label: Primary
+    email: ops@example.com
+  - label: Billing
+    email: finance@example.com
+</code></pre>
+</li>
+<li>
+<p><strong>Validate and explore.</strong>  Run <code>mergeway-cli validate</code> to ensure your data conforms to the schema.  Use <code>mergeway-cli data list --type Customer</code> to see loaded customers or <code>mergeway-cli gen-erd</code> to visualize relationships.</p>
+</li>
+</ol>
+<p>JSON Schema centralizes validation rules and makes your data contracts explicit.  Mergeway automatically converts nested objects into nested fields, sets array fields as repeated, and honours enum constraints.  This reduces duplication and lets you re‑use the same schema in other tools.</p>
+<h2 id="loading-multiple-records-with-jsonpath"><a class="header" href="#loading-multiple-records-with-jsonpath">Loading Multiple Records with JSONPath</a></h2>
+<p>Sometimes you want to load many objects from a single JSON file.  Instead of splitting the file, you can provide a JSONPath selector in your <code>include</code> mapping.  When several objects live in one file, use a selector to extract them.</p>
+<h2 id="users-from-a-json-array"><a class="header" href="#users-from-a-json-array">Users from a JSON Array</a></h2>
+<ol>
+<li>
+<p><strong>Prepare the source JSON.</strong>  Create <code>data/users.json</code> containing an array of users:</p>
+<pre><code class="language-json">{
+  "users": [
+    { "id": "User-001", "name": "Ada" },
+    { "id": "User-002", "name": "Grace" }
+  ]
+}
+</code></pre>
+</li>
+<li>
+<p><strong>Define the entity with a JSONPath selector.</strong>  In <code>mergeway.yaml</code>, specify the <code>path</code> and <code>selector</code> keys.  The <code>selector</code> uses JSONPath syntax (<code>$.users[*]</code>) to iterate over the elements of the <code>users</code> array.</p>
+<pre><code class="language-yaml">mergeway:
+  version: 1
+
+entities:
+  User:
+    identifier: id
+    fields:
+      id: string
+      name: string
+    include:
+      - path: data/users.json
+        selector: "$.users[*]"
+</code></pre>
+</li>
+<li>
+<p><strong>Load and validate.</strong>  Run <code>mergeway-cli validate</code> to confirm the JSONPath extracts objects (non‑objects trigger a format error).  Then list users with <code>mergeway-cli data list User</code>.</p>
+</li>
+</ol>
+<p><strong>Tip:</strong> Without a <code>selector</code>, Mergeway treats the entire JSON file as a single record or reads the <code>items</code> array if present.
+Selectors allow you to re-use existing data files / exports.</p>
+<h2 id="best-practices"><a class="header" href="#best-practices">Best Practices</a></h2>
+<ul>
+<li>Store each entity’s schema in its own file and keep data organized in predictable folders (e.g., <code>data/customers/</code>, <code>data/users/</code>).</li>
+<li>Run <code>mergeway-cli validate</code> after every change to catch schema or data errors early.</li>
+<li>Use enums (<code>enum</code>/<code>const</code>/<code>oneOf</code>) and <code>format</code> constraints in your JSON Schema to enforce consistent values.</li>
+<li>Combine JSON Schema and JSONPath when dealing with complex documents—derive field definitions from the schema and extract many objects with selectors.</li>
+</ul>
+<p>By integrating JSON Schema and JSONPath into your Mergeway workspace you can model rich data structures, enforce contracts, and scale your repository organization.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="set-up-mergeway-lsp-in-vs-code-and-neovim"><a href="#set-up-mergeway-lsp-in-vs-code-and-neovim" class="header">Set up mergeway-lsp in VS Code and Neovim</a></h1>
+<p>This guide covers the current editor setup paths for <code>mergeway-lsp</code>.</p>
+<h2 id="before-you-start"><a class="header" href="#before-you-start">Before You Start</a></h2>
+<ul>
+<li>Put <code>mergeway-lsp</code> on your <code>PATH</code>, or use an absolute path to the binary.</li>
+<li>Open a folder that contains <code>mergeway.yaml</code> or <code>mergeway.yml</code>.</li>
+<li>Keep stdout reserved for protocol traffic. Send logs to stderr or a log file instead.</li>
+</ul>
+<h2 id="vs-code"><a class="header" href="#vs-code">VS Code</a></h2>
+<p>Use the extension in <code>vscode/</code> and follow <code>vscode/README.md</code>, then point it at your local <code>mergeway-lsp</code> binary.</p>
+<p>Example workspace settings:</p>
+<pre><code class="language-json">{
+  "mergeway.lsp.path": "${workspaceFolder}/bin/mergeway-lsp",
+  "mergeway.lsp.trace.server": "off"
+}
+</code></pre>
+<p><code>${workspaceFolder}</code> expands to the first open workspace folder before the extension validates the configured path.
+You can also use a plain absolute path instead.</p>
+<p>The extension activates only when the opened workspace contains <code>mergeway.yaml</code> or <code>mergeway.yml</code>.</p>
+<h2 id="vs-code-generic-lsp-client"><a class="header" href="#vs-code-generic-lsp-client">VS Code Generic LSP Client</a></h2>
+<p>If you prefer a generic LSP launcher extension, configure it to run <code>mergeway-lsp</code>.</p>
+<p>Example settings shape:</p>
+<pre><code class="language-json">{
+  "mergeway.server.command": "mergeway-lsp",
+  "mergeway.server.args": [
+    "--log-file",
+    "/tmp/mergeway-lsp.log"
+  ],
+  "mergeway.server.filetypes": [
+    "yaml",
+    "json"
+  ],
+  "mergeway.server.rootPatterns": [
+    "mergeway.yaml",
+    "mergeway.yml"
+  ]
+}
+</code></pre>
+<p>Adjust the exact setting names to match the generic LSP client extension you are using. The important pieces are the command, optional debug args, filetypes, and root markers.</p>
+<h2 id="neovim"><a class="header" href="#neovim">Neovim</a></h2>
+<p>With <code>nvim-lspconfig</code>, you can register the server directly:</p>
+<pre><code class="language-lua">local lspconfig = require("lspconfig")
+local util = require("lspconfig.util")
+
+lspconfig.mergeway_lsp = {
+  default_config = {
+    cmd = { "mergeway-lsp", "--log-file", "/tmp/mergeway-lsp.log" },
+    filetypes = { "yaml", "json" },
+    root_dir = util.root_pattern("mergeway.yaml", "mergeway.yml"),
+    single_file_support = false,
+  },
+}
+
+lspconfig.mergeway_lsp.setup({})
+</code></pre>
+<p>If you keep the binary outside <code>PATH</code>, replace <code>mergeway-lsp</code> with the absolute path to the executable.</p>
+<h2 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h2>
+<ul>
+<li>If the server does not start, run <code>mergeway-lsp --log-stderr --log-level=debug</code> directly in a terminal and inspect the error.</li>
+<li>If the editor connects but features are missing, confirm the opened folder contains <code>mergeway.yaml</code> or <code>mergeway.yml</code>.</li>
+<li>If diagnostics look wrong, compare the same workspace with <code>mergeway-cli validate</code>.</li>
+<li>If you need persistent logs, use <code>--log-file /tmp/mergeway-lsp.log</code>.</li>
+<li>If an editor integration writes logs to stdout, disable that behavior. LSP transport requires stdout to stay protocol-only.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="use-mergeway-mcp-with-claude-and-codex"><a href="#use-mergeway-mcp-with-claude-and-codex" class="header">Use mergeway-mcp with Claude and Codex</a></h1>
+<p>This guide shows how to launch <code>mergeway-mcp</code> over stdio from a local MCP client.</p>
+<h2 id="before-you-start-1"><a class="header" href="#before-you-start-1">Before You Start</a></h2>
+<ul>
+<li>Put <code>mergeway-mcp</code> on your <code>PATH</code>, or use an absolute path to the binary.</li>
+<li>Decide which Mergeway repository root the server should expose.</li>
+<li>Prefer an absolute path for <code>--root</code> so the client does not depend on its own working directory.</li>
+<li>Keep stdout reserved for MCP protocol traffic. Do not wrap <code>mergeway-mcp</code> in a script that prints extra output to stdout.</li>
+</ul>
+<p>For example, if the repository you want to inspect lives at <code>/abs/path/to/repo</code>, this guide uses:</p>
+<pre><code class="language-bash">mergeway-mcp --root /abs/path/to/repo
+</code></pre>
+<p>Add repeated <code>--entity</code> flags if the client should only see specific exact entity names:</p>
+<pre><code class="language-bash">mergeway-mcp --root /abs/path/to/repo --entity User --entity Post
+</code></pre>
+<h2 id="claude"><a class="header" href="#claude">Claude</a></h2>
+<p>If you use Claude Code, add the server from the CLI:</p>
+<pre><code class="language-bash">claude mcp add --transport stdio mergeway -- mergeway-mcp --root /abs/path/to/repo
+</code></pre>
+<p>Run <code>claude mcp list</code> or open <code>/mcp</code> inside Claude Code to confirm that the server is connected.</p>
+<p>If you use Claude Desktop, add a stdio server entry to your <code>claude_desktop_config.json</code>:</p>
+<pre><code class="language-json">{
+  "mcpServers": {
+    "mergeway": {
+      "type": "stdio",
+      "command": "mergeway-mcp",
+      "args": [
+        "--root",
+        "/abs/path/to/repo"
+      ],
+      "env": {}
+    }
+  }
+}
+</code></pre>
+<p>If <code>mergeway-mcp</code> is not on <code>PATH</code>, replace <code>command</code> with the full executable path.</p>
+<p>After saving the file, restart Claude Desktop so it reloads the MCP configuration.</p>
+<h2 id="codex"><a class="header" href="#codex">Codex</a></h2>
+<p>You can add the server from the CLI:</p>
+<pre><code class="language-bash">codex mcp add mergeway -- mergeway-mcp --root /abs/path/to/repo
+</code></pre>
+<p>To keep the configuration in <code>~/.codex/config.toml</code> or a trusted project-level <code>.codex/config.toml</code>, use:</p>
+<pre><code class="language-toml">[mcp_servers.mergeway]
+command = "mergeway-mcp"
+args = ["--root", "/abs/path/to/repo"]
+</code></pre>
+<p>If you want to narrow the exposed surface, include entity filters in <code>args</code>:</p>
+<pre><code class="language-toml">[mcp_servers.mergeway]
+command = "mergeway-mcp"
+args = ["--root", "/abs/path/to/repo", "--entity", "User", "--entity", "Post"]
+</code></pre>
+<p>Run <code>codex mcp list</code> to confirm that Codex sees the server.</p>
+<h2 id="example-prompts"><a class="header" href="#example-prompts">Example Prompts</a></h2>
+<p>Once the client connects, ask for repository inspection tasks such as:</p>
+<ul>
+<li><code>List the Mergeway entities in this repository.</code></li>
+<li><code>Show the schema for the User entity.</code></li>
+<li><code>List the User objects and summarize the identifiers.</code></li>
+<li><code>Export the repository structure and explain the main entity relationships.</code></li>
+</ul>
+<h2 id="related-pages"><a class="header" href="#related-pages">Related Pages</a></h2>
+<ul>
+<li><a href="#mergeway-mcp-reference">mergeway-mcp Reference</a> — flags, transport options, and tool surface.</li>
+<li><a href="#installation">Install Mergeway</a> — installation paths for <code>mergeway-mcp</code>.</li>
+<li><a href="https://code.claude.com/docs/en/mcp">Claude Code MCP docs</a> — Anthropic MCP client documentation.</li>
+<li><a href="https://developers.openai.com/codex/codex-manual">Codex manual: Model Context Protocol</a> — official Codex MCP configuration docs.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="set-up-mergeway-with-github"><a href="#set-up-mergeway-with-github" class="header">Set Up Mergeway with GitHub</a></h1>
+<p>Goal: wire Mergeway into GitHub so formatting stays consistent and ownership of datasets is clearly distributed across teams.</p>
+<p>Throughout this guide we will reference <strong>GrainBox Market</strong>, a fictional marketplace that stores product data in <code>data/products/</code> and category lookups in <code>data/categories/</code>. The Data Platform team maintains <code>mergeway.yaml</code>, while Inventory Operations and Category Management own their respective folders.</p>
+<h2 id="prerequisites-1"><a class="header" href="#prerequisites-1">Prerequisites</a></h2>
+<ul>
+<li>A repository that already contains a valid <code>mergeway.yaml</code> and the files it references.</li>
+<li>GitHub Actions enabled for the repository.</li>
+<li>Permission to configure GitHub teams (or at least invite individual maintainers) so CODEOWNERS can route reviews correctly.</li>
+</ul>
+<h2 id="1-add-a-mergeway-workflow"><a class="header" href="#1-add-a-mergeway-workflow">1. Add a Mergeway Workflow</a></h2>
+<p>Create <code>.github/workflows/mergeway-fmt.yml</code> to ensure every pull request keeps GrainBox data formatted:</p>
+<pre><code class="language-yaml">name: Mergeway Formatting
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "**/*.yaml"
+      - "**/*.yml"
+      - mergeway.yaml
+  push:
+    branches: [main]
+
+jobs:
+  mergeway-cli-fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Go toolchain
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install Mergeway CLI
+        run: go install github.com/mergewayhq/mergeway-cli@latest
+
+      - name: Lint Mergeway formatting
+        run: mergeway-cli fmt --lint
+</code></pre>
+<p>This job fails fast whenever a record under <code>data/products/</code> or <code>data/categories/</code> is out of format, ensuring reviewers only see clean diffs. Adjust the <code>paths</code> filters if your workspace stores data outside YAML.</p>
+<h2 id="2-explain-the-failure-mode-to-contributors"><a class="header" href="#2-explain-the-failure-mode-to-contributors">2. Explain the Failure Mode to Contributors</a></h2>
+<p><code>mergeway-cli fmt --lint</code> prints each offending file, so GrainBox developers fix CI failures locally with <code>mergeway-cli fmt --in-place</code>. Capture that reminder in your pull-request template or CONTRIBUTING guide so the workflow feels helpful rather than mysterious.</p>
+<h2 id="3-assign-ownership-with-codeowners"><a class="header" href="#3-assign-ownership-with-codeowners">3. Assign Ownership with CODEOWNERS</a></h2>
+<p>Formatting alone is not enough—you also want the right people reviewing Mergeway changes. GitHub’s <a href="https://docs.github.com/articles/about-code-owners">CODEOWNERS</a> file routes pull requests to specific teams or individuals based on path globs.</p>
+<p>Create <code>.github/CODEOWNERS</code> with entries for both GrainBox teams and any shared files:</p>
+<pre><code># Mergeway schema is owned by Data Platform
+mergeway.yaml @grainbox/data-platform
+
+# Data files are split by operational team
+data/products/ @grainbox/inventory-ops
+data/categories/ @grainbox/category-mgmt
+</code></pre>
+<p>Key considerations:</p>
+<ul>
+<li>Teams need to exist inside your GitHub organization (for example <code>@org/team-slug</code>). If you don’t have teams yet, either create them under <strong>Settings → Teams</strong> or list specific people such as <code>@alice</code> and <code>@bob</code>.</li>
+<li>You can mix teams and individuals to cover overlapping areas—for instance, keep <code>mergeway.yaml</code> owned by <code>@grainbox/data-platform</code> and also list <code>@lead-architect</code> for extra oversight.</li>
+<li>CODEOWNERS applies to all pull requests, so combining it with the workflow guarantees every Mergeway change is reviewed by someone who understands that slice of the dataset.</li>
+</ul>
+<h2 id="4-keep-versions-predictable"><a class="header" href="#4-keep-versions-predictable">4. Keep Versions Predictable</a></h2>
+<p>GrainBox pins versions for long-lived branches by replacing <code>@latest</code> with a tag (e.g., <code>@v1.2.3</code>) or by caching the binary. Matching versions between local machines and CI prevents “works on my laptop” formatting diffs.</p>
+<p>Once the workflow and CODEOWNERS file land in the default branch, any pull request that touches Mergeway files will:</p>
+<ol>
+<li>Trigger the formatting check so contributors fix issues before merging.</li>
+<li>Automatically request reviewers from the right team, ensuring accountability for each dataset.</li>
+</ol>
+<p>That combination keeps Mergeway-managed data healthy as your GitHub organization grows.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="enforce-mergeway-formatting-with-pre-commit"><a href="#enforce-mergeway-formatting-with-pre-commit" class="header">Enforce Mergeway Formatting with pre-commit</a></h1>
+<p>Goal: run <code>mergeway-cli fmt</code> automatically before every commit so contributors push consistently formatted GrainBox Market data.</p>
+<p>We will keep using the fictional GrainBox Market repository from the GitHub how-to: schemas live in <code>mergeway.yaml</code>, product data sits under <code>data/products/</code>, and category lookups live in <code>data/categories/</code>.</p>
+<h2 id="prerequisites-2"><a class="header" href="#prerequisites-2">Prerequisites</a></h2>
+<ul>
+<li>The Mergeway CLI (<code>mergeway-cli</code>) is already installed on developer machines and in your <code>PATH</code>.</li>
+<li>Python 3.8+ is available (pre-commit ships via <code>pipx</code>, <code>pip</code>, or Homebrew).</li>
+<li>Your repo includes the Mergeway workspace you want to protect.</li>
+</ul>
+<h2 id="1-install-pre-commit-locally"><a class="header" href="#1-install-pre-commit-locally">1. Install pre-commit Locally</a></h2>
+<p>Pick the method that matches your tooling:</p>
+<pre><code class="language-bash">pipx install pre-commit      # recommended
+# or
+pip install pre-commit       # inside a virtualenv
+# or
+brew install pre-commit      # macOS
+</code></pre>
+<p>Developers only need to do this once per workstation.</p>
+<h2 id="2-configure-the-hook"><a class="header" href="#2-configure-the-hook">2. Configure the Hook</a></h2>
+<p>Add a <code>.pre-commit-config.yaml</code> file in the repo root (or extend your existing config) with a local hook that invokes <code>mergeway-cli fmt</code>:</p>
+<pre><code class="language-yaml">repos:
+  - repo: local
+    hooks:
+      - id: mergeway-fmt
+        name: mergeway fmt
+        entry: mergeway-cli fmt
+        language: system
+        pass_filenames: false
+        files: ^data/(products|categories)/.*\.(ya?ml|json)$
+</code></pre>
+<p>Why these settings?</p>
+<ul>
+<li><code>entry: mergeway-cli fmt</code> rewrites any out-of-format records before the commit proceeds (it defaults to in-place mode).</li>
+<li><code>pass_filenames: false</code> lets Mergeway discover files from <code>mergeway.yaml</code> rather than only the files staged by Git—useful when your workspace spans multiple folders.</li>
+<li><code>files</code> narrows execution to the GrainBox data directories so unrelated commits (docs, code) skip the hook. Adjust the regex for your layout or remove the key to run on everything.</li>
+</ul>
+<p>If you prefer CI-style failures, swap <code>--in-place</code> for <code>--lint</code>. The hook will then block the commit and print offending files without mutating them.</p>
+<h2 id="3-install-the-git-hook"><a class="header" href="#3-install-the-git-hook">3. Install the Git Hook</a></h2>
+<p>Tell pre-commit to write the hook into <code>.git/hooks/pre-commit</code>:</p>
+<pre><code class="language-bash">pre-commit install --hook-type pre-commit
+</code></pre>
+<p>To cover pushes from automation as well, you may also install it as a <code>pre-push</code> hook:</p>
+<pre><code class="language-bash">pre-commit install --hook-type pre-push
+</code></pre>
+<p>Each contributor only needs to run these commands once per clone.</p>
+<h2 id="4-test-the-setup"><a class="header" href="#4-test-the-setup">4. Test the Setup</a></h2>
+<p>Run the hook against every tracked file to confirm it formats data as expected:</p>
+<pre><code class="language-bash">pre-commit run mergeway-fmt --all-files
+</code></pre>
+<ul>
+<li>If the repo already follows Mergeway’s canonical layout, the command prints <code>mergeway-fmt..................................Passed</code>.</li>
+<li>If output shows <code>Failed</code>, inspect the listed files, rerun <code>mergeway-cli fmt &lt;file&gt;</code> manually if needed, then stage the changes.</li>
+</ul>
+<p>Developers now get immediate feedback before commits ever leave their machines, and CI stays clean because repositories reach GitHub with consistent Mergeway formatting.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="communicate-repository-changes-with-mergeway-diff"><a href="#communicate-repository-changes-with-mergeway-diff" class="header">Communicate Repository Changes with mergeway-diff</a></h1>
+<p>Goal: produce a shareable summary of Mergeway-managed data changes over time by comparing the current repository state to a commit selected with a Git time offset.</p>
+<p>We will keep using the fictional GrainBox Market repository from the other guides. Product records live under <code>data/products/</code>, category lookups live under <code>data/categories/</code>, and the Data Platform team wants a weekly update that operations, merchandising, and leadership can all understand without reading raw Git file diffs.</p>
+<h2 id="prerequisites-3"><a class="header" href="#prerequisites-3">Prerequisites</a></h2>
+<ul>
+<li>The repository is already initialized as a Git repository and contains a valid Mergeway workspace.</li>
+<li><code>mergeway-diff</code> is installed and available on your <code>PATH</code>.</li>
+<li>You know the reporting window you want to communicate, such as the last 7 days.</li>
+</ul>
+<h2 id="1-pick-a-baseline-commit-from-a-time-offset"><a class="header" href="#1-pick-a-baseline-commit-from-a-time-offset">1. Pick a Baseline Commit from a Time Offset</a></h2>
+<p>Use Git to find the most recent commit that existed before your reporting window started:</p>
+<pre><code class="language-bash">BASELINE="$(git log -1 --before="7 days ago" --format="%H")"
+printf 'Baseline commit: %s\n' "$BASELINE"
+git show --stat --oneline --no-patch "$BASELINE"
+</code></pre>
+<p>This command asks Git for the latest commit older than 7 days and stores its full commit identifier in <code>BASELINE</code>. That gives you a stable starting point for a weekly summary without manually searching through history.</p>
+<p>If <code>BASELINE</code> is empty, your repository may not have any commits that old yet. In that case, shorten the time window or choose a specific revision manually.</p>
+<h2 id="2-compare-the-baseline-to-the-current-committed-state"><a class="header" href="#2-compare-the-baseline-to-the-current-committed-state">2. Compare the Baseline to the Current Committed State</a></h2>
+<p>For a report you want to share broadly, compare two revisions explicitly:</p>
+<pre><code class="language-bash">mergeway-diff "$BASELINE" HEAD
+</code></pre>
+<p>This produces a semantic, data-only diff between the baseline commit and the current <code>HEAD</code> commit. Unlike a raw Git diff, <code>mergeway-diff</code> groups changes by Mergeway object identity and field values, so the result is easier to explain to non-specialists.</p>
+<p>Example output:</p>
+<pre><code class="language-text">ADDED Product[prod-104]
+  at: data/products/prod-104.yaml
+
+MODIFIED Category[cat-bulk]
+  description: "Warehouse items" -&gt; "Warehouse and bulk items"
+
+REMOVED Product[prod-017]
+  from: data/products/prod-017.yaml
+</code></pre>
+<p>This is usually the right mode for weekly or monthly updates because it ignores local, uncommitted work and reports only the committed state of the repository.</p>
+<h2 id="3-know-when-to-include-the-working-tree"><a class="header" href="#3-know-when-to-include-the-working-tree">3. Know When to Include the Working Tree</a></h2>
+<p><code>mergeway-diff</code> has three useful snapshot modes:</p>
+<ul>
+<li><code>mergeway-diff</code> compares <code>HEAD</code> against unstaged changes only.</li>
+<li><code>mergeway-diff "$BASELINE"</code> compares the baseline revision against your full current working tree, including staged and unstaged changes.</li>
+<li><code>mergeway-diff "$BASELINE" HEAD</code> compares two revisions and ignores local worktree noise.</li>
+</ul>
+<p>For communication with a broader audience, prefer <code>mergeway-diff "$BASELINE" HEAD</code>. Use <code>mergeway-diff "$BASELINE"</code> only when you intentionally want to preview in-progress changes before they are committed.</p>
+<h2 id="4-validate-before-you-share-the-diff"><a class="header" href="#4-validate-before-you-share-the-diff">4. Validate Before You Share the Diff</a></h2>
+<p>Run validation first so your report is based on a clean, parseable dataset:</p>
+<pre><code class="language-bash">mergeway-cli validate
+mergeway-diff "$BASELINE" HEAD
+</code></pre>
+<p>If the workspace contains invalid YAML, duplicate identifiers, or broken references, fix those issues before publishing the summary. That keeps the diff focused on real data changes instead of repository problems.</p>
+<h2 id="5-capture-json-output-for-automation"><a class="header" href="#5-capture-json-output-for-automation">5. Capture JSON Output for Automation</a></h2>
+<p>If you want to feed the result into a script, dashboard, or release-note generator, use JSON output:</p>
+<pre><code class="language-bash">mergeway-diff --format json "$BASELINE" HEAD &gt; weekly-diff.json
+</code></pre>
+<p>This is useful when the Data Platform team wants to post the same weekly change set into Slack, an internal changelog, or a reporting pipeline.</p>
+<h2 id="6-assemble-a-shareable-weekly-update"><a class="header" href="#6-assemble-a-shareable-weekly-update">6. Assemble a Shareable Weekly Update</a></h2>
+<p>You can combine the time-based baseline, the current commit, and the semantic diff into a short report file:</p>
+<pre><code class="language-bash">CURRENT="$(git rev-parse HEAD)"
+
+{
+  echo "# GrainBox weekly data update"
+  echo
+  echo "Baseline: $BASELINE"
+  echo "Current:  $CURRENT"
+  echo
+  mergeway-diff "$BASELINE" HEAD
+} &gt; weekly-data-update.md
+</code></pre>
+<p>The resulting file gives stakeholders a compact summary of what changed over the last week without requiring them to inspect every modified YAML or JSON file.</p>
+<h2 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h2>
+<ul>
+<li>Review the <a href="#mergeway-diff-reference"><code>mergeway-diff</code> reference</a> for the exact snapshot rules and output modes.</li>
+<li>Pair this workflow with <a href="#mergeway-cli-validate"><code>mergeway-cli validate</code></a> in CI if you want every published change summary to come from a valid repository state.</li>
+<li>If you want teams to review the underlying changes before the summary is shared, combine this guide with <a href="#set-up-mergeway-with-github">Set up Mergeway with GitHub Actions</a>.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-reference"><a href="#mergeway-cli-reference" class="header">mergeway-cli Reference</a></h1>
+<p><code>mergeway-cli</code> is the primary workspace-management binary. It handles repository setup, schema inspection, validation, formatting, and object operations.</p>
+<p>Use <code>--long-name</code>; single-dash long flags like <code>-root</code> are not supported. Global flags can appear before or after the command name.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Flag</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--root</code></td><td>Path to the workspace (defaults to <code>.</code>).</td></tr>
+<tr><td><code>--config</code></td><td>Explicit path to <code>mergeway.yaml</code> (defaults to <code>&lt;root&gt;/mergeway.yaml</code>).</td></tr>
+<tr><td><code>--format</code></td><td>Output format (<code>yaml</code> or <code>json</code>, default <code>yaml</code>).</td></tr>
+<tr><td><code>--fail-fast</code></td><td>Stop after the first validation error (where supported).</td></tr>
+<tr><td><code>--yes</code></td><td>Auto-confirm prompts (useful for <code>delete</code>).</td></tr>
+<tr><td><code>--verbose</code></td><td>Emit additional logging.</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="mergeway-cli-repository-setup"><a class="header" href="#mergeway-cli-repository-setup"><code>mergeway-cli</code> Repository Setup</a></h2>
+<ul>
+<li><a href="#mergeway-cli-init"><code>init</code></a></li>
+<li><a href="#mergeway-cli-validate"><code>validate</code></a></li>
+<li><a href="#mergeway-cli-version"><code>version</code></a></li>
+</ul>
+<h2 id="mergeway-cli-schema-utilities"><a class="header" href="#mergeway-cli-schema-utilities"><code>mergeway-cli</code> Schema Utilities</a></h2>
+<ul>
+<li><a href="#mergeway-cli-entity-list"><code>entity list</code></a></li>
+<li><a href="#mergeway-cli-entity-show"><code>entity show</code></a></li>
+<li><a href="cli-reference/fmt.html"><code>fmt</code></a></li>
+<li><a href="#mergeway-cli-config-lint"><code>config lint</code></a></li>
+<li><a href="#mergeway-cli-config-export"><code>config export</code></a></li>
+<li><a href="#mergeway-cli-gen-erd"><code>gen-erd</code></a></li>
+</ul>
+<p>For more information on the schema, please consult the <a href="#schema-format">Schema Format</a></p>
+<h2 id="mergeway-cli-object-operations"><a class="header" href="#mergeway-cli-object-operations"><code>mergeway-cli</code> Object Operations</a></h2>
+<ul>
+<li><a href="#mergeway-cli-list"><code>list</code></a></li>
+<li><a href="#mergeway-cli-files"><code>files</code></a></li>
+<li><a href="#mergeway-cli-get"><code>get</code></a></li>
+<li><a href="#mergeway-cli-create"><code>create</code></a></li>
+<li><a href="#mergeway-cli-update"><code>update</code></a></li>
+<li><a href="#mergeway-cli-delete"><code>delete</code></a></li>
+<li><a href="#mergeway-cli-export"><code>export</code></a></li>
+</ul>
+<p>For the other binaries, see <a href="#mergeway-diff-reference">mergeway-diff Reference</a>, <a href="#mergeway-lsp-reference">mergeway-lsp Reference</a>, and <a href="#mergeway-mcp-reference">mergeway-mcp Reference</a>. Need a refresher on terminology? See the <a href="getting-started/README.html">Basic Concepts</a> page.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-init"><a href="#mergeway-cli-init" class="header">mergeway-cli init</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Scaffold the directory layout and default configuration for a Mergeway workspace.</p>
+</blockquote>
+<h2 id="usage"><a class="header" href="#usage">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] init
+</code></pre>
+<p><code>mergeway-cli init</code> targets the directory referenced by <code>--root</code> (default <code>.</code>) and does not accept positional arguments. Use <code>mkdir</code>/<code>cd</code> before running the command if you want to initialize a new folder.</p>
+<p>Need a walkthrough after initialization? Continue with the <a href="getting-started/README.html">Getting Started guide</a>.</p>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
+<pre><code class="language-bash">mkdir blog-metadata
+cd blog-metadata
+mergeway-cli init
+</code></pre>
+<p>Output resembles:</p>
+<pre><code>Initialized repository at .
+</code></pre>
+<p><code>mergeway-cli init</code> ensures a starter <code>mergeway.yaml</code> exists in the target directory. Add folders such as <code>entities/</code> or <code>data/</code> yourself once the project grows; keeping everything in a single file is perfectly valid. Re-run the command safely—it won’t overwrite existing files.</p>
+<p>The default configuration contains:</p>
+<pre><code class="language-yaml"># mergeway-cli configuration
+mergeway:
+  version: 1
+
+entities: {}
+</code></pre>
+<h2 id="related-commands"><a class="header" href="#related-commands">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-validate"><code>mergeway-cli validate</code></a> — run after adding schema and data files.</li>
+<li><a href="#mergeway-cli-config-lint"><code>mergeway-cli config lint</code></a> — verify configuration changes once you edit <code>mergeway.yaml</code>.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-validate"><a href="#mergeway-cli-validate" class="header">mergeway-cli validate</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Check schemas, records, and references, emitting formatted errors when something is wrong.</p>
+</blockquote>
+<h2 id="usage-1"><a class="header" href="#usage-1">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] validate [--phase format|schema|references]... [--fail-fast]
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Flag</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--phase</code></td><td>Optional. Repeat to run a subset of phases. By default all phases run (<code>format</code>, <code>schema</code>, then <code>references</code>).</td></tr>
+<tr><td><code>--fail-fast</code></td><td>Stop after the first error. Defaults to the global <code>--fail-fast</code> flag.</td></tr>
+</tbody>
+</table>
+</div>
+<p>When you request the <code>references</code> phase, Mergeway automatically includes the <code>schema</code> phase so reference checks have the information they need.</p>
+<h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
+<p>Run the command from the workspace root (or add <code>--root</code> to point elsewhere).</p>
+<p>Validate the current workspace:</p>
+<pre><code class="language-bash">mergeway-cli validate
+</code></pre>
+<p>Add <code>--format json</code> when you need machine-readable output.</p>
+<p>Output:</p>
+<pre><code class="language-yaml">status: validation succeeded
+</code></pre>
+<p>Run validation after introducing a breaking schema change:</p>
+<pre><code class="language-bash">mergeway-cli validate
+</code></pre>
+<p>Output when the <code>Post</code> schema requires an <code>author</code> but the record is missing it:</p>
+<pre><code class="language-yaml">- phase: schema
+  type: Post
+  id: post-001
+  file: data/posts/launch.yaml
+  message: missing required field "author"
+</code></pre>
+<p>The command writes errors to standard output and still exits with status <code>0</code>, so automation can check whether any errors were returned.</p>
+<h2 id="related-commands-1"><a class="header" href="#related-commands-1">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-config-lint"><code>mergeway-cli config lint</code></a> — validate configuration without loading data.</li>
+<li><a href="#mergeway-cli-list"><code>mergeway-cli list</code></a> — locate the objects mentioned in validation errors.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-entity-list"><a href="#mergeway-cli-entity-list" class="header">mergeway-cli entity list</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Show every entity Mergeway discovered from your configuration.</p>
+</blockquote>
+<h2 id="usage-2"><a class="header" href="#usage-2">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] entity list
+</code></pre>
+<p>No command-specific flags. Add the global <code>--root</code> flag if you need to inspect another workspace.</p>
+<h2 id="example-1"><a class="header" href="#example-1">Example</a></h2>
+<p>List entities for the <code>examples/</code> workspace bundled with the repository:</p>
+<pre><code class="language-bash">mergeway-cli --root examples/full entity list
+</code></pre>
+<p>Output:</p>
+<pre><code>Comment
+Post
+Tag
+User
+</code></pre>
+<p>Entities are listed alphabetically.</p>
+<h2 id="related-commands-2"><a class="header" href="#related-commands-2">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-entity-show"><code>mergeway-cli entity show</code></a> — inspect an individual schema definition.</li>
+<li><a href="#mergeway-cli-config-lint"><code>mergeway-cli config lint</code></a> — verify the configuration if an entity is missing.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-entity-show"><a href="#mergeway-cli-entity-show" class="header">mergeway-cli entity show</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Print the normalized schema for a given entity.</p>
+</blockquote>
+<h2 id="usage-3"><a class="header" href="#usage-3">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] entity show &lt;entity&gt;
+</code></pre>
+<p>No additional flags. Use <code>--format json</code> if you prefer JSON output, and add the global <code>--root</code> flag when working outside the workspace root.</p>
+<p>For inherited entities, the output shows the effective flattened schema, including inherited fields. The normalized output also preserves <code>extends</code> metadata so the inheritance chain remains visible.</p>
+<h2 id="example-2"><a class="header" href="#example-2">Example</a></h2>
+<p>Show the <code>Post</code> entity in YAML form:</p>
+<pre><code class="language-bash">mergeway-cli --root examples/full --format yaml entity show Post
+</code></pre>
+<p>Output (abridged):</p>
+<pre><code class="language-yaml">name: Post
+source: .../examples/full/entities/Post.yaml
+identifier:
+  field: id
+filepatterns:
+  - data/posts/*.yaml
+fields:
+  title:
+    type: string
+    required: true
+  author:
+    type: User
+    required: true
+  body:
+    type: string
+</code></pre>
+<h2 id="related-commands-3"><a class="header" href="#related-commands-3">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-entity-list"><code>mergeway-cli entity list</code></a> — find available entities.</li>
+<li><a href="#mergeway-cli-config-export"><code>mergeway-cli config export</code></a> — generate a JSON Schema from an entity definition.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-config-lint"><a href="#mergeway-cli-config-lint" class="header">mergeway-cli config lint</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Validate configuration files (including includes) without touching data.</p>
+</blockquote>
+<h2 id="usage-4"><a class="header" href="#usage-4">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] config lint
+</code></pre>
+<p>No additional flags.</p>
+<h2 id="example-3"><a class="header" href="#example-3">Example</a></h2>
+<p>Run the command from the workspace root (or pass <code>--root</code>):</p>
+<pre><code class="language-bash">mergeway-cli config lint
+</code></pre>
+<p>Output:</p>
+<pre><code>configuration valid
+</code></pre>
+<p>If the command encounters a problem (for example, an include pattern that matches no files), it prints the error and exits with status <code>1</code>.</p>
+<p>Run this command whenever you edit <code>mergeway.yaml</code> or add new entity definitions to catch syntax mistakes early.</p>
+<h2 id="related-commands-4"><a class="header" href="#related-commands-4">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-config-export"><code>mergeway-cli config export</code></a> — derive a JSON Schema for a type.</li>
+<li><a href="#mergeway-cli-validate"><code>mergeway-cli validate</code></a> — validate both schemas and data.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-config-export"><a href="#mergeway-cli-config-export" class="header">mergeway-cli config export</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Emit a JSON Schema for one of your types.</p>
+</blockquote>
+<h2 id="usage-5"><a class="header" href="#usage-5">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] config export --type &lt;type&gt;
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Flag</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--type</code></td><td>Required. Type identifier to export.</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="example-4"><a class="header" href="#example-4">Example</a></h2>
+<p>Run the command from the workspace root (or pass <code>--root</code>). Export the <code>Post</code> type as JSON Schema:</p>
+<pre><code class="language-bash">mergeway-cli --root examples --format json config export --type Post
+</code></pre>
+<p>Output (abridged):</p>
+<pre><code class="language-json">{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "author": {
+      "type": "string",
+      "x-reference-type": "User"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "required": ["id", "title", "author"],
+  "type": "object"
+}
+</code></pre>
+<p>Fields that reference other types include the <code>x-reference-type</code> hint.</p>
+<p>Reference unions such as <code>User | Team</code> are not exportable as JSON Schema. They are supported only in native Mergeway <code>fields:</code> definitions, so <code>mergeway-cli config export</code> returns an error for those entities.</p>
+<p>Validate your workspace (<code>mergeway-cli config lint</code> or <code>mergeway-cli validate</code>) after editing type files to ensure the exported schema stays in sync.</p>
+<h2 id="related-commands-5"><a class="header" href="#related-commands-5">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-entity-show"><code>mergeway-cli entity show</code></a> — view the full Mergeway representation of an entity.</li>
+<li><a href="#mergeway-cli-validate"><code>mergeway-cli validate</code></a> — ensure data conforms to the schema you just exported.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-list"><a href="#mergeway-cli-list" class="header">mergeway-cli list</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> List object identifiers for a given type, optionally filtered by a field.</p>
+</blockquote>
+<h2 id="usage-6"><a class="header" href="#usage-6">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] list --type &lt;type&gt; [--filter key=value]
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Flag</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--type</code></td><td>Required. Type identifier to query. When the type has descendants, the list also includes objects from those descendant types.</td></tr>
+<tr><td><code>--filter</code></td><td>Optional <code>key=value</code> string used to filter objects before listing their IDs. The comparison is a simple string equality check. Declared read-only fields derived from file paths can also be used here.</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="example-5"><a class="header" href="#example-5">Example</a></h2>
+<p>Run the command from the workspace root. If you need to operate on another directory, add the global <code>--root</code> flag.</p>
+<p>List all posts in the quickstart workspace:</p>
+<pre><code class="language-bash">mergeway-cli list --type Post
+</code></pre>
+<p>Output:</p>
+<pre><code>post-001
+</code></pre>
+<p>If an entity uses <code>identifier: $path</code>, the output contains workspace-relative file paths such as <code>data/notes/alpha.yaml</code>. When the entity reads files from outside the workspace root, the identifier may contain <code>../...</code>, for example <code>../secondary/products/widget.yaml</code>.</p>
+<p>Filter by author:</p>
+<pre><code class="language-bash">mergeway-cli list --type Post --filter author=user-alice
+</code></pre>
+<p>Output:</p>
+<pre><code>post-001
+</code></pre>
+<p>Filter by a declared path-derived field:</p>
+<pre><code class="language-bash">mergeway-cli list --type Page --filter 'section=guides'
+</code></pre>
+<p>For inherited entities, querying the parent includes descendant objects:</p>
+<pre><code class="language-bash">mergeway-cli --root examples/inheritance list --type Animal
+</code></pre>
+<p>Output:</p>
+<pre><code>dog-1
+</code></pre>
+<h2 id="related-commands-6"><a class="header" href="#related-commands-6">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-get"><code>mergeway-cli get</code></a> — inspect a specific object.</li>
+<li><a href="#mergeway-cli-create"><code>mergeway-cli create</code></a> — add a new object when an ID is missing.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-files"><a href="#mergeway-cli-files" class="header">mergeway-cli files</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> List included YAML data files, or grouped storage containers, together with their entity types.</p>
+</blockquote>
+<h2 id="usage-7"><a class="header" href="#usage-7">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] files [--type &lt;type&gt;] [--group]
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Flag</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--type</code></td><td>Optional. Restrict output to one entity type.</td></tr>
+<tr><td><code>--group</code></td><td>Optional. Collapse one-object-per-file directories to their wildcard path.</td></tr>
+</tbody>
+</table>
+</div>
+<p>The command only lists YAML-backed files matched by entity <code>include</code> globs. Inline records and JSON files are excluded.</p>
+<h2 id="example-6"><a class="header" href="#example-6">Example</a></h2>
+<p>List every included YAML data file:</p>
+<pre><code class="language-bash">mergeway-cli files
+</code></pre>
+<p>Output:</p>
+<pre><code class="language-yaml">- type: Post
+  file: data/posts/posts.yaml
+- type: Tag
+  file: data/tags/tag-product.yaml
+</code></pre>
+<p>Request JSON output for automation:</p>
+<pre><code class="language-bash">mergeway-cli --format json files --type Tag
+</code></pre>
+<p>Show storage containers instead of every concrete file:</p>
+<pre><code class="language-bash">mergeway-cli files --group
+</code></pre>
+<p>Example output:</p>
+<pre><code class="language-yaml">- type: Post
+  file: data/posts/posts.yaml
+- type: User
+  file: data/users/*.yaml
+</code></pre>
+<h2 id="related-commands-7"><a class="header" href="#related-commands-7">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-list"><code>mergeway-cli list</code></a> — list object identifiers for one type.</li>
+<li><a href="#mergeway-cli-validate"><code>mergeway-cli validate</code></a> — confirm the listed files still contain valid records.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-get"><a href="#mergeway-cli-get" class="header">mergeway-cli get</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Print the fields of one object.</p>
+</blockquote>
+<h2 id="usage-8"><a class="header" href="#usage-8">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] get --type &lt;type&gt; &lt;id&gt;
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Flag</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--type</code></td><td>Required. Type identifier that owns the object. Parent types can also resolve descendant objects.</td></tr>
+<tr><td><code>&lt;id&gt;</code></td><td>Required positional argument representing the object identifier. For entities that use <code>identifier: $path</code>, this is the relative file path ID, which may include <code>../...</code> for records loaded from outside the workspace root.</td></tr>
+</tbody>
+</table>
+</div>
+<p>Use <code>--format json</code> if you prefer JSON output.</p>
+<p>If the schema declares read-only fields derived from the backing file path, <code>get</code> includes those fields in the output.</p>
+<h2 id="example-7"><a class="header" href="#example-7">Example</a></h2>
+<p>Run the command from the workspace root. Use <code>--root</code> if you need to target another workspace.</p>
+<p>Fetch the <code>post-001</code> record as YAML:</p>
+<pre><code class="language-bash">mergeway-cli --format yaml get --type Post post-001
+</code></pre>
+<p>Output:</p>
+<pre><code class="language-yaml">author: user-alice
+body: |
+  We are excited to announce the product launch.
+id: post-001
+title: Launch Day
+</code></pre>
+<p>For path-based identifiers, the lookup uses the file path instead:</p>
+<pre><code class="language-bash">mergeway-cli --format yaml get --type Note data/notes/alpha.yaml
+</code></pre>
+<p>External-root <code>$path</code> records work the same way:</p>
+<pre><code class="language-bash">mergeway-cli --format yaml get --type Product ../secondary/products/widget.yaml
+</code></pre>
+<p>Inherited entities also work through the parent type:</p>
+<pre><code class="language-bash">mergeway-cli --root examples/inheritance --format yaml get --type Animal dog-1
+</code></pre>
+<h2 id="related-commands-8"><a class="header" href="#related-commands-8">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-list"><code>mergeway-cli list</code></a> — discover identifiers before calling <code>get</code>.</li>
+<li><a href="#mergeway-cli-update"><code>mergeway-cli update</code></a> — change object fields.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-create"><a href="#mergeway-cli-create" class="header">mergeway-cli create</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Create a new object file that conforms to an entity definition.</p>
+</blockquote>
+<h2 id="usage-9"><a class="header" href="#usage-9">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] create --type &lt;type&gt; [--file path] [--id value]
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Flag</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--type</code></td><td>Required. Type identifier to create.</td></tr>
+<tr><td><code>--file</code></td><td>Optional path to a YAML/JSON payload. If omitted, data is read from STDIN.</td></tr>
+<tr><td><code>--id</code></td><td>Optional identifier override for field-based identifiers. Required when the entity uses <code>identifier: $path</code>, in which case the value must be the workspace-relative file path to create.</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="example-8"><a class="header" href="#example-8">Example</a></h2>
+<p>Run the command from the workspace root (or pass <code>--root</code> if you are elsewhere). Create a user by piping a YAML document and letting Mergeway write the file under <code>data/users/</code>:</p>
+<pre><code class="language-bash">cat &lt;&lt;'PAYLOAD' &gt; user.yaml
+name: Bob Example
+PAYLOAD
+
+mergeway-cli create --type User --file user.yaml --id user-bob
+</code></pre>
+<p>Output:</p>
+<pre><code>User user-bob created
+</code></pre>
+<p>The command writes <code>data/users/user-bob.yaml</code> with the provided fields. Remove the temporary <code>user.yaml</code> file afterward and run <code>mergeway-cli validate</code> to confirm the new object passes checks.</p>
+<p>When an entity uses <code>identifier: $path</code>, pass the target file path with <code>--id</code>, for example <code>--id data/notes/alpha.yaml</code>. Mergeway uses that workspace-relative path as the object ID and does not persist a <code>$path</code> field into the file.</p>
+<p><code>create</code> only writes inside the workspace root. If a type loads records from an external path such as <code>../secondary/products/*.yaml</code>, you can still list, get, validate, and export those records, but <code>create</code> will reject IDs that point outside the workspace root.</p>
+<h2 id="related-commands-9"><a class="header" href="#related-commands-9">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-update"><code>mergeway-cli update</code></a> — modify an existing object.</li>
+<li><a href="#mergeway-cli-delete"><code>mergeway-cli delete</code></a> — remove an object.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-update"><a href="#mergeway-cli-update" class="header">mergeway-cli update</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Modify an existing object. You can replace the object entirely or merge in a subset of fields.</p>
+</blockquote>
+<h2 id="usage-10"><a class="header" href="#usage-10">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] update --type &lt;type&gt; --id &lt;id&gt; [--file path] [--merge]
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Flag</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--type</code></td><td>Required. Type identifier.</td></tr>
+<tr><td><code>--id</code></td><td>Required. Object identifier to update. For entities that use <code>identifier: $path</code>, this is the workspace-relative file path.</td></tr>
+<tr><td><code>--file</code></td><td>Optional path to a YAML/JSON payload (defaults to STDIN).</td></tr>
+<tr><td><code>--merge</code></td><td>Merge fields into the existing object instead of replacing it.</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="example-9"><a class="header" href="#example-9">Example</a></h2>
+<p>Run the command from the workspace root (or add <code>--root</code> to target another workspace). Update a post title by merging in a tiny payload:</p>
+<pre><code class="language-bash">cat &lt;&lt;'PAYLOAD' &gt; post-update.yaml
+title: Launch Day (Updated)
+PAYLOAD
+
+mergeway-cli update --type Post --id post-001 --file post-update.yaml --merge
+</code></pre>
+<p>Output:</p>
+<pre><code>Post post-001 updated
+</code></pre>
+<p>Run <code>mergeway-cli validate</code> after significant updates to confirm references still resolve. Without <code>--merge</code>, the payload replaces the entire object.</p>
+<p>For entities that use <code>identifier: $path</code>, pass the workspace-relative file path to <code>--id</code>, for example <code>mergeway-cli update --type Note --id data/notes/alpha.yaml --file note.yaml --merge</code>.</p>
+<p>If the resolved record lives outside the workspace root, <code>update</code> rejects it. External-root <code>$path</code> records are intentionally read-only through the CLI even though they can still be listed, fetched, validated, and exported.</p>
+<h2 id="related-commands-10"><a class="header" href="#related-commands-10">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-create"><code>mergeway-cli create</code></a> — add new objects.</li>
+<li><a href="#mergeway-cli-delete"><code>mergeway-cli delete</code></a> — remove objects that are no longer needed.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-delete"><a href="#mergeway-cli-delete" class="header">mergeway-cli delete</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Remove an object file from the workspace.</p>
+</blockquote>
+<h2 id="usage-11"><a class="header" href="#usage-11">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] delete --type &lt;type&gt; &lt;id&gt;
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Flag</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--type</code></td><td>Required. Type identifier.</td></tr>
+<tr><td><code>&lt;id&gt;</code></td><td>Required positional argument identifying the object to delete. For entities that use <code>identifier: $path</code>, this is the workspace-relative file path.</td></tr>
+</tbody>
+</table>
+</div>
+<p>The command prompts for confirmation unless you pass the global <code>--yes</code> flag.</p>
+<p>Global flags (like <code>--yes</code> or <code>--root</code>) can appear before or after the command name.</p>
+<h2 id="example-10"><a class="header" href="#example-10">Example</a></h2>
+<p>Run the command from the workspace root (or add <code>--root</code> to target another workspace). Delete a user without prompting:</p>
+<pre><code class="language-bash">mergeway-cli --yes delete --type User user-bob
+</code></pre>
+<p>Output:</p>
+<pre><code>User user-bob deleted
+</code></pre>
+<p>For path-based identifiers, delete by file path:</p>
+<pre><code class="language-bash">mergeway-cli --yes delete --type Note data/notes/alpha.yaml
+</code></pre>
+<p>Like <code>create</code> and <code>update</code>, <code>delete</code> only operates on files inside the workspace root. If a <code>$path</code> record comes from an external include such as <code>../secondary/products/widget.yaml</code>, you can inspect and export it, but <code>delete</code> will reject that identifier.</p>
+<h2 id="related-commands-11"><a class="header" href="#related-commands-11">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-list"><code>mergeway-cli list</code></a> — confirm an object’s identifier before deleting.</li>
+<li><a href="#mergeway-cli-create"><code>mergeway-cli create</code></a> — recreate an object if you delete the wrong one.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-gen-erd"><a href="#mergeway-cli-gen-erd" class="header">mergeway-cli gen-erd</a></h1>
+<p>Generates an Entity Relationship Diagram (ERD) of your data model.</p>
+<pre><code class="language-bash">mergeway-cli gen-erd --path &lt;output-file&gt;
+</code></pre>
+<p>This command inspects your configuration and generates a visual representation of your entities and their relationships. It relies on <a href="https://graphviz.org/">Graphviz</a> (specifically the <code>dot</code> command) to produce the output image.</p>
+<h2 id="arguments"><a class="header" href="#arguments">Arguments</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Argument</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--path</code></td><td><strong>Required.</strong> The path where the generated image will be saved. The file extension determines the output format (e.g., .png, .svg).</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="examples-1"><a class="header" href="#examples-1">Examples</a></h2>
+<p>Generate a PNG image of your schema:</p>
+<pre><code class="language-bash">mergeway-cli gen-erd --path schema.png
+</code></pre>
+<p>Generate an SVG:</p>
+<pre><code class="language-bash">mergeway-cli gen-erd --path schema.svg
+</code></pre>
+<p>Example output, based on the <a href="https://github.com/mergewayhq/mergeway-cli/tree/main/examples/full">full example</a>:</p>
+<p><img src="cli-reference/assets/erd-example-full.png" alt="ERD of the full example"></p>
+<h2 id="requirements"><a class="header" href="#requirements">Requirements</a></h2>
+<p>The <code>dot</code> executable from <a href="https://graphviz.org/">Graphviz</a> needs to be installed and available in your system’s PATH.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-export"><a href="#mergeway-cli-export" class="header">mergeway-cli export</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Export repository objects into a single JSON or YAML document.</p>
+</blockquote>
+<h2 id="usage-12"><a class="header" href="#usage-12">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] export [--output &lt;path&gt;] [entity...]
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Flag</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--output</code></td><td>Optional path to write the exported document. Defaults to STDOUT.</td></tr>
+<tr><td><code>entity...</code></td><td>Optional list of type names to include. Omitting the list exports every entity defined in the workspace.</td></tr>
+</tbody>
+</table>
+</div>
+<p>The export format matches the global <code>--format</code> flag (<code>yaml</code> by default).</p>
+<h2 id="examples-2"><a class="header" href="#examples-2">Examples</a></h2>
+<p>Export every entity in the repository as YAML to the terminal:</p>
+<pre><code class="language-bash">mergeway-cli export
+</code></pre>
+<p>Export only the <code>User</code> and <code>Post</code> entities as JSON into a file:</p>
+<pre><code class="language-bash">mergeway-cli --format json export --output snapshot.json User Post
+</code></pre>
+<p>Each top-level key in the output map is the entity name; the value is an array of records sorted by ID.</p>
+<p>If the schema declares read-only fields derived from the backing file path, those fields appear in the exported payload.</p>
+<p>Entities that use <code>identifier: $path</code> can also be exported when their include paths point outside the workspace root. In that case the record IDs and any declared path-derived fields still resolve from those external file paths, including <code>../...</code> when needed.</p>
+<h2 id="related-commands-12"><a class="header" href="#related-commands-12">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-list"><code>mergeway-cli list</code></a> — inspect available identifiers before exporting.</li>
+<li><a href="#mergeway-cli-get"><code>mergeway-cli get</code></a> — fetch a single object instead of the full dataset.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-cli-version"><a href="#mergeway-cli-version" class="header">mergeway-cli version</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Display the CLI build metadata (semantic version, commit, build date).</p>
+</blockquote>
+<h2 id="usage-13"><a class="header" href="#usage-13">Usage</a></h2>
+<pre><code class="language-bash">mergeway-cli [global flags] version
+</code></pre>
+<p>No additional flags.</p>
+<p>This command does not touch workspace files; global flags like <code>--root</code> are ignored.</p>
+<h2 id="example-11"><a class="header" href="#example-11">Example</a></h2>
+<pre><code class="language-bash">mergeway-cli --format json version
+</code></pre>
+<p>Output:</p>
+<pre><code class="language-json">{
+  "version": "0.8.0",
+  "commit": "a713be5",
+  "buildDate": "2025-10-22T18:25:03Z"
+}
+</code></pre>
+<p>Values change with each build; use the command to confirm which binary produced a validation report or data change.</p>
+<h2 id="related-commands-13"><a class="header" href="#related-commands-13">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-validate"><code>mergeway-cli validate</code></a> — include the CLI version in validation artifacts for traceability.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-diff-reference"><a href="#mergeway-diff-reference" class="header">mergeway-diff Reference</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Compare Mergeway-managed data between logical repository snapshots.</p>
+</blockquote>
+<h2 id="usage-14"><a class="header" href="#usage-14">Usage</a></h2>
+<pre><code class="language-bash">mergeway-diff [flags]
+mergeway-diff [flags] &lt;left&gt;
+mergeway-diff [flags] &lt;left&gt; &lt;right&gt;
+mergeway-diff --format json [&lt;left&gt;] [&lt;right&gt;]
+</code></pre>
+<p><code>mergeway-diff</code> is a standalone binary. It does not accept <code>mergeway-cli</code> subcommands.</p>
+<h2 id="flags"><a class="header" href="#flags">Flags</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Flag</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--root</code></td><td>Path to the workspace (defaults to <code>.</code>).</td></tr>
+<tr><td><code>--config</code></td><td>Explicit path to <code>mergeway.yaml</code> (defaults to <code>&lt;root&gt;/mergeway.yaml</code>).</td></tr>
+<tr><td><code>--format</code></td><td>Output format (<code>yaml</code> or <code>json</code>, default <code>yaml</code>).</td></tr>
+</tbody>
+</table>
+</div>
+<p>This command is a data-only diff. It compares Mergeway-managed records across the repository and excludes configuration entirely.</p>
+<p>Snapshot interpretation:</p>
+<ul>
+<li><code>mergeway-diff</code> compares <code>HEAD</code> data against current working tree data using unstaged changes only.</li>
+<li><code>mergeway-diff &lt;left&gt;</code> compares <code>&lt;left&gt;</code> against the current working tree state including unstaged changes.</li>
+<li><code>mergeway-diff &lt;left&gt; &lt;right&gt;</code> compares <code>&lt;left&gt;</code> against <code>&lt;right&gt;</code>.</li>
+</ul>
+<p>Passing more than two positional arguments is an error.</p>
+<h2 id="examples-3"><a class="header" href="#examples-3">Examples</a></h2>
+<p>Compare the current <code>HEAD</code> data against unstaged local changes:</p>
+<pre><code class="language-bash">mergeway-diff
+</code></pre>
+<p>Compare an earlier revision against the full current working tree:</p>
+<pre><code class="language-bash">mergeway-diff HEAD~1
+</code></pre>
+<p>Emit machine-readable output for automation:</p>
+<pre><code class="language-bash">mergeway-diff --format json HEAD~1 HEAD
+</code></pre>
+<h2 id="notes"><a class="header" href="#notes">Notes</a></h2>
+<ul>
+<li>The command reports semantic record changes, not path-based Git file diffs.</li>
+<li>Output is intentionally simple for now and may be refined in a later phase.</li>
+<li><code>mergeway-diff &lt;left&gt;</code> includes both staged and unstaged working tree changes on the right-hand side.</li>
+<li><code>mergeway-diff &lt;left&gt; &lt;right&gt;</code> compares two explicit revisions and ignores local working tree noise.</li>
+</ul>
+<h2 id="related-commands-14"><a class="header" href="#related-commands-14">Related Commands</a></h2>
+<ul>
+<li><a href="#mergeway-cli-export"><code>mergeway-cli export</code></a> — inspect repository data in a serialized form.</li>
+<li><a href="#mergeway-cli-validate"><code>mergeway-cli validate</code></a> — validate the current repository state before comparing revisions.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-lsp-reference"><a href="#mergeway-lsp-reference" class="header">mergeway-lsp Reference</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Run the Mergeway Language Server Protocol server over stdio.</p>
+</blockquote>
+<h2 id="usage-15"><a class="header" href="#usage-15">Usage</a></h2>
+<pre><code class="language-bash">mergeway-lsp [flags]
+</code></pre>
+<p><code>mergeway-lsp</code> is a standalone binary. It does not read <code>mergeway-cli</code> global flags such as <code>--root</code> or <code>--format</code>.</p>
+<h2 id="flags-1"><a class="header" href="#flags-1">Flags</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Flag</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--log-file</code></td><td>Write server logs to the given file path.</td></tr>
+<tr><td><code>--log-level</code></td><td>Set the log level: <code>debug</code>, <code>info</code>, <code>warn</code>, or <code>error</code>.</td></tr>
+<tr><td><code>--log-stderr</code></td><td>Write server logs to stderr instead of discarding them.</td></tr>
+</tbody>
+</table>
+</div>
+<p>If you omit all logging flags, the server stays quiet and reserves stdout for JSON-RPC traffic.</p>
+<h2 id="examples-4"><a class="header" href="#examples-4">Examples</a></h2>
+<p>Start the server and wait for framed LSP messages on stdin:</p>
+<pre><code class="language-bash">mergeway-lsp
+</code></pre>
+<p>Enable debug logging on stderr while testing a client manually:</p>
+<pre><code class="language-bash">mergeway-lsp --log-stderr --log-level=debug
+</code></pre>
+<p>Write logs to a file instead of stderr:</p>
+<pre><code class="language-bash">mergeway-lsp --log-file /tmp/mergeway-lsp.log --log-level=debug
+</code></pre>
+<h2 id="environment-variables"><a class="header" href="#environment-variables">Environment Variables</a></h2>
+<p>The server accepts environment-variable equivalents for its logging settings:</p>
+<ul>
+<li><code>MERGEWAY_LSP_LOG_FILE=/tmp/mergeway-lsp.log</code></li>
+<li><code>MERGEWAY_LSP_LOG_LEVEL=debug</code></li>
+<li><code>MERGEWAY_LSP_LOG_STDERR=1</code></li>
+</ul>
+<p>Command-line flags take precedence over environment variables when both are set.</p>
+<h2 id="notes-1"><a class="header" href="#notes-1">Notes</a></h2>
+<ul>
+<li>Keep stdout protocol-only. Human-readable output on stdout will break editor integration.</li>
+<li>In normal use, your editor launches <code>mergeway-lsp</code> for you rather than you starting it by hand.</li>
+<li>The server discovers Mergeway roots from the files the editor opens and uses the same validation core as <code>mergeway-cli validate</code>.</li>
+</ul>
+<h2 id="related-pages-1"><a class="header" href="#related-pages-1">Related Pages</a></h2>
+<ul>
+<li><a href="#run-mergeway-lsp-manually">Run mergeway-lsp manually</a> — startup basics and current capabilities.</li>
+<li><a href="#set-up-mergeway-lsp-in-vs-code-and-neovim">Set up mergeway-lsp in VS Code and Neovim</a> — editor wiring examples.</li>
+<li><a href="#mergeway-cli-validate"><code>mergeway-cli validate</code></a> — compare editor diagnostics with CLI validation output.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mergeway-mcp-reference"><a href="#mergeway-mcp-reference" class="header">mergeway-mcp Reference</a></h1>
+<blockquote>
+<p><strong>Synopsis:</strong> Run the Mergeway read-only MCP server for repository inspection.</p>
+</blockquote>
+<h2 id="usage-16"><a class="header" href="#usage-16">Usage</a></h2>
+<pre><code class="language-bash">mergeway-mcp [flags]
+</code></pre>
+<p><code>mergeway-mcp</code> is a standalone binary. It does not run through <code>mergeway-cli</code>, and it does not expose any mutation workflow.</p>
+<h2 id="flags-2"><a class="header" href="#flags-2">Flags</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Flag</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--root</code></td><td>Root folder of the Mergeway repository (defaults to <code>.</code>).</td></tr>
+<tr><td><code>--transport</code></td><td>MCP transport: <code>stdio</code> or <code>http</code> (defaults to <code>stdio</code>).</td></tr>
+<tr><td><code>--http-listen</code></td><td>Listen address for HTTP transport (defaults to <code>127.0.0.1:8080</code>).</td></tr>
+<tr><td><code>--http-base-path</code></td><td>Base path for HTTP transport (defaults to <code>/</code>). Only valid with <code>--transport=http</code>.</td></tr>
+<tr><td><code>--entity</code></td><td>Allow only the named exact entity. Repeat the flag to build an allow-list.</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="behavior"><a class="header" href="#behavior">Behavior</a></h2>
+<ul>
+<li>The server is read-only. It exposes repository inspection tools and does not support create, update, or delete operations.</li>
+<li><code>--entity</code> uses exact entity names. Allowing <code>Animal</code> does not implicitly expose <code>Dog</code>.</li>
+<li>Repository state reloads on each request, so changes made after server startup become visible on later calls.</li>
+<li>In <code>stdio</code> mode, keep stdout protocol-only. Any extra text written to stdout will break the MCP session.</li>
+</ul>
+<h2 id="examples-5"><a class="header" href="#examples-5">Examples</a></h2>
+<p>Start the default stdio server rooted at the current repository:</p>
+<pre><code class="language-bash">mergeway-mcp
+</code></pre>
+<p>Point the server at a different repository root:</p>
+<pre><code class="language-bash">mergeway-mcp --root examples/full
+</code></pre>
+<p>Expose only the <code>User</code> and <code>Post</code> entities to the client:</p>
+<pre><code class="language-bash">mergeway-mcp --root examples/full --entity User --entity Post
+</code></pre>
+<p>Serve the MCP endpoint over HTTP on the default local address:</p>
+<pre><code class="language-bash">mergeway-mcp --root examples/full --transport=http
+</code></pre>
+<p>Serve HTTP from a custom mount path:</p>
+<pre><code class="language-bash">mergeway-mcp --root examples/full --transport=http --http-listen 127.0.0.1:9090 --http-base-path /mcp
+</code></pre>
+<h2 id="tool-surface"><a class="header" href="#tool-surface">Tool Surface</a></h2>
+<p>The initial tool set is intentionally narrow and read-only:</p>
+<ul>
+<li><code>entity_list</code></li>
+<li><code>entity_show</code></li>
+<li><code>object_list</code></li>
+<li><code>object_get</code></li>
+<li><code>repository_export</code></li>
+<li><code>files_list</code></li>
+</ul>
+<p>Clients should treat these tool names and their structured responses as the supported inspection surface.</p>
+<h2 id="notes-2"><a class="header" href="#notes-2">Notes</a></h2>
+<ul>
+<li>Use <code>stdio</code> for MCP clients that launch <code>mergeway-mcp</code> as a subprocess.</li>
+<li>Use <code>http</code> when the client expects a streamable HTTP endpoint.</li>
+<li>Bad flag combinations fail before the server starts. For example, <code>--http-listen</code> and <code>--http-base-path</code> require <code>--transport=http</code>.</li>
+</ul>
+<h2 id="related-pages-2"><a class="header" href="#related-pages-2">Related Pages</a></h2>
+<ul>
+<li><a href="#installation">Install Mergeway</a> — release, Go, and source installation paths.</li>
+<li><a href="#use-mergeway-mcp-with-claude-and-codex">Use mergeway-mcp with Claude and Codex</a> — stdio client setup examples.</li>
+<li><a href="cli-reference/README.html">mergeway-cli Reference</a> — repository management and CRUD commands.</li>
+<li><a href="#mergeway-lsp-reference">mergeway-lsp Reference</a> — compare the MCP server with the editor-facing LSP binary.</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr-ef4e11c1.min.js"></script>
+        <script src="mark-09e88c2c.min.js"></script>
+        <script src="searcher-c2a407aa.js"></script>
+
+        <script src="clipboard-1626706a.min.js"></script>
+        <script src="highlight-abc7f01d.js"></script>
+        <script src="book-a0b12cfe.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>
