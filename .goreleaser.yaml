@@ -54,6 +54,23 @@ builds:
       - arm64
     ldflags:
       - -s -w
+  - id: mcp
+    binary: mergeway-mcp
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/mergeway-mcp
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/mergewayhq/mergeway-cli/internal/version.Number={{.Version}}
+      - -X github.com/mergewayhq/mergeway-cli/internal/version.Commit={{.Commit}}
+      - -X github.com/mergewayhq/mergeway-cli/internal/version.BuildDate={{.Date}}
 
 dockers_v2:
   - id: container

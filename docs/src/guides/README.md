@@ -8,3 +8,5 @@ weight: 30
 The how-to guides capture focused, task-oriented recipes for Mergeway users. Each guide assumes you already understand the core concepts and need a concrete sequence of steps to accomplish a specific outcome, such as enforcing formatting in CI or wiring Mergeway into deployment automation.
 
 For editor integration, start with [Set up mergeway-lsp in VS Code and Neovim](setup-mergeway-lsp-editors.md).
+
+For MCP client setup, see [Use mergeway-mcp with Claude and Codex](use-mergeway-mcp-with-claude-and-codex.md).

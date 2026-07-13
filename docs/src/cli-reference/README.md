@@ -45,4 +45,4 @@ For more information on the schema, please consult the [Schema Format](../gettin
 - [`delete`](delete.md)
 - [`export`](export.md)
 
-For the other binaries, see [mergeway-diff Reference](diff.md) and [mergeway-lsp Reference](lsp.md). Need a refresher on terminology? See the [Basic Concepts](../getting-started/README.md) page.
+For the other binaries, see [mergeway-diff Reference](diff.md), [mergeway-lsp Reference](lsp.md), and [mergeway-mcp Reference](mcp.md). Need a refresher on terminology? See the [Basic Concepts](../getting-started/README.md) page.

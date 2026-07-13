@@ -1,6 +1,6 @@
 # Mergeway CLI
 
-`mergeway-cli` is a command-line toolkit for keeping metadata in version control. It stores YAML and JSON objects on disk, validates their schemas, and verifies the integrity of relationships between those objects so your automation stays trustworthy. This repository also ships `mergeway-diff` for semantic repository snapshots and `mergeway-lsp`, a stdio language server for editor integrations.
+`mergeway-cli` is a command-line toolkit for keeping metadata in version control. It stores YAML and JSON objects on disk, validates their schemas, and verifies the integrity of relationships between those objects so your automation stays trustworthy. This repository also ships `mergeway-diff` for semantic repository snapshots, `mergeway-lsp` for editor integrations, and `mergeway-mcp` as a read-only MCP server for repository inspection workflows.
 
 For full product and documentation coverage, visit:
 
@@ -36,6 +36,14 @@ go install github.com/mergewayhq/mergeway-cli@latest
 
 Ensure your `GOBIN` (or `GOPATH/bin`) is on `PATH`, then confirm with `mergeway-cli version`.
 
+This installs `mergeway-cli`. Install the other binaries separately if needed:
+
+```bash
+go install github.com/mergewayhq/mergeway-cli/cmd/mergeway-diff@latest
+go install github.com/mergewayhq/mergeway-cli/cmd/mergeway-lsp@latest
+go install github.com/mergewayhq/mergeway-cli/cmd/mergeway-mcp@latest
+```
+
 ### Using Docker
 
 ```bash
@@ -68,11 +76,12 @@ nix run github:mergewayhq/mergeway-cli -- help
 
 ### Download a Release Binary
 
-Each GitHub release publishes macOS, Linux, and Windows assets for `amd64` and `arm64`, covering `mergeway-cli`, `mergeway-diff`, and `mergeway-lsp`.
+Each GitHub release publishes macOS, Linux, and Windows assets for `amd64` and `arm64`, covering `mergeway-cli`, `mergeway-diff`, `mergeway-lsp`, and `mergeway-mcp`.
 
 - Put `mergeway-cli` on `PATH` for CLI use.
 - Put `mergeway-diff` on `PATH` for semantic diff workflows.
 - Put `mergeway-lsp` on `PATH` for editor integration.
+- Put `mergeway-mcp` on `PATH` for MCP client integrations.
 - The published container image remains CLI-only.
 
 ### Build from Source
@@ -84,6 +93,7 @@ make build
 ./bin/mergeway-cli version
 ./bin/mergeway-diff --help
 ./bin/mergeway-lsp --log-stderr --log-level=debug
+./bin/mergeway-mcp --help
 ```
 
 ## Semantic Diff
@@ -112,6 +122,19 @@ Current limitations:
 - The VS Code extension currently expects you to install or build `mergeway-lsp` yourself and point `mergeway.lsp.path` at it.
 - The LSP currently uses full-document sync.
 - The Docker image contains `mergeway-cli` only.
+
+## MCP Server
+
+`mergeway-mcp` exposes a read-only Model Context Protocol server for inspecting a Mergeway repository.
+
+- Build it locally with `make build` or `make build-mcp`, or extract it from a release archive.
+- Use stdio by default for MCP clients that launch a subprocess.
+- Use `--transport=http` when you need a streamable HTTP endpoint instead.
+- Scope access with repeated `--entity` flags when a client should only see specific exact entity names.
+- The server does not allow create, update, or delete operations.
+- MCP startup and flags are documented here:
+  - [mergeway-mcp reference](docs/src/cli-reference/mcp.md)
+  - [setup for Claude and Codex](docs/src/guides/use-mergeway-mcp-with-claude-and-codex.md)
 
 ## Quick Start
 

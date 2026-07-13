@@ -10,6 +10,7 @@
   - [Getting Started with Mergeway CLI Using the Example Repository](guides/example-repo.md)
   - [Using JSON Schema & JSONPath in Mergeway](guides/json-schema.md)
   - [Set up mergeway-lsp in VS Code and Neovim](guides/setup-mergeway-lsp-editors.md)
+  - [Use mergeway-mcp with Claude and Codex](guides/use-mergeway-mcp-with-claude-and-codex.md)
   - [Set Up Mergeway with GitHub](guides/setup-mergeway-github.md)
   - [Enforce Mergeway Formatting with pre-commit](guides/setup-mergeway-pre-commit.md)
   - [Communicate Repository Changes with mergeway-diff](guides/communicate-changes-with-diff.md)
@@ -31,3 +32,4 @@
   - [`mergeway-cli version`](cli-reference/version.md)
 - [mergeway-diff Reference](cli-reference/diff.md)
 - [mergeway-lsp Reference](cli-reference/lsp.md)
+- [mergeway-mcp Reference](cli-reference/mcp.md)

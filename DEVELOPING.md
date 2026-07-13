@@ -6,7 +6,7 @@ Use this guide when you are extending the CLI itself. For installation and every
 
 ### Required
 
-- **Go 1.24.x** (the project targets Go 1.24.x)
+- **Go 1.25.x** (the project currently targets Go 1.25.x)
 - **devenv** (optional, but recommended for a consistent development environment via `devenv shell`)
 
 ### Optional
@@ -30,7 +30,7 @@ direnv allow
 ```
 
 The devenv.sh environment includes:
-- Go 1.24.x
+- Go 1.25.x
 - golangci-lint
 - mdbook and mdbook-gitinfo
 - graphviz (for ERD generation)
@@ -40,7 +40,7 @@ The devenv.sh environment includes:
 ### Without devenv
 
 Install the prerequisites manually:
-- Install Go 1.24.x
+- Install Go 1.25.x
 - Install golangci-lint v2.4.0 or newer
 - Install mdbook if working on documentation
 - Install graphviz if using the `gen-erd` command
@@ -50,6 +50,7 @@ Install the prerequisites manually:
 - `cmd/mergeway-cli/main.go` is the CLI entrypoint that wires flags into internal packages
 - `cmd/mergeway-diff/main.go` is the semantic diff entrypoint
 - `cmd/mergeway-lsp/main.go` is the stdio language server entrypoint
+- `cmd/mergeway-mcp/main.go` is the standalone MCP server entrypoint
 - `internal/` contains shared packages that power metadata handling and integrity checks
 - `pkg/` contains public packages
 - `examples/` stores sample configuration and data for demos and local tests
@@ -93,9 +94,10 @@ If you add an editor-facing feature, prefer extending shared workspace/index hel
 
 ### Building
 
-- `make build` produces `bin/mergeway-cli`, `bin/mergeway-diff`, and `bin/mergeway-lsp`
+- `make build` produces `bin/mergeway-cli`, `bin/mergeway-diff`, `bin/mergeway-lsp`, and `bin/mergeway-mcp`
+- `make build-mcp` builds only `bin/mergeway-mcp`
 - The CLI build includes Git commit hash and build timestamp via `-ldflags`
-- GoReleaser release assets cover all three binaries for each supported platform
+- GoReleaser release assets cover all four binaries for each supported platform
 
 ### Documentation
 
@@ -131,8 +133,8 @@ The project uses [GoReleaser](https://goreleaser.com/) for automated releases:
    git push origin vX.Y.Z
    ```
 4. GitHub Actions automatically:
-   - Builds `mergeway-cli`, `mergeway-diff`, and `mergeway-lsp` for Linux, macOS, and Windows on `amd64` and `arm64`
-   - Creates release assets (`.tar.gz` for Unix, `.zip` for Windows) for all three binaries
+   - Builds `mergeway-cli`, `mergeway-diff`, `mergeway-lsp`, and `mergeway-mcp` for Linux, macOS, and Windows on `amd64` and `arm64`
+   - Creates release assets (`.tar.gz` for Unix, `.zip` for Windows) for all four binaries
    - Generates checksums
    - Publishes the release with all assets
    - Builds and publishes the CLI-only GHCR image
@@ -146,3 +148,11 @@ See `.github/workflows/release.yml` and `.goreleaser.yaml` for configuration det
 - Use `./bin/mergeway-lsp --log-stderr --log-level=debug` for local debugging.
 - Use `MERGEWAY_LSP_LOG_FILE=/tmp/mergeway-lsp.log` when you want logs without mixing them into editor stderr capture.
 - Protocol regression coverage lives in `internal/lsp/*_test.go`; prefer adding fixture-driven tests there for new editor features.
+
+## MCP Debugging
+
+- Keep stdout protocol-only when running `mergeway-mcp` with the default stdio transport.
+- Use `./bin/mergeway-mcp --help` to verify flag wiring quickly.
+- Use `./bin/mergeway-mcp --root examples/full --entity User` for a constrained local test target.
+- Use `./bin/mergeway-mcp --root examples/full --transport=http --http-listen 127.0.0.1:8080 --http-base-path /` when you need to exercise the HTTP transport locally.
+- Protocol regression coverage lives in `internal/mcp/*_test.go`; prefer adding fixture-driven tests there for tool, transport, and policy changes.

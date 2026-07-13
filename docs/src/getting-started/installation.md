@@ -1,7 +1,7 @@
 ---
 title: "Install Mergeway CLI"
 linkTitle: "Installation"
-description: "Install mergeway-cli, mergeway-diff, and mergeway-lsp from a release archive, Docker, Go, Nix, or source."
+description: "Install mergeway-cli, mergeway-diff, mergeway-lsp, and mergeway-mcp from a release archive, Docker, Go, Nix, or source."
 weight: 15
 ---
 
@@ -13,7 +13,7 @@ GitHub releases publish platform assets for:
 
 - Linux, macOS, and Windows
 - `amd64` and `arm64`
-- `mergeway-cli`, `mergeway-diff`, and `mergeway-lsp`
+- `mergeway-cli`, `mergeway-diff`, `mergeway-lsp`, and `mergeway-mcp`
 
 Download the asset or assets for your platform from the latest release page, then install the extracted binaries you need:
 
@@ -21,9 +21,10 @@ Download the asset or assets for your platform from the latest release page, the
 install -m 0755 mergeway-cli /usr/local/bin/mergeway-cli
 install -m 0755 mergeway-diff /usr/local/bin/mergeway-diff
 install -m 0755 mergeway-lsp /usr/local/bin/mergeway-lsp
+install -m 0755 mergeway-mcp /usr/local/bin/mergeway-mcp
 ```
 
-Put `mergeway-cli` on `PATH` for terminal use, `mergeway-diff` on `PATH` for semantic snapshot workflows, and `mergeway-lsp` on `PATH` for editor integration.
+Put `mergeway-cli` on `PATH` for terminal use, `mergeway-diff` on `PATH` for semantic snapshot workflows, `mergeway-lsp` on `PATH` for editor integration, and `mergeway-mcp` on `PATH` for MCP client integrations.
 
 ## Option 2: Docker
 
@@ -41,7 +42,7 @@ docker run --rm \
   ghcr.io/mergewayhq/mergeway-cli validate
 ```
 
-The container image does **not** include `mergeway-diff` or `mergeway-lsp`.
+The container image does **not** include `mergeway-diff`, `mergeway-lsp`, or `mergeway-mcp`.
 
 ## Option 3: Go Install
 
@@ -54,6 +55,7 @@ This installs `mergeway-cli`. Install the other binaries separately if needed:
 ```bash
 go install github.com/mergewayhq/mergeway-cli/cmd/mergeway-diff@latest
 go install github.com/mergewayhq/mergeway-cli/cmd/mergeway-lsp@latest
+go install github.com/mergewayhq/mergeway-cli/cmd/mergeway-mcp@latest
 ```
 
 ## Option 4: Nix
@@ -70,7 +72,7 @@ Or run it directly:
 nix run github:mergewayhq/mergeway-cli -- help
 ```
 
-The flake path is currently oriented around the CLI. Use a release archive or a local source build if you also need `mergeway-diff` or `mergeway-lsp`.
+The flake path is currently oriented around the CLI. Use a release archive or a local source build if you also need `mergeway-diff`, `mergeway-lsp`, or `mergeway-mcp`.
 
 ## Option 5: Build from Source
 
@@ -81,9 +83,10 @@ make build
 ./bin/mergeway-cli version
 ./bin/mergeway-diff --help
 ./bin/mergeway-lsp --log-stderr --log-level=debug
+./bin/mergeway-mcp --help
 ```
 
-`make build` produces all three binaries under `bin/`.
+`make build` produces all four binaries under `bin/`.
 
 ## Supported Platforms
 
@@ -97,8 +100,11 @@ make build
 mergeway-cli version
 mergeway-diff --help
 mergeway-lsp --log-stderr --log-level=debug
+mergeway-mcp --help
 ```
 
 If the language server starts successfully, it waits for LSP input on stdin. Stop it with `Ctrl+C`.
+
+If the MCP server starts successfully in stdio mode, it waits for MCP traffic on stdin and reserves stdout for protocol messages. Stop it with `Ctrl+C`.
 
 For manual startup and editor wiring, continue with [Run mergeway-lsp manually](language-server.md).
