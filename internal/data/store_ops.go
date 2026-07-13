@@ -29,6 +29,22 @@ func (s *Store) List(typeName string) ([]string, error) {
 	return ids, nil
 }
 
+// ListExact returns sorted identifiers for objects declared exactly as the specified type.
+func (s *Store) ListExact(typeName string) ([]string, error) {
+	objects, err := s.LoadExactAll(typeName)
+	if err != nil {
+		return nil, err
+	}
+
+	ids := make([]string, 0, len(objects))
+	for _, obj := range objects {
+		ids = append(ids, obj.ID)
+	}
+
+	sort.Strings(ids)
+	return ids, nil
+}
+
 // Get returns the object by identifier.
 func (s *Store) Get(typeName, id string) (*Object, error) {
 	if id == "" {
@@ -64,6 +80,37 @@ func (s *Store) Get(typeName, id string) (*Object, error) {
 	return obj, nil
 }
 
+// GetExact returns the object by identifier, restricting the lookup to objects declared exactly as typeName.
+func (s *Store) GetExact(typeName, id string) (*Object, error) {
+	if id == "" {
+		return nil, errors.New("data: id is required")
+	}
+	typeDef, err := s.requireType(typeName)
+	if err != nil {
+		return nil, err
+	}
+	id, err = normalizeLookupID(typeDef, id)
+	if err != nil {
+		return nil, err
+	}
+
+	loc, err := s.findExactObject(typeDef, id)
+	if err != nil {
+		return nil, err
+	}
+	if loc == nil {
+		return nil, fmt.Errorf("data: %s %q not found", typeName, id)
+	}
+
+	obj := loc.cloneObject()
+	fields, err := s.fieldsWithDerivedValues(typeDef, obj.File, obj.Fields)
+	if err != nil {
+		return nil, err
+	}
+	obj.Fields = fields
+	return obj, nil
+}
+
 // LoadAll retrieves all objects of a type.
 func (s *Store) LoadAll(typeName string) ([]*Object, error) {
 	typeDef, err := s.requireType(typeName)
@@ -72,6 +119,25 @@ func (s *Store) LoadAll(typeName string) ([]*Object, error) {
 	}
 
 	objs, err := s.loadAll(typeDef)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*Object, len(objs))
+	for i, obj := range objs {
+		result[i] = obj.clone()
+	}
+	return result, nil
+}
+
+// LoadExactAll retrieves all objects declared exactly as typeName.
+func (s *Store) LoadExactAll(typeName string) ([]*Object, error) {
+	typeDef, err := s.requireType(typeName)
+	if err != nil {
+		return nil, err
+	}
+
+	objs, err := s.loadExactAll(typeDef)
 	if err != nil {
 		return nil, err
 	}
