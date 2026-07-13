@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"strings"
 	"testing"
 )
 
@@ -72,8 +71,8 @@ func TestServiceObjectGetRejectsDescendantLookupThroughParentEntity(t *testing.T
 	}
 
 	_, err = service.ObjectGet("Animal", "dog-1")
-	if err == nil || !strings.Contains(err.Error(), `Animal "dog-1" not found`) {
-		t.Fatalf("expected exact entity miss, got %v", err)
+	if err == nil || !errors.Is(err, ErrObjectNotFound) {
+		t.Fatalf("expected exact entity miss sentinel, got %v", err)
 	}
 }
 

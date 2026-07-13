@@ -19,6 +19,8 @@ var (
 	ErrUnknownEntity = errors.New("mcp: unknown entity")
 	// ErrEntityNotAllowed reports that the requested entity is blocked by the configured allow-list.
 	ErrEntityNotAllowed = errors.New("mcp: entity not allowed")
+	// ErrObjectNotFound reports that the requested object does not exist for the exact entity query.
+	ErrObjectNotFound = errors.New("mcp: object not found")
 )
 
 // FileEntry describes one configured backing file for an entity.
@@ -149,6 +151,9 @@ func (s *Service) ObjectGet(typeName, id string) (*data.Object, error) {
 
 	obj, err := state.Store.GetExact(typeName, id)
 	if err != nil {
+		if strings.Contains(err.Error(), " not found") {
+			return nil, fmt.Errorf("%w: %s %s", ErrObjectNotFound, typeName, id)
+		}
 		return nil, err
 	}
 	return cloneObject(obj), nil
