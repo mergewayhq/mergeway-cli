@@ -6,6 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
+	"net/http"
+	"path"
+	"strings"
+	"time"
 
 	sdkjsonrpc "github.com/modelcontextprotocol/go-sdk/jsonrpc"
 	sdkmcp "github.com/modelcontextprotocol/go-sdk/mcp"
@@ -24,10 +29,12 @@ const (
 
 // RunOptions configures server startup for the currently supported transports.
 type RunOptions struct {
-	Service   *Service
-	Transport string
-	Stdin     io.Reader
-	Stdout    io.Writer
+	Service      *Service
+	Transport    string
+	Stdin        io.Reader
+	Stdout       io.Writer
+	HTTPListen   string
+	HTTPBasePath string
 }
 
 // NewServer constructs an MCP server exposing the initial read-only Mergeway tools.
@@ -160,6 +167,37 @@ func NewServer(service *Service) *sdkmcp.Server {
 	return server
 }
 
+// HTTPHandlerOptions configures the mounted HTTP handler.
+type HTTPHandlerOptions struct {
+	BasePath string
+}
+
+// NewHTTPHandler constructs the single supported HTTP transport mode:
+// streamable HTTP mounted at one base path in stateless JSON-response mode.
+func NewHTTPHandler(service *Service, opts HTTPHandlerOptions) (http.Handler, error) {
+	if service == nil {
+		return nil, errors.New("mcp: service is required")
+	}
+
+	basePath, err := normalizeMountedBasePath(opts.BasePath)
+	if err != nil {
+		return nil, err
+	}
+
+	server := NewServer(service)
+	handler := sdkmcp.NewStreamableHTTPHandler(func(*http.Request) *sdkmcp.Server {
+		return server
+	}, &sdkmcp.StreamableHTTPOptions{
+		Stateless:    true,
+		JSONResponse: true,
+	})
+
+	return mountedHTTPHandler{
+		basePath: basePath,
+		handler:  handler,
+	}, nil
+}
+
 // Run starts the MCP server over the currently supported transport.
 func Run(ctx context.Context, opts RunOptions) error {
 	if opts.Service == nil {
@@ -177,9 +215,55 @@ func Run(ctx context.Context, opts RunOptions) error {
 			Writer: nopWriteCloser{Writer: opts.Stdout},
 		})
 	case "http":
-		return errors.New("mcp: http transport not implemented yet")
+		return runHTTP(ctx, opts)
 	default:
 		return fmt.Errorf("mcp: unsupported transport %q", opts.Transport)
+	}
+}
+
+func runHTTP(ctx context.Context, opts RunOptions) error {
+	handler, err := NewHTTPHandler(opts.Service, HTTPHandlerOptions{BasePath: opts.HTTPBasePath})
+	if err != nil {
+		return err
+	}
+
+	listenAddr := strings.TrimSpace(opts.HTTPListen)
+	if listenAddr == "" {
+		return errors.New("mcp: http listen address is required")
+	}
+
+	listener, err := net.Listen("tcp", listenAddr)
+	if err != nil {
+		return fmt.Errorf("mcp: listen %s: %w", listenAddr, err)
+	}
+
+	server := &http.Server{
+		Handler: handler,
+	}
+
+	errCh := make(chan error, 1)
+	go func() {
+		err := server.Serve(listener)
+		if errors.Is(err, http.ErrServerClosed) {
+			errCh <- nil
+			return
+		}
+		errCh <- err
+	}()
+
+	select {
+	case err := <-errCh:
+		return err
+	case <-ctx.Done():
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := server.Shutdown(shutdownCtx); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			return fmt.Errorf("mcp: shutdown http server: %w", err)
+		}
+		if err := <-errCh; err != nil {
+			return err
+		}
+		return nil
 	}
 }
 
@@ -299,3 +383,44 @@ type nopWriteCloser struct {
 }
 
 func (nopWriteCloser) Close() error { return nil }
+
+type mountedHTTPHandler struct {
+	basePath string
+	handler  http.Handler
+}
+
+func (h mountedHTTPHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	if !matchesMountedBasePath(req.URL.Path, h.basePath) {
+		http.NotFound(w, req)
+		return
+	}
+	h.handler.ServeHTTP(w, req)
+}
+
+func normalizeMountedBasePath(basePath string) (string, error) {
+	trimmed := strings.TrimSpace(basePath)
+	if trimmed == "" {
+		trimmed = "/"
+	}
+	if !strings.HasPrefix(trimmed, "/") {
+		return "", fmt.Errorf("mcp: invalid http base path %q", basePath)
+	}
+
+	cleaned := path.Clean(trimmed)
+	if !strings.HasPrefix(cleaned, "/") {
+		cleaned = "/" + cleaned
+	}
+	return cleaned, nil
+}
+
+func matchesMountedBasePath(requestPath, basePath string) bool {
+	if basePath == "/" {
+		return requestPath == "/"
+	}
+
+	requestClean := path.Clean(requestPath)
+	if !strings.HasPrefix(requestClean, "/") {
+		requestClean = "/" + requestClean
+	}
+	return requestClean == basePath
+}

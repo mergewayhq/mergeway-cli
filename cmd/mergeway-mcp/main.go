@@ -16,10 +16,12 @@ func main() {
 				return err
 			}
 			return mergewaymcp.Run(ctx, mergewaymcp.RunOptions{
-				Service:   service,
-				Transport: inv.Transport,
-				Stdin:     inv.Stdin,
-				Stdout:    inv.Stdout,
+				Service:      service,
+				Transport:    inv.Transport,
+				Stdin:        inv.Stdin,
+				Stdout:       inv.Stdout,
+				HTTPListen:   inv.HTTPListen,
+				HTTPBasePath: inv.HTTPBasePath,
 			})
 		},
 	}))
