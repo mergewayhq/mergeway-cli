@@ -16,6 +16,7 @@ import (
 	"testing"
 	"time"
 
+	sdkjsonrpc "github.com/modelcontextprotocol/go-sdk/jsonrpc"
 	sdkmcp "github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
@@ -198,6 +199,166 @@ func TestServerRepositoryExportAndFilesList(t *testing.T) {
 	}
 	if !reflect.DeepEqual(filesOut.Files, wantFiles) {
 		t.Fatalf("expected files %v, got %v", wantFiles, filesOut.Files)
+	}
+}
+
+func TestServerExposesOnlyReadOnlyToolSet(t *testing.T) {
+	service, err := NewService(filepath.Join("..", "data", "testdata", "repo"), nil)
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
+
+	session := connectServer(t, NewServer(service))
+	defer func() {
+		if err := session.Close(); err != nil {
+			t.Errorf("session.Close: %v", err)
+		}
+	}()
+
+	var got []string
+	for tool, err := range session.Tools(context.Background(), nil) {
+		if err != nil {
+			t.Fatalf("Tools iterator: %v", err)
+		}
+		got = append(got, tool.Name)
+	}
+
+	for _, forbidden := range []string{"create", "update", "delete", "entity_create", "entity_update", "entity_delete"} {
+		for _, name := range got {
+			if name == forbidden {
+				t.Fatalf("unexpected mutation tool %q in %v", forbidden, got)
+			}
+		}
+	}
+}
+
+func TestServerReturnsStructuredProtocolErrors(t *testing.T) {
+	service, err := NewService(filepath.Join("..", "data", "testdata", "repo"), nil)
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
+
+	session := connectServer(t, NewServer(service))
+	defer func() {
+		if err := session.Close(); err != nil {
+			t.Errorf("session.Close: %v", err)
+		}
+	}()
+
+	cases := []struct {
+		name     string
+		params   *sdkmcp.CallToolParams
+		wantMsg  string
+		wantKind string
+	}{
+		{
+			name:     "missing object",
+			params:   &sdkmcp.CallToolParams{Name: ToolObjectGet, Arguments: map[string]any{"entity": "User", "id": "Missing"}},
+			wantMsg:  "object not found",
+			wantKind: "object_not_found",
+		},
+		{
+			name:     "unknown entity",
+			params:   &sdkmcp.CallToolParams{Name: ToolEntityShow, Arguments: map[string]any{"entity": "Missing"}},
+			wantMsg:  "unknown entity",
+			wantKind: "unknown_entity",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := session.CallTool(context.Background(), tc.params)
+			if err == nil {
+				t.Fatal("expected protocol error")
+			}
+			var wireErr *sdkjsonrpc.Error
+			if !errors.As(err, &wireErr) {
+				t.Fatalf("expected jsonrpc error, got %T %v", err, err)
+			}
+			if wireErr.Code != sdkjsonrpc.CodeInvalidParams {
+				t.Fatalf("expected invalid params code, got %d", wireErr.Code)
+			}
+			if !strings.Contains(wireErr.Message, tc.wantMsg) {
+				t.Fatalf("expected message containing %q, got %q", tc.wantMsg, wireErr.Message)
+			}
+			var data map[string]any
+			if err := json.Unmarshal(wireErr.Data, &data); err != nil {
+				t.Fatalf("unmarshal error data: %v", err)
+			}
+			if data["kind"] != tc.wantKind {
+				t.Fatalf("expected kind %q, got %+v", tc.wantKind, data)
+			}
+		})
+	}
+}
+
+func TestServerReturnsToolErrorResultForInvalidArguments(t *testing.T) {
+	service, err := NewService(filepath.Join("..", "data", "testdata", "repo"), nil)
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
+
+	session := connectServer(t, NewServer(service))
+	defer func() {
+		if err := session.Close(); err != nil {
+			t.Errorf("session.Close: %v", err)
+		}
+	}()
+
+	res, err := session.CallTool(context.Background(), &sdkmcp.CallToolParams{
+		Name:      ToolObjectGet,
+		Arguments: map[string]any{"entity": "User"},
+	})
+	if err != nil {
+		t.Fatalf("expected tool error result, got protocol error %v", err)
+	}
+	if res == nil || !res.IsError {
+		t.Fatalf("expected tool error result, got %+v", res)
+	}
+	if len(res.Content) == 0 {
+		t.Fatalf("expected tool error content, got %+v", res)
+	}
+	text, ok := res.Content[0].(*sdkmcp.TextContent)
+	if !ok {
+		t.Fatalf("expected text error content, got %T", res.Content[0])
+	}
+	if text.Text == "" {
+		t.Fatalf("expected non-empty validation error text, got %+v", res)
+	}
+}
+
+func TestNewHTTPHandlerSupportsDefaultBasePath(t *testing.T) {
+	service, err := NewService(filepath.Join("..", "data", "testdata", "repo"), nil)
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
+
+	handler, err := NewHTTPHandler(service, HTTPHandlerOptions{BasePath: "/"})
+	if err != nil {
+		t.Fatalf("NewHTTPHandler: %v", err)
+	}
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	client := sdkmcp.NewClient(&sdkmcp.Implementation{Name: "mergeway-mcp-http-root-test-client"}, nil)
+	session, err := client.Connect(context.Background(), &sdkmcp.StreamableClientTransport{Endpoint: server.URL}, nil)
+	if err != nil {
+		t.Fatalf("client.Connect /: %v", err)
+	}
+	defer func() {
+		if err := session.Close(); err != nil {
+			t.Errorf("session.Close: %v", err)
+		}
+	}()
+
+	res, err := session.CallTool(context.Background(), &sdkmcp.CallToolParams{Name: ToolEntityList})
+	if err != nil {
+		t.Fatalf("CallTool entity_list: %v", err)
+	}
+	var out entityListOutput
+	decodeResultJSON(t, res, &out)
+	if !reflect.DeepEqual(out.Entities, []string{"Post", "Tag", "User"}) {
+		t.Fatalf("expected visible entities, got %v", out.Entities)
 	}
 }
 

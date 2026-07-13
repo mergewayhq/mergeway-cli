@@ -116,6 +116,16 @@ func TestRunRejectsInvalidHTTPListen(t *testing.T) {
 	}
 }
 
+func TestRunRejectsInvalidHTTPBasePath(t *testing.T) {
+	code, _, stderr := runForTest(t, []string{"--root", filepath.Join("..", "..", "examples", "full"), "--transport", "http", "--http-base-path", "mcp"}, nil)
+	if code != 2 {
+		t.Fatalf("expected exit code 2, got %d", code)
+	}
+	if !strings.Contains(stderr, `invalid --http-base-path "mcp"`) {
+		t.Fatalf("expected invalid http base path error, got %q", stderr)
+	}
+}
+
 func TestRunNormalizesHTTPBasePath(t *testing.T) {
 	var got Invocation
 	code, _, stderr := runForTest(t, []string{"--root", filepath.Join("..", "..", "examples", "full"), "--transport", "http", "--http-base-path", "/mcp/"}, func(_ context.Context, invocation Invocation) error {
