@@ -140,9 +140,9 @@ func collectListFileEntries(root string, cfg *config.Config, typeName string, gr
 				}
 
 				entryPath := displayWorkspacePath(absRoot, absMatch)
-				if group && include.Selector == "" && includeHasGlob(include.Path) {
+				if group && include.Selector == "" && fileNameHasGlob(include.Path) {
 					if multi, ok := yamlFileContainsItems(absMatch); ok && !multi {
-						entryPath = displayWorkspacePath(absRoot, pattern)
+						entryPath = displayWorkspacePath(absRoot, filepath.Join(filepath.Dir(absMatch), filepath.Base(pattern)))
 					}
 				}
 
@@ -169,6 +169,10 @@ func isYAMLPath(path string) bool {
 
 func includeHasGlob(path string) bool {
 	return strings.ContainsAny(path, "*?[")
+}
+
+func fileNameHasGlob(path string) bool {
+	return includeHasGlob(filepath.Base(path))
 }
 
 func yamlFileContainsItems(path string) (multi bool, ok bool) {

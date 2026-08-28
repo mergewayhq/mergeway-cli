@@ -284,6 +284,52 @@ func TestFilesCommandGroupsContainers(t *testing.T) {
 	}
 }
 
+func TestFilesCommandGroupsOnlyFileGlobs(t *testing.T) {
+	root := t.TempDir()
+	cfg := `mergeway:
+  version: 1
+
+entities:
+  Example:
+    identifier: id
+    include:
+      - path1/*/abc/*.yaml
+    fields:
+      id: string
+`
+	if err := os.WriteFile(filepath.Join(root, "mergeway.yaml"), []byte(cfg), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	for _, subdir := range []string{"sub1", "sub2"} {
+		dir := filepath.Join(root, "path1", subdir, "abc")
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			t.Fatalf("make %s: %v", dir, err)
+		}
+		if err := os.WriteFile(filepath.Join(dir, "example.yaml"), []byte("id: "+subdir+"\n"), 0o644); err != nil {
+			t.Fatalf("write %s: %v", subdir, err)
+		}
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{"--root", root, "--format", "json", "files", "--group"}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("files --group exit %d stderr %s", code, stderr.String())
+	}
+
+	var entries []map[string]string
+	if err := json.Unmarshal(stdout.Bytes(), &entries); err != nil {
+		t.Fatalf("expected json output, got parse error: %v\nbody:\n%s", err, stdout.String())
+	}
+	expected := []map[string]string{
+		{"type": "Example", "file": "path1/sub1/abc/*.yaml"},
+		{"type": "Example", "file": "path1/sub2/abc/*.yaml"},
+	}
+	if !reflect.DeepEqual(entries, expected) {
+		t.Fatalf("expected %v, got %v", expected, entries)
+	}
+}
+
 func TestFilesCommandGroupsContainersWithRelativeRoot(t *testing.T) {
 	repo := copyFixture(t)
 	cwd, err := os.Getwd()
