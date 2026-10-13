@@ -1,7 +1,10 @@
 package cli
 
 import (
+	"bytes"
+	"strings"
 	"testing"
+	"text/template"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
 )
@@ -70,6 +73,61 @@ func TestPrepareERDData(t *testing.T) {
 	edge := data.Edges[0]
 	if edge.Source != "User" || edge.Target != "Group" || edge.Label != "Group" {
 		t.Errorf("Incorrect edge: %+v", edge)
+	}
+}
+
+func TestPrepareERDData_ExtensionsShowOnlyLocalFieldsAndRelations(t *testing.T) {
+	cfg := &config.Config{
+		Types: map[string]*config.TypeDefinition{
+			"Animal": {
+				Name: "Animal",
+				Fields: map[string]*config.FieldDefinition{
+					"ID":     {Type: "string"},
+					"Keeper": {Type: "Person"},
+				},
+			},
+			"Dog": {
+				Name:    "Dog",
+				Extends: "Animal",
+				Fields: map[string]*config.FieldDefinition{
+					// Normalized child types contain inherited fields as well as local ones.
+					"ID":     {Type: "string"},
+					"Keeper": {Type: "Person"},
+					"Breed":  {Type: "Breed"},
+				},
+			},
+			"Person": {Name: "Person"},
+			"Breed":  {Name: "Breed"},
+		},
+	}
+
+	data := prepareERDData(cfg)
+	var dog erdType
+	for _, typ := range data.Types {
+		if typ.Name == "Dog" {
+			dog = typ
+			break
+		}
+	}
+	if len(dog.Fields) != 1 || dog.Fields[0].Name != "Breed" {
+		t.Fatalf("expected Dog to contain only its local field, got %+v", dog.Fields)
+	}
+
+	if len(data.Edges) != 3 {
+		t.Fatalf("expected parent relation, child relation, and extension edge, got %+v", data.Edges)
+	}
+	for _, edge := range data.Edges {
+		if edge.Source == "Dog" && edge.Target == "Person" {
+			t.Fatalf("inherited relation should not be drawn on child: %+v", edge)
+		}
+	}
+
+	var output bytes.Buffer
+	if err := template.Must(template.New("erd").Parse(erdTemplate)).Execute(&output, data); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(output.String(), `"Dog" -> "Animal" [arrowhead="empty"]`) {
+		t.Fatalf("expected UML-style extension edge, got %s", output.String())
 	}
 }
 

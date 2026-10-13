@@ -40,7 +40,7 @@ digraph ERD {
     {{end}}
 
     {{range .Edges}}
-    "{{.Source}}" -> "{{.Target}}" [label="{{.Label}}"];
+    "{{.Source}}" -> "{{.Target}}" [{{if .Inheritance}}arrowhead="empty"{{else}}label="{{.Label}}"{{end}}];
     {{end}}
 }
 `
@@ -57,9 +57,10 @@ type erdField struct {
 }
 
 type erdEdge struct {
-	Source string
-	Target string
-	Label  string
+	Source      string
+	Target      string
+	Label       string
+	Inheritance bool
 }
 
 type erdData struct {
@@ -146,7 +147,11 @@ func prepareERDData(cfg *config.Config) erdData {
 
 		// Collect fields
 		var fields []erdField
+		inheritedFields := erdInheritedFields(def, cfg.Types)
 		for fName, fDef := range def.Fields {
+			if _, inherited := inheritedFields[fName]; inherited {
+				continue
+			}
 			fields = append(fields, erdField{Name: fName, Type: fDef.Type})
 
 			// Infer edges from direct references and reference unions.
@@ -157,6 +162,14 @@ func prepareERDData(cfg *config.Config) erdData {
 					Label:  fName,
 				})
 			}
+		}
+
+		if def.Extends != "" {
+			edges = append(edges, erdEdge{
+				Source:      name,
+				Target:      def.Extends,
+				Inheritance: true,
+			})
 		}
 		// Sort fields for consistent output
 		sort.Slice(fields, func(i, j int) bool {
@@ -183,10 +196,38 @@ func prepareERDData(cfg *config.Config) erdData {
 		if edges[i].Source != edges[j].Source {
 			return edges[i].Source < edges[j].Source
 		}
-		return edges[i].Target < edges[j].Target
+		if edges[i].Target != edges[j].Target {
+			return edges[i].Target < edges[j].Target
+		}
+		if edges[i].Inheritance != edges[j].Inheritance {
+			return edges[i].Inheritance
+		}
+		return edges[i].Label < edges[j].Label
 	})
 
 	return erdData{Types: types, Edges: edges}
+}
+
+// erdInheritedFields returns every field supplied by an ancestor. Normalized
+// configurations merge those fields into a child, but an ERD should show each
+// field and its relationship only where it is declared.
+func erdInheritedFields(def *config.TypeDefinition, types map[string]*config.TypeDefinition) map[string]struct{} {
+	if def == nil || def.Extends == "" {
+		return nil
+	}
+
+	fields := make(map[string]struct{})
+	for parentName := def.Extends; parentName != ""; {
+		parent := types[parentName]
+		if parent == nil {
+			break
+		}
+		for fieldName := range parent.Fields {
+			fields[fieldName] = struct{}{}
+		}
+		parentName = parent.Extends
+	}
+	return fields
 }
 
 func erdReferenceTargets(field *config.FieldDefinition, typeNames map[string]struct{}) []string {
