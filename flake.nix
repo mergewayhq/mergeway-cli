@@ -40,6 +40,8 @@
             subPackages = [
               "cmd/mergeway-cli"
               "cmd/mergeway-lsp"
+              "cmd/mergeway-diff"
+              "cmd/mergeway-mcp"
             ];
 
           meta = with pkgs.lib; {
