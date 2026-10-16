@@ -215,7 +215,7 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 		}, nil
 	}
 
-	if err := s.writeSingle(target.Path, target.Format, normalized); err != nil {
+	if err := s.writeSingle(target.Path, target.Format, typeDef.Name, normalized); err != nil {
 		return nil, err
 	}
 	returnFields, err := s.fieldsWithDerivedValues(typeDef, target.Path, normalized)
@@ -301,7 +301,7 @@ func (s *Store) Update(typeName, id string, fields map[string]any, merge bool) (
 		}, nil
 	}
 
-	if err := s.writeSingle(loc.FilePath, loc.Format, updated); err != nil {
+	if err := s.writeSingle(loc.FilePath, loc.Format, typeDef.Name, updated); err != nil {
 		return nil, err
 	}
 	returnFields, err := s.fieldsWithDerivedValues(typeDef, loc.FilePath, updated)

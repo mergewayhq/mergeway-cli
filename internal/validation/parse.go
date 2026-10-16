@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/mergewayhq/mergeway-cli/internal/fileutil"
+	"github.com/mergewayhq/mergeway-cli/internal/okf"
 	"github.com/theory/jsonpath"
 	"gopkg.in/yaml.v3"
 )
@@ -23,11 +24,21 @@ func parseDataFile(path string, expectedType string, selector string, ops fileut
 
 	if selector == "" {
 		var doc map[string]any
-		if err := yaml.Unmarshal(content, &doc); err != nil {
+		if okf.IsFile(path) {
+			frontmatter, body, err := okf.Parse(content)
+			if err != nil {
+				return nil, err
+			}
+			doc = frontmatter
+			doc["body"] = body
+		} else if err := yaml.Unmarshal(content, &doc); err != nil {
 			return nil, fmt.Errorf("unable to parse: %w", err)
 		}
 
 		typeName, hasType := getString(doc, "type")
+		if okf.IsFile(path) && (!hasType || typeName == "") {
+			return nil, fmt.Errorf("OKF document requires a non-empty type frontmatter property")
+		}
 		if hasType {
 			delete(doc, "type")
 		}

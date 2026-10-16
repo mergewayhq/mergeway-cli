@@ -98,6 +98,7 @@ type fileFormat int
 const (
 	formatYAML fileFormat = iota
 	formatJSON
+	formatOKF
 )
 
 // fileContent captures parsed file state.

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
+	"github.com/mergewayhq/mergeway-cli/internal/okf"
 	"github.com/mergewayhq/mergeway-cli/internal/scalar"
 )
 
@@ -14,6 +15,9 @@ func detectFormat(path string) fileFormat {
 	ext := strings.ToLower(filepath.Ext(path))
 	if ext == ".json" {
 		return formatJSON
+	}
+	if okf.IsFile(path) {
+		return formatOKF
 	}
 	return formatYAML
 }

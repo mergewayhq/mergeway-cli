@@ -38,6 +38,40 @@ func TestStoreLoadExamples(t *testing.T) {
 	}
 }
 
+func TestStoreLoadsOKFExampleBodyAndPathDerivedID(t *testing.T) {
+	root, err := filepath.Abs(filepath.Join("..", "..", "examples", "okf"))
+	if err != nil {
+		t.Fatalf("abs example root: %v", err)
+	}
+	cfg, err := config.Load(filepath.Join(root, "mergeway.yaml"))
+	if err != nil {
+		t.Fatalf("load config: %v", err)
+	}
+	store, err := NewStore(root, cfg)
+	if err != nil {
+		t.Fatalf("new store: %v", err)
+	}
+
+	obj, err := store.Get("Knowledge", "customer-orders.md")
+	if err != nil {
+		t.Fatalf("get OKF concept: %v", err)
+	}
+	if got, want := obj.Fields["id"], "customer-orders.md"; got != want {
+		t.Fatalf("expected path-derived id %q, got %#v", want, got)
+	}
+	if got, want := obj.Fields["body"], "# Schema\n\n| Column | Type | Description |\n| --- | --- | --- |\n| `order_id` | STRING | Globally unique order identifier. |\n\n# Joins\n\nJoined with the customer concept on `customer_id`.\n"; got != want {
+		t.Fatalf("expected OKF body %q, got %#v", want, got)
+	}
+
+	okfObject, err := store.Get("Knowledge", "order-returns.okf")
+	if err != nil {
+		t.Fatalf("get .okf concept: %v", err)
+	}
+	if got, want := okfObject.Fields["body"], "# Returns\n\nOrders may be returned within 30 days of delivery.\n"; got != want {
+		t.Fatalf("expected .okf body %q, got %#v", want, got)
+	}
+}
+
 func exampleRoots(t *testing.T) []string {
 	t.Helper()
 	base := filepath.Join("..", "..", "examples")

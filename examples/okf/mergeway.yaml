@@ -1,0 +1,26 @@
+mergeway:
+  version: 1
+
+entities:
+  Knowledge:
+    description: Knowledge concepts imported from Open Knowledge Format documents
+    identifier: id
+    include:
+      - data/concepts/*.md
+      - data/concepts/*.okf
+    fields:
+      id:
+        type: string
+        required: true
+        source:
+          path_segment_rev: 0
+      title:
+        type: string
+        required: true
+      description: string
+      tags:
+        type: string
+        repeated: true
+      body:
+        type: string
+        required: true

@@ -23,6 +23,17 @@ func deriveIdentifierValue(typeDef *config.TypeDefinition, fields map[string]any
 		}
 		return id, id, nil
 	}
+	if idField := typeDef.Fields[typeDef.Identifier.Field]; idField != nil && idField.Source.IsPathDerived() {
+		pathID, err := relativePathIdentifier(root, sourcePath, true)
+		if err != nil {
+			return "", nil, err
+		}
+		value, err := config.DerivePathSourceValue(idField.Source, pathID)
+		if err != nil {
+			return "", nil, fmt.Errorf("derive identifier field %q: %w", typeDef.Identifier.Field, err)
+		}
+		return value, value, nil
+	}
 	return extractIdentifierValue(typeDef, fields)
 }
 

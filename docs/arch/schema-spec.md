@@ -131,7 +131,7 @@ Extra validation knobs let future tooling derive JSON Schema while preserving ri
 
 ## File Association
 
-`include` bind a type to one or more data files. Patterns may select both YAML and JSON documents. Each entry can be a plain glob string or a mapping with `path` and optional `selector`. When matching files, the CLI infers the type from the configuration; a top-level `type` field is optional and only used as an override/sanity check.
+`include` bind a type to one or more data files. Patterns may select YAML, JSON, and Open Knowledge Format (OKF) Markdown documents. Each entry can be a plain glob string or a mapping with `path` and optional `selector`. When matching files, the CLI infers the type from the configuration; a top-level `type` field is optional and only used as an override/sanity check.
 
 ```yaml
 include:
@@ -141,6 +141,10 @@ include:
 ```
 
 Without a selector, Mergeway treats the entire file as one object (falling back to an `items:` array when present). With `selector`, each match needs to be an object; the CLI surfaces an error otherwise. When `identifier: $path` is enabled, each matched file must yield exactly one object; files with `items:` arrays or selectors that return multiple objects are rejected.
+
+### Open Knowledge Format files
+
+Files with the `.md` or `.okf` extension are parsed as [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) concept documents. An OKF document requires a YAML frontmatter block with a non-empty `type`; this value must exactly match the included Mergeway entity. Frontmatter values become record fields and the Markdown content after the closing frontmatter delimiter becomes `body`. An identifier remains required unless its configured identifier field is path-derived through `source`; in that case the derived path value is used.
 
 Inline data defined within the schema participates in validation and read operations just like file-backed records. When both inline and file data supply the same identifier, the file-sourced record wins. Inline data is intentionally immutable at runtime; mutating commands continue to operate on disk files only. Types using `identifier: $path` cannot declare inline data because inline records do not have file paths.
 

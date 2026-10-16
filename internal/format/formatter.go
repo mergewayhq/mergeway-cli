@@ -43,6 +43,12 @@ func FormatFile(path string, schema *Schema) (*Result, error) {
 
 // FormatBytes normalizes raw file contents according to the configured rules.
 func FormatBytes(path string, data []byte, schema *Schema) ([]byte, error) {
+	if ext := strings.ToLower(filepath.Ext(path)); ext == ".md" || ext == ".okf" {
+		// OKF documents combine YAML frontmatter with arbitrary Markdown. Their
+		// body is intentionally not a YAML document, so leave it unchanged.
+		return data, nil
+	}
+
 	trimmed := bytes.TrimSpace(data)
 	if len(trimmed) == 0 {
 		return data, nil

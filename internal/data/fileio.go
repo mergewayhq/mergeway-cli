@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/mergewayhq/mergeway-cli/internal/config"
+	"github.com/mergewayhq/mergeway-cli/internal/okf"
 )
 
 func (s *Store) loadFile(path string, expectedType string, selector string) (*fileContent, error) {
@@ -23,11 +24,21 @@ func (s *Store) loadFile(path string, expectedType string, selector string) (*fi
 
 	if selector == "" {
 		var doc map[string]any
-		if err := yaml.Unmarshal(data, &doc); err != nil {
+		if format == formatOKF {
+			frontmatter, body, err := okf.Parse(data)
+			if err != nil {
+				return nil, fmt.Errorf("data: parse %s: %w", path, err)
+			}
+			doc = frontmatter
+			doc["body"] = body
+		} else if err := yaml.Unmarshal(data, &doc); err != nil {
 			return nil, fmt.Errorf("data: parse %s: %w", path, err)
 		}
 
 		typeName, hasType := getString(doc, "type")
+		if format == formatOKF && (!hasType || typeName == "") {
+			return nil, fmt.Errorf("data: OKF document %s requires a non-empty type frontmatter property", path)
+		}
 		if hasType {
 			delete(doc, "type")
 		}
@@ -153,6 +164,9 @@ func (s *Store) writeFile(path string, fc *fileContent) error {
 		}
 		return os.WriteFile(path, append(encoded, '\n'), 0o644)
 	}
+	if fc.Format == formatOKF {
+		return fmt.Errorf("data: OKF files cannot contain multiple objects")
+	}
 
 	encoded, err := yaml.Marshal(payload)
 	if err != nil {
@@ -161,7 +175,7 @@ func (s *Store) writeFile(path string, fc *fileContent) error {
 	return os.WriteFile(path, encoded, 0o644)
 }
 
-func (s *Store) writeSingle(path string, format fileFormat, payload map[string]any) error {
+func (s *Store) writeSingle(path string, format fileFormat, typeName string, payload map[string]any) error {
 	if err := ensureDir(filepath.Dir(path)); err != nil {
 		return err
 	}
@@ -172,6 +186,17 @@ func (s *Store) writeSingle(path string, format fileFormat, payload map[string]a
 			return fmt.Errorf("data: encode json %s: %w", path, err)
 		}
 		return os.WriteFile(path, append(encoded, '\n'), 0o644)
+	}
+	if format == formatOKF {
+		body, _ := payload["body"].(string)
+		frontmatter := cloneMap(payload)
+		delete(frontmatter, "body")
+		frontmatter["type"] = typeName
+		encoded, err := yaml.Marshal(frontmatter)
+		if err != nil {
+			return fmt.Errorf("data: encode OKF frontmatter %s: %w", path, err)
+		}
+		return os.WriteFile(path, []byte("---\n"+string(encoded)+"---\n"+body), 0o644)
 	}
 
 	encoded, err := yaml.Marshal(payload)

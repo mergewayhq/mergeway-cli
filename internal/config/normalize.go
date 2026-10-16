@@ -270,9 +270,6 @@ func normalizeTypeDefinition(rawType rawTypeWithSource, parentDef *TypeDefinitio
 		if len(spec.Data) > 0 {
 			return nil, fmt.Errorf("config: type %q cannot use field %q source with inline data", rawType.Name, name)
 		}
-		if identifier.Field == name {
-			return nil, fmt.Errorf("config: type %q identifier field %q cannot derive its value from field source", rawType.Name, name)
-		}
 	}
 
 	fields, fieldOrder, err = mergeInheritedFields(rawType.Name, parentDef, fields, fieldOrder)
