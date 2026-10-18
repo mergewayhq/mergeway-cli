@@ -14,6 +14,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  website-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16
+        with:
+          name: devenv
+      - name: Install devenv.sh
+        run: nix profile install github:cachix/devenv/v1.11.2
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .devenv
+            /nix/store
+          key: ${{ runner.os }}-devenv-${{ hashFiles('**/devenv.lock') }}
+
+      - name: Build and validate website
+        shell: devenv shell bash -- -e {0}
+        run: make website-check
+
   build-and-deploy:
     runs-on: ubuntu-latest
 

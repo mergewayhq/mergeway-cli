@@ -1,6 +1,6 @@
 {{- if .Site.Params.BookBreadcrumbs }}
 <nav aria-label="Breadcrumb">
-  <ol class="flex flex-wrap">
+  <ol class="flex flex-wrap" style="list-style: none; padding-left: 0;">
     {{- range .Ancestors.Reverse }}
     <li><a href="{{ .RelPermalink }}">{{ partial "docs/title" . }}</a>&nbsp;/&nbsp;</li>
     {{- end }}

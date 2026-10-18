@@ -1,0 +1,9 @@
+# External destinations are intentionally outside this deterministic internal
+# check. Local pages are served over loopback so root-relative links resolve in
+# exactly the same way as they do in a browser.
+include_fragments = true
+no_progress = true
+exclude = [
+  "^https://github.com/mergewayhq/mergeway-cli",
+  "^https://mergewayhq.github.io/",
+]

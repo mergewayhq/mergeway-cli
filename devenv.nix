@@ -14,6 +14,8 @@
     pkgs.go_1_26
     pkgs.golangci-lint
     pkgs.hugo
+    pkgs.lychee
+    pkgs.curl
     pkgs.mdbook
     pkgs.graphviz
     pkgs.shellcheck
