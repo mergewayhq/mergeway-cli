@@ -1,0 +1,10 @@
+{{- if .Site.Params.BookBreadcrumbs }}
+<nav aria-label="Breadcrumb">
+  <ol class="flex flex-wrap">
+    {{- range .Ancestors.Reverse }}
+    <li><a href="{{ .RelPermalink }}">{{ partial "docs/title" . }}</a>&nbsp;/&nbsp;</li>
+    {{- end }}
+    <li aria-current="page">{{ partial "docs/title" . }}</li>
+  </ol>
+</nav>
+{{- end }}

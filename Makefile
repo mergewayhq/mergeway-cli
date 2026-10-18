@@ -3,6 +3,9 @@ GORUN = GOMODCACHE=$(PWD)/.cache/go GOCACHE=$(PWD)/.cache/gobuild $(GO)
 
 MDBOOK ?= mdbook
 DOCS_DIR ?= docs
+HUGO ?= hugo
+WEBSITE_DIR ?= website
+HUGO_CACHEDIR ?= $(PWD)/.cache/hugo
 
 PKG := github.com/mergewayhq/mergeway-cli
 GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
@@ -11,7 +14,7 @@ LDFLAGS := -X $(PKG)/internal/version.Commit=$(GIT_COMMIT) -X $(PKG)/internal/ve
 
 GOFILES := $(shell find . -type f -name '*.go' -not -path './.git/*' -not -path './.cache/*')
 
-.PHONY: check-go build build-cli build-diff build-lsp build-mcp fmt fmt-check lint test race coverage ci clean release docs-build docs-serve
+.PHONY: check-go build build-cli build-diff build-lsp build-mcp fmt fmt-check lint test race coverage ci clean release docs-build docs-serve website-build website-serve website-clean
 
 check-go:
 	@command -v $(GO) >/dev/null 2>&1 || { \
@@ -69,3 +72,12 @@ docs-build:
 
 docs-serve:
 	$(MDBOOK) serve $(DOCS_DIR)
+
+website-build:
+	cd $(WEBSITE_DIR) && HUGO_CACHEDIR=$(HUGO_CACHEDIR) $(HUGO) --environment production --baseURL https://mergewayhq.github.io/ --buildDrafts=false --buildFuture=false --cleanDestinationDir --gc --minify
+
+website-serve:
+	cd $(WEBSITE_DIR) && HUGO_CACHEDIR=$(HUGO_CACHEDIR) $(HUGO) server --buildDrafts=false --buildFuture=false --disableFastRender
+
+website-clean:
+	cd $(WEBSITE_DIR) && rm -rf public resources/_gen .hugo_build.lock

@@ -13,6 +13,7 @@
     pkgs.yamllint
     pkgs.go_1_26
     pkgs.golangci-lint
+    pkgs.hugo
     pkgs.mdbook
     pkgs.graphviz
     pkgs.shellcheck
