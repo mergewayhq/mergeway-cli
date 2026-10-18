@@ -7,8 +7,15 @@ bookToC: true
 
 # Mergeway
 
-Mergeway is a specification and suite of tools for working with structured records in a file-based database. This site is being assembled in reviewed phases while the existing documentation remains the production source.
+Mergeway is a specification and suite of tools for reading and modifying a file-based database. Schemas and records stay in ordinary YAML and JSON files, so teams can review data changes in Git while Mergeway checks structure and relationships.
 
-## Documentation
+## One repository model, several ways to work
 
-Start with the [documentation](/docs/) or choose a [component](/docs/components/). Detailed tutorials, guides, and reference material will be added in later phases.
+Use `mergeway-cli` to validate, inspect, modify, format, and export records. Add `mergeway-diff` for semantic reviews, `mergeway-mcp` for read-only AI-tool access, or `mergeway-lsp` for editor diagnostics and navigation. Every component implements the same repository model defined by the Mergeway specification.
+
+## Start here
+
+- [Build your first Mergeway repository](/docs/tutorials/first-repository/) with a fixed, tested example.
+- [Install the Mergeway tools](/docs/how-to/install/) for your platform and workflow.
+- [Understand the repository model](/docs/explanation/repository-model/) before adapting Mergeway to existing data.
+- [Choose a component](/docs/components/) when you already know the kind of integration you need.

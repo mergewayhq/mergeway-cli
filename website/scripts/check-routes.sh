@@ -15,9 +15,14 @@ routes='
 /docs/components/lsp/ docs/components/lsp/index.html
 /docs/components/vscode/ docs/components/vscode/index.html
 /docs/tutorials/ docs/tutorials/index.html
+/docs/tutorials/first-repository/ docs/tutorials/first-repository/index.html
 /docs/how-to/ docs/how-to/index.html
+/docs/how-to/install/ docs/how-to/install/index.html
 /docs/reference/ docs/reference/index.html
 /docs/explanation/ docs/explanation/index.html
+/docs/explanation/metadata-as-code/ docs/explanation/metadata-as-code/index.html
+/docs/explanation/repository-model/ docs/explanation/repository-model/index.html
+/docs/explanation/validation-model/ docs/explanation/validation-model/index.html
 /docs/project/ docs/project/index.html'
 
 echo "$routes" | while read -r route file; do
@@ -72,4 +77,34 @@ if grep -R -n -E --include='*.html' "href=[\"']?([^\"' >]*/)?docs/src(/|[\"'#])"
   exit 1
 fi
 
-printf 'Verified 14 required routes, navigation order, and legacy-link isolation.\n'
+for alias_file in \
+  getting-started/installation.html \
+  getting-started/workspace-setup.html \
+  guides/example-repo.html
+do
+  if [ ! -s "$public_dir/$alias_file" ]; then
+    echo "missing legacy alias $public_dir/$alias_file" >&2
+    exit 1
+  fi
+done
+
+search_index=$(find "$public_dir" -maxdepth 1 -type f -name 'en.search-data*.json' -print -quit)
+if [ -z "$search_index" ]; then
+  echo "missing generated search index in $public_dir" >&2
+  exit 1
+fi
+for term in \
+  'Specification' \
+  'mergeway-cli' \
+  'mergeway-diff' \
+  'mergeway-mcp' \
+  'mergeway-lsp' \
+  'VS Code'
+do
+  if ! grep -q "$term" "$search_index"; then
+    echo "search index does not contain component term: $term" >&2
+    exit 1
+  fi
+done
+
+printf 'Verified 19 required routes, legacy aliases, component search terms, navigation order, and legacy-link isolation.\n'

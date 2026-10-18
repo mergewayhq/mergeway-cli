@@ -8,6 +8,10 @@ bookToC: true
 
 # Explanation
 
-Explanation pages will build understanding of metadata as code, the repository and validation models, semantic comparison, editor architecture, and safe AI-tool access.
+Build a mental model before choosing commands or designing a repository:
 
-These concept pages arrive in later phases. The [component overview](../components/) shows how the current tools relate to the shared specification.
+- [Why metadata as code?](metadata-as-code/) connects file-backed records to normal review and automation practices.
+- [The Mergeway repository model](repository-model/) explains repositories, workspaces, entities, and records.
+- [The validation model](validation-model/) explains the checks shared by Mergeway tools.
+
+Later pages will explain semantic comparison, editor architecture, and safe AI-tool access. The [component overview](../components/) shows how the current tools relate to the shared specification.

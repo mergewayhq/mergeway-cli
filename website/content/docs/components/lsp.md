@@ -10,10 +10,26 @@ bookToC: true
 
 `mergeway-lsp` is a Language Server Protocol server that gives editors repository-aware diagnostics and navigation. It reuses Mergeway's configuration, data, and validation behavior so editor feedback aligns with command-line validation.
 
-## Availability
+## Who it is for
 
-The language server is released in GitHub release archives and can be built from this repository. It communicates over stdio and must be started by an editor or LSP client with stdout reserved for protocol traffic.
+Repository authors who want feedback while editing and editor/plugin authors who need a standards-based integration use LSP.
 
-## Planned documentation
+## Purpose and boundaries
 
-Later phases will add editor configuration and troubleshooting guides, supported-capability reference, logging details, and an explanation of workspace and document ownership.
+The server provides diagnostics and repository-aware navigation over stdio. It is not a standalone terminal UI, does not replace final CLI validation, and does not install or configure an editor integration by itself. Standard output is reserved for protocol traffic.
+
+## Relationship to the suite
+
+LSP discovers workspaces and reuses Mergeway configuration, data, and validation behavior. The VS Code extension launches this server; other compatible editors can integrate it directly.
+
+## Availability and compatibility
+
+`mergeway-lsp` is included in release archives for Linux, macOS, and Windows on `amd64` and `arm64`; it can also be installed with Go or built from source. Docker and the Nix flake do not provide it. The server is distributed separately from the VS Code extension.
+
+## Start here
+
+- [Install Mergeway tools](../../how-to/install/) to obtain the server.
+- Learn how [workspaces and repositories](../../explanation/repository-model/) differ.
+- Compare editor feedback with [the validation model](../../explanation/validation-model/).
+
+Editor configuration, capabilities, logging, workspace ownership, and troubleshooting will be added in the LSP documentation phase.

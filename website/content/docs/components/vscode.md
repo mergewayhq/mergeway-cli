@@ -10,10 +10,26 @@ bookToC: true
 
 The Mergeway VS Code extension connects Visual Studio Code to `mergeway-lsp`. It is the suite's editor-specific integration and depends on the language server for diagnostics and navigation.
 
-## Availability
+## Who it is for
 
-The extension source is included in this repository and can be built into a local VSIX. There is not yet a documented public extension distribution channel, and the VSIX does not bundle `mergeway-lsp`; users must install or build the server and configure its path. This site does not yet present local contributor packaging as an end-user installation path.
+VS Code users are the intended audience for the extension. Extension contributors can build and test it from this repository.
 
-## Planned documentation
+## Purpose and boundaries
 
-After a public distribution route and the editor surface are ready for review, later phases will add installation, editing, diagnostics, navigation, settings, commands, and troubleshooting documentation.
+The extension connects editor documents and user actions to Mergeway language features. It does not define repository behavior and does not bundle the language server. The CLI remains the explicit final validation and automation interface.
+
+## Relationship to the suite
+
+The extension launches `mergeway-lsp`, which shares the specification and validation behavior used by the CLI. It is the editor-specific layer, while LSP is the reusable protocol layer.
+
+## Availability and compatibility
+
+The extension source is in this repository and contributors can build a local VSIX. There is no documented public Marketplace or Open VSX distribution channel, so this site does not present contributor packaging as an end-user installation route. A locally built VSIX also requires a separately installed `mergeway-lsp` and configuration of its path.
+
+## Start here
+
+- Read the [LSP component overview](../lsp/) to understand the required server.
+- Learn [the repository model](../../explanation/repository-model/) and [validation model](../../explanation/validation-model/) that drive editor feedback.
+- Use [the CLI tutorial](../../tutorials/first-repository/) for the supported first-use path today.
+
+Public installation, editing, settings, commands, and troubleshooting documentation wait for the reviewed extension distribution route and the VS Code documentation phase.

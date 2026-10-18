@@ -8,6 +8,8 @@ bookToC: true
 
 # How-to guides
 
-How-to guides will provide focused procedures for real tasks, such as installing the tools, validating a repository in CI, comparing revisions, configuring an MCP client, or troubleshooting editor feedback.
+How-to guides provide focused procedures for real tasks.
 
-The guides are added in later phases as their commands and outcomes are verified. See [Components](../components/) for current availability boundaries.
+- [Install Mergeway tools](install/) using a release archive or a clearly scoped alternative.
+
+Repository automation, semantic comparison, MCP, and editor guides will be added as their commands and outcomes are verified. See [Components](../components/) for current availability boundaries.
