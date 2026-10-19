@@ -3,7 +3,9 @@ title: Tutorials
 description: Learn Mergeway through guided, reproducible experiences.
 type: docs
 weight: 20
-bookToC: true
+params:
+  bookFlatSection: true
+  bookIcon: rocket_launch
 ---
 
 # Tutorials

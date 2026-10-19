@@ -3,7 +3,8 @@ title: Diff tasks
 description: Compare working and committed repository states and consume semantic change output.
 type: docs
 weight: 30
-bookToC: true
+params:
+    bookCollapseSection: true
 ---
 
 # Diff tasks

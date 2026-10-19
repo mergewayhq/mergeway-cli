@@ -3,7 +3,9 @@ title: How-to guides
 description: Complete a specific Mergeway repository, automation, integration, or editor task.
 type: docs
 weight: 30
-bookToC: true
+params:
+  bookFlatSection: true
+  bookIcon: lightbulb
 ---
 
 # How-to guides

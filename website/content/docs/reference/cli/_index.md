@@ -3,10 +3,11 @@ title: mergeway-cli reference
 description: Invocation, global behavior, and released command reference for mergeway-cli v0.10.0.
 type: docs
 weight: 20
-bookToC: true
 aliases:
   - /cli-reference/index.html
   - /cli-reference/
+params:
+    bookCollapseSection: true
 ---
 
 # `mergeway-cli` reference

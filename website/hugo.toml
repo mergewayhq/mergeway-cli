@@ -18,35 +18,11 @@ disableKinds = ['taxonomy', 'term']
 
 [params]
   BookSection = 'docs'
-  BookToC = true
+  BookToC = false
   BookBreadcrumbs = true
   BookSearch = true
   BookComments = false
   BookRepo = 'https://github.com/mergewayhq/mergeway-cli'
-  BookEditLink = '{{ .Site.Params.BookRepo }}/edit/main/website/{{ .Path }}'
+  #BookEditLink = '{{ .Site.Params.BookRepo }}/edit/main/website/{{ .Path }}'
+  BookLastChangeLink = '{{ .Site.Params.BookRepo }}/commit/{{ .GitInfo.Hash }}'
   BookFavicon = 'favicon.svg'
-
-[[menu.before]]
-  name = 'Home'
-  pageRef = '/'
-  weight = 10
-
-[[menu.after]]
-  name = 'GitHub'
-  url = 'https://github.com/mergewayhq/mergeway-cli'
-  weight = 10
-
-[[menu.after]]
-  name = 'Releases'
-  url = 'https://github.com/mergewayhq/mergeway-cli/releases'
-  weight = 20
-
-[[menu.after]]
-  name = 'Contributing'
-  url = 'https://github.com/mergewayhq/mergeway-cli/blob/main/DEVELOPING.md'
-  weight = 30
-
-[[menu.after]]
-  name = 'MIT License'
-  url = 'https://github.com/mergewayhq/mergeway-cli/blob/main/LICENSE.md'
-  weight = 40

@@ -2,7 +2,8 @@
 title: Mergeway
 description: Explore the Mergeway specification and tools for working with a file-based database.
 type: docs
-bookToC: true
+params:
+  bookIcon: home
 ---
 
 # Mergeway

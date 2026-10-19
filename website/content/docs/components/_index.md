@@ -3,7 +3,9 @@ title: Components
 description: Choose among the Mergeway specification, command-line tools, protocol servers, and VS Code integration.
 type: docs
 weight: 10
-bookToC: true
+params:
+  bookFlatSection: true
+  bookIcon: browse
 ---
 
 # Components

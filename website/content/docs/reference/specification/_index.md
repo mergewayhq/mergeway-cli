@@ -4,7 +4,8 @@ description: Normative version 1 contract for Mergeway repositories, configurati
 type: docs
 mode: reference
 weight: 10
-bookToC: true
+params:
+    bookCollapseSection: true
 ---
 
 # Mergeway specification

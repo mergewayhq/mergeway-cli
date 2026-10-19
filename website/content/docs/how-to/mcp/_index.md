@@ -3,7 +3,8 @@ title: MCP guides
 description: Connect, scope, serve, and troubleshoot read-only MCP access to a Mergeway repository.
 type: docs
 weight: 30
-bookToC: true
+params:
+    bookCollapseSection: true
 ---
 
 # MCP guides

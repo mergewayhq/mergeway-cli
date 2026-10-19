@@ -3,7 +3,9 @@ title: Explanation
 description: Understand Mergeway's concepts, design choices, and component relationships.
 type: docs
 weight: 50
-bookToC: true
+params:
+  bookFlatSection: true
+  bookIcon: owl
 ---
 
 # Explanation

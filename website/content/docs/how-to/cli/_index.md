@@ -2,7 +2,8 @@
 title: CLI tasks
 description: Operate and automate a Mergeway repository with mergeway-cli.
 weight: 20
-bookToC: true
+params:
+    bookCollapseSection: true
 ---
 # CLI tasks
 

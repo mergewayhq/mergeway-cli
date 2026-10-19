@@ -7,6 +7,8 @@ bookToC: true
 aliases:
   - /cli-reference/mcp.html
   - /cli-reference/mcp/
+params:
+    bookCollapseSection: true
 ---
 
 # `mergeway-mcp` reference

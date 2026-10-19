@@ -3,7 +3,6 @@ title: Documentation authoring
 description: Conventions and templates for writing pages in the Mergeway website.
 type: docs
 weight: 10
-bookToC: true
 ---
 
 # Documentation authoring

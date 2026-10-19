@@ -7,6 +7,8 @@ bookToC: true
 aliases:
   - /cli-reference/diff.html
   - /cli-reference/diff/
+params:
+    bookCollapseSection: true
 ---
 
 # `mergeway-diff` reference

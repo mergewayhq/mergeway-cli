@@ -3,7 +3,9 @@ title: Project
 description: Find Mergeway releases, source, contribution guidance, and documentation conventions.
 type: docs
 weight: 60
-bookToC: true
+params:
+  bookFlatSection: true
+  bookIcon: assignment
 ---
 
 # Project
