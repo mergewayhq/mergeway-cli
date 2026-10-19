@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "kind": "modified",
+      "type": "User",
+      "object_id": "user-alice",
+      "old_value": {
+        "email": "alice@example.com",
+        "id": "user-alice",
+        "name": "Alice Example",
+        "roles": [
+          "admin",
+          "author"
+        ]
+      },
+      "new_value": {
+        "email": "alice@example.com",
+        "id": "user-alice",
+        "name": "Alice Reviewed",
+        "roles": [
+          "admin",
+          "author"
+        ]
+      },
+      "changes": [
+        {
+          "path": "name",
+          "before": "Alice Example",
+          "after": "Alice Reviewed"
+        }
+      ],
+      "old_sources": [
+        {
+          "path": "data/users/alice.yaml"
+        }
+      ],
+      "new_sources": [
+        {
+          "path": "data/users/alice.yaml"
+        }
+      ]
+    }
+  ]
+}

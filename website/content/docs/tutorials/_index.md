@@ -10,4 +10,4 @@ bookToC: true
 
 Tutorials teach Mergeway through fixed, runnable paths with expected results.
 
-Start with [Build your first Mergeway repository](first-repository/). Later tutorials will cover semantic review, AI-assisted inspection, and editor workflows after their supporting documentation is reviewed.
+Start with [Build your first Mergeway repository](first-repository/), then [review your first semantic change](review-semantic-change/). Later tutorials will cover AI-assisted inspection and editor workflows after their supporting documentation is reviewed.

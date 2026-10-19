@@ -17,5 +17,7 @@ How-to guides provide focused procedures for real tasks.
 - [Validate in GitHub Actions](cli/github-actions/) and [format safely in CI](cli/format-ci/).
 - [Enforce formatting with pre-commit](cli/pre-commit/).
 - [Export repository data](cli/export-data/) or [generate an ERD](cli/generate-erd/).
+- [Compare working data](diff/working-tree/) or [two committed revisions](diff/revisions/) semantically.
+- [Publish a semantic summary](diff/publish-summary/) or [consume JSON diff output](diff/json-automation/).
 
-Semantic comparison, MCP, and editor guides will be added as their commands and outcomes are verified. See [Components](../components/) for current availability boundaries.
+MCP and editor guides will be added as their commands and outcomes are verified. See [Components](../components/) for current availability boundaries.

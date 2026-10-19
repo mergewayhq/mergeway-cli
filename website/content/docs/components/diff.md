@@ -29,7 +29,15 @@ Diff compares committed revisions or a revision and working-tree state, then des
 ## Start here
 
 - [Install Mergeway tools](../../how-to/install/).
-- Learn [why metadata as code](../../explanation/metadata-as-code/) makes semantic review useful.
-- Build and validate [the tutorial repository](../../tutorials/first-repository/) before comparing revisions.
+- Follow [Review your first semantic change](../../tutorials/review-semantic-change/) for a complete guided review.
+- Read [Semantic diff versus file diff](../../explanation/semantic-diff/) to understand logical records and snapshots.
+- Look up the complete [`mergeway-diff` reference](../../reference/diff/).
 
-Guided review workflows, output contracts, and complete command reference will be added in the Diff documentation phase.
+## Common tasks
+
+- [Compare the working tree with `HEAD`](../../how-to/diff/working-tree/).
+- [Compare two Git revisions](../../how-to/diff/revisions/).
+- [Publish a semantic change summary](../../how-to/diff/publish-summary/).
+- [Consume JSON output in automation](../../how-to/diff/json-automation/).
+
+Validate a repository with [`mergeway-cli validate`](../../reference/cli/validate/) before publishing a diff. Diff parses repository data so it can compare records, but it does not perform the full schema and relationship validation contract.

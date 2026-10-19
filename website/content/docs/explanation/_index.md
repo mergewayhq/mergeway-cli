@@ -13,5 +13,6 @@ Build a mental model before choosing commands or designing a repository:
 - [Why metadata as code?](metadata-as-code/) connects file-backed records to normal review and automation practices.
 - [The Mergeway repository model](repository-model/) explains repositories, workspaces, entities, and records.
 - [The validation model](validation-model/) explains the checks shared by Mergeway tools.
+- [Semantic diff versus file diff](semantic-diff/) explains logical records, snapshots, and why line changes are not always data changes.
 
-Later pages will explain semantic comparison, editor architecture, and safe AI-tool access. The [component overview](../components/) shows how the current tools relate to the shared specification.
+Later pages will explain editor architecture and safe AI-tool access. The [component overview](../components/) shows how the current tools relate to the shared specification.
