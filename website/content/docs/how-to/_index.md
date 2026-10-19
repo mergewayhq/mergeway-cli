@@ -22,5 +22,6 @@ How-to guides provide focused procedures for real tasks.
 - [Compare working data](diff/working-tree/) or [two committed revisions](diff/revisions/) semantically.
 - [Publish a semantic summary](diff/publish-summary/) or [consume JSON diff output](diff/json-automation/).
 - [Connect, scope, serve, and troubleshoot read-only MCP access](mcp/).
+- [Configure and troubleshoot an editor-neutral LSP client](lsp/).
 
-Editor guides will be added as their commands and outcomes are verified. See [Components](../components/) for current availability boundaries.
+See [Components](../components/) for current availability boundaries.

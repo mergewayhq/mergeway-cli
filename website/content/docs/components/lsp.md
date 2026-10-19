@@ -29,7 +29,9 @@ LSP discovers workspaces and reuses Mergeway configuration, data, and validation
 ## Start here
 
 - [Install Mergeway tools](../../how-to/install/) to obtain the server.
-- Learn how [workspaces and repositories](../../explanation/repository-model/) differ.
-- Compare editor feedback with [the validation model](../../explanation/validation-model/).
+- [Configure Neovim](../../how-to/lsp/neovim/) or [another LSP client](../../how-to/lsp/generic-client/).
+- Look up the complete [`mergeway-lsp` server contract](../../reference/lsp/).
+- Understand [how the editor integration works](../../explanation/editor-architecture/), including roots, in-memory overlays, and validation parity.
+- [Capture debug logs](../../how-to/lsp/debug-logs/) or [troubleshoot missing features](../../how-to/lsp/troubleshoot/).
 
-Editor configuration, capabilities, logging, workspace ownership, and troubleshooting will be added in the LSP documentation phase.
+The released server supports diagnostics, completion, hover, definitions, references, document and workspace symbols, and conservative quick fixes. The separate [VS Code component](../vscode/) owns VS Code extension and visual-editor guidance.

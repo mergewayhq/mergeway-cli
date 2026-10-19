@@ -26,6 +26,7 @@ routes='
 /docs/reference/mcp/ docs/reference/mcp/index.html
 /docs/reference/mcp/transports/ docs/reference/mcp/transports/index.html
 /docs/reference/mcp/tools/ docs/reference/mcp/tools/index.html
+/docs/reference/lsp/ docs/reference/lsp/index.html
 /docs/reference/specification/ docs/reference/specification/index.html
 /docs/reference/specification/overview/ docs/reference/specification/overview/index.html
 /docs/reference/specification/terminology/ docs/reference/specification/terminology/index.html
@@ -46,6 +47,7 @@ routes='
 /docs/explanation/validation-model/ docs/explanation/validation-model/index.html
 /docs/explanation/semantic-diff/ docs/explanation/semantic-diff/index.html
 /docs/explanation/mcp-access-security/ docs/explanation/mcp-access-security/index.html
+/docs/explanation/editor-architecture/ docs/explanation/editor-architecture/index.html
 /docs/project/ docs/project/index.html'
 
 for cli_page in init validate version entity-list entity-show fmt config-lint config-export gen-erd list files get create update delete export; do
@@ -77,6 +79,14 @@ done
 routes="$routes
 /docs/how-to/mcp/ docs/how-to/mcp/index.html"
 
+for lsp_page in neovim generic-client debug-logs troubleshoot; do
+  routes="$routes
+/docs/how-to/lsp/$lsp_page/ docs/how-to/lsp/$lsp_page/index.html"
+done
+
+routes="$routes
+/docs/how-to/lsp/ docs/how-to/lsp/index.html"
+
 echo "$routes" | while read -r route file; do
   [ -n "$route" ] || continue
   if [ ! -s "$public_dir/$file" ]; then
@@ -89,7 +99,10 @@ for alias_file in \
   cli-reference/diff.html \
   cli-reference/mcp.html \
   guides/use-mergeway-mcp-with-claude-and-codex.html \
-  guides/communicate-changes-with-diff.html
+  guides/communicate-changes-with-diff.html \
+  cli-reference/lsp.html \
+  getting-started/language-server.html \
+  guides/setup-mergeway-lsp-editors.html
 do
   if [ ! -s "$public_dir/$alias_file" ]; then
     echo "missing Diff legacy alias $public_dir/$alias_file" >&2
@@ -199,6 +212,22 @@ do
 done
 
 for term in \
+  'textDocumentSync' \
+  'completionProvider' \
+  'definitionProvider' \
+  'workspaceSymbolProvider' \
+  'MERGEWAY_LSP_LOG_FILE' \
+  'full document' \
+  'Editor architecture' \
+  'Configure Neovim'
+do
+  if ! grep -qi "$term" "$search_index"; then
+    echo "search index does not contain LSP term: $term" >&2
+    exit 1
+  fi
+done
+
+for term in \
   entity_list \
   entity_show \
   object_list \
@@ -253,4 +282,4 @@ for page in "$spec_source"/*.md; do
   fi
 done
 
-printf 'Verified 77 required routes, specification markers, legacy aliases, CLI, Diff, and MCP search terms, navigation order, ERD alt text, and legacy-link isolation.\n'
+printf 'Verified 84 required routes, specification markers, legacy aliases, CLI, Diff, MCP, and LSP search terms, navigation order, ERD alt text, and legacy-link isolation.\n'

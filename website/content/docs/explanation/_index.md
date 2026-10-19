@@ -17,5 +17,6 @@ Build a mental model before choosing commands or designing a repository:
 - [The validation model](validation-model/) explains the checks shared by Mergeway tools.
 - [Semantic diff versus file diff](semantic-diff/) explains logical records, snapshots, and why line changes are not always data changes.
 - [MCP access and security](mcp-access-security/) explains read-only tools, entity scoping, and the surrounding trust boundaries.
+- [Editor architecture](editor-architecture/) explains the LSP process, workspace ownership, in-memory overlays, and validation feedback loop.
 
-Later pages will explain editor architecture. The [component overview](../components/) shows how the current tools relate to the shared specification.
+The [component overview](../components/) shows how the current tools relate to the shared specification.
