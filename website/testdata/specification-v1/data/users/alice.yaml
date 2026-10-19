@@ -1,0 +1,6 @@
+id: user-alice
+display_name: Alice Example
+email: alice@example.com
+roles: [author]
+profile:
+  homepage: https://example.com/alice

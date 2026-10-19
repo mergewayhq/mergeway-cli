@@ -8,6 +8,6 @@ bookToC: true
 
 # Reference
 
-Reference documentation will contain the normative Mergeway specification plus exact CLI, Diff, MCP, LSP, and VS Code interfaces. It is intended for lookup and will be tied to released behavior.
+Reference documentation contains the normative Mergeway specification and will also contain exact CLI, Diff, MCP, LSP, and VS Code interfaces. It is intended for lookup and is tied to released behavior.
 
-The reference is populated in later phases. Start with the [Specification component hub](../components/specification/) for its scope and availability.
+Start with the [normative specification](specification/) for the version 1 repository contract or the [Specification component hub](../components/specification/) for suite context.

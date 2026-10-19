@@ -1,0 +1,5 @@
+mergeway:
+  version: 1
+
+include:
+  - entities/*.yaml

@@ -1,0 +1,5 @@
+{
+  "id": "customer-acme",
+  "name": "Acme",
+  "account_owner": "user-alice"
+}

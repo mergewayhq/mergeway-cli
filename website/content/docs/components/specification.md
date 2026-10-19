@@ -24,10 +24,11 @@ All released binaries implement or consume the model: the CLI manages and valida
 
 ## Availability and compatibility
 
-Specification version 1 is implemented by released tools for repositories declaring `mergeway.version: 1`. The complete reviewed normative reference is assigned to the next documentation phase; until it is published here, released behavior and the existing production documentation remain authoritative. Unreleased proposals are not specification requirements.
+Specification version 1 is implemented by released tools for repositories declaring `mergeway.version: 1`. The [reviewed normative reference](../../reference/specification/) is aligned with release v0.10.0. Unreleased proposals are not specification requirements.
 
 ## Start here
 
 - [Build your first Mergeway repository](../../tutorials/first-repository/) to use a version 1 repository.
+- Use the [normative specification](../../reference/specification/) for exact version 1 behavior.
 - Read [The Mergeway repository model](../../explanation/repository-model/) for the public vocabulary.
 - Read [The validation model](../../explanation/validation-model/) to understand conformance checks.

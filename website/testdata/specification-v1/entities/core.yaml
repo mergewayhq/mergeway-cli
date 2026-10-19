@@ -1,0 +1,63 @@
+mergeway:
+  version: 1
+
+entities:
+  Principal:
+    description: A schema-only base entity.
+    identifier:
+      field: id
+      generated: true
+      pattern: "^[a-z][a-z0-9-]+$"
+    fields:
+      id:
+        type: string
+        required: true
+      display_name:
+        type: string
+        required: true
+
+  User:
+    description: A user that inherits the Principal fields.
+    extends: Principal
+    include:
+      - data/users/*.yaml
+    fields:
+      email:
+        type: string
+        required: true
+        unique: true
+        format: email
+        description: Primary contact address.
+      state:
+        type: enum
+        enum: [active, disabled]
+        default: active
+      roles:
+        type: string
+        repeated: true
+      profile:
+        type: object
+        properties:
+          homepage:
+            type: string
+            format: uri
+
+  Team:
+    identifier: id
+    fields:
+      id: string
+      name: string
+    data:
+      - id: team-docs
+        name: Documentation
+
+  Activity:
+    identifier: id
+    fields:
+      id: string
+      owner:
+        type: User | Team
+        required: true
+    data:
+      - id: activity-review
+        owner: user-alice

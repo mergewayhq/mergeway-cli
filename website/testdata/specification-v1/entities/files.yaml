@@ -1,0 +1,53 @@
+mergeway:
+  version: 1
+
+entities:
+  Page:
+    identifier: slug
+    include:
+      - data/pages/*.yaml
+    fields:
+      slug: string
+      title:
+        type: string
+        pattern: "^[A-Z]"
+      file:
+        type: string
+        required: true
+        source:
+          path: true
+      directory:
+        type: string
+        source:
+          path_segment: 1
+      filename:
+        type: string
+        source:
+          path_segment_rev: 0
+
+  Note:
+    identifier: $path
+    include:
+      - data/notes/*.yaml
+    fields:
+      title:
+        type: string
+        required: true
+
+  Event:
+    identifier: id
+    include:
+      - data/events.yaml
+    fields:
+      id: integer
+      score: number
+      published: boolean
+
+  SelectedItem:
+    identifier: id
+    include:
+      - path: data/catalog.json
+        selector: "$.items[*]"
+    fields:
+      id: string
+      label: string

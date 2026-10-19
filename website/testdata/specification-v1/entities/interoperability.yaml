@@ -1,0 +1,24 @@
+mergeway:
+  version: 1
+
+entities:
+  Customer:
+    identifier: id
+    include:
+      - data/customers/*.json
+    json_schema: ../schemas/customer.json
+
+  Knowledge:
+    identifier: id
+    include:
+      - data/knowledge/*.md
+    fields:
+      id:
+        type: string
+        required: true
+        source:
+          path_segment_rev: 0
+      title: string
+      body:
+        type: string
+        required: true

@@ -15,7 +15,7 @@ LDFLAGS := -X $(PKG)/internal/version.Commit=$(GIT_COMMIT) -X $(PKG)/internal/ve
 
 GOFILES := $(shell find . -type f -name '*.go' -not -path './.git/*' -not -path './.cache/*')
 
-.PHONY: check-go build build-cli build-diff build-lsp build-mcp fmt fmt-check lint test race coverage ci clean release docs-build docs-serve website-build website-check website-check-routes website-check-links website-check-tutorial website-serve website-clean
+.PHONY: check-go build build-cli build-diff build-lsp build-mcp fmt fmt-check lint test race coverage ci clean release docs-build docs-serve website-build website-check website-check-routes website-check-links website-check-tutorial website-check-specification website-serve website-clean
 
 check-go:
 	@command -v $(GO) >/dev/null 2>&1 || { \
@@ -77,7 +77,7 @@ docs-serve:
 website-build:
 	cd $(WEBSITE_DIR) && HUGO_CACHEDIR=$(HUGO_CACHEDIR) $(HUGO) --environment production --baseURL https://mergewayhq.github.io/ --buildDrafts=false --buildFuture=false --cleanDestinationDir --gc --minify --panicOnWarning
 
-website-check: website-build website-check-routes website-check-tutorial website-check-links
+website-check: website-build website-check-routes website-check-tutorial website-check-specification website-check-links
 
 website-check-routes:
 	sh $(WEBSITE_DIR)/scripts/check-routes.sh $(WEBSITE_DIR)/public
@@ -87,6 +87,9 @@ website-check-links:
 
 website-check-tutorial:
 	GOMODCACHE=$(PWD)/.cache/go GOCACHE=$(PWD)/.cache/gobuild sh $(WEBSITE_DIR)/scripts/check-first-repository.sh
+
+website-check-specification:
+	GOMODCACHE=$(PWD)/.cache/go GOCACHE=$(PWD)/.cache/gobuild sh $(WEBSITE_DIR)/scripts/check-specification.sh
 
 website-serve:
 	cd $(WEBSITE_DIR) && HUGO_CACHEDIR=$(HUGO_CACHEDIR) $(HUGO) server --buildDrafts=false --buildFuture=false --disableFastRender

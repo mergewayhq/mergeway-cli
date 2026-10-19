@@ -19,6 +19,20 @@ routes='
 /docs/how-to/ docs/how-to/index.html
 /docs/how-to/install/ docs/how-to/install/index.html
 /docs/reference/ docs/reference/index.html
+/docs/reference/specification/ docs/reference/specification/index.html
+/docs/reference/specification/overview/ docs/reference/specification/overview/index.html
+/docs/reference/specification/terminology/ docs/reference/specification/terminology/index.html
+/docs/reference/specification/conformance/ docs/reference/specification/conformance/index.html
+/docs/reference/specification/repository-configuration/ docs/reference/specification/repository-configuration/index.html
+/docs/reference/specification/entities/ docs/reference/specification/entities/index.html
+/docs/reference/specification/fields/ docs/reference/specification/fields/index.html
+/docs/reference/specification/records/ docs/reference/specification/records/index.html
+/docs/reference/specification/identifiers-references/ docs/reference/specification/identifiers-references/index.html
+/docs/reference/specification/validation/ docs/reference/specification/validation/index.html
+/docs/reference/specification/json-schema/ docs/reference/specification/json-schema/index.html
+/docs/reference/specification/path-derived-data/ docs/reference/specification/path-derived-data/index.html
+/docs/reference/specification/open-knowledge-format/ docs/reference/specification/open-knowledge-format/index.html
+/docs/reference/specification/changelog/ docs/reference/specification/changelog/index.html
 /docs/explanation/ docs/explanation/index.html
 /docs/explanation/metadata-as-code/ docs/explanation/metadata-as-code/index.html
 /docs/explanation/repository-model/ docs/explanation/repository-model/index.html
@@ -107,4 +121,12 @@ do
   fi
 done
 
-printf 'Verified 19 required routes, legacy aliases, component search terms, navigation order, and legacy-link isolation.\n'
+spec_source=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)/content/docs/reference/specification
+for page in "$spec_source"/*.md; do
+  if ! grep -q 'Normative v1' "$page"; then
+    echo "specification page does not identify normative v1 applicability: $page" >&2
+    exit 1
+  fi
+done
+
+printf 'Verified 33 required routes, normative v1 markers, legacy aliases, component search terms, navigation order, and legacy-link isolation.\n'

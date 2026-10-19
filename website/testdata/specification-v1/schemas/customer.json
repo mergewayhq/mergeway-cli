@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["id", "name", "account_owner"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "account_owner": {
+      "type": "string",
+      "x-reference-type": "User"
+    }
+  }
+}

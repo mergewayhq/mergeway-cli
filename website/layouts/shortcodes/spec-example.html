@@ -1,0 +1,3 @@
+{{- $path := .Get "path" -}}
+{{- $language := .Get "language" | default "yaml" -}}
+{{- highlight (readFile $path) $language "" -}}
