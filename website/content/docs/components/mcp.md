@@ -24,12 +24,11 @@ MCP loads the specification's entities and records using the shared repository c
 
 ## Availability and compatibility
 
-`mergeway-mcp` is included in release archives for Linux, macOS, and Windows on `amd64` and `arm64`; it can also be installed with Go or built from source. Docker and the Nix flake do not provide it. It works with clients that support a compatible MCP stdio or HTTP connection.
+`mergeway-mcp` v0.10.0 is included in release archives for Linux, macOS, and Windows on `amd64` and `arm64`; it can also be installed with Go or built from source. Docker and the Nix flake do not provide it. The released Go SDK negotiates MCP `2025-11-25`, `2025-06-18`, `2025-03-26`, and `2024-11-05` over stdio or streamable HTTP.
 
 ## Start here
 
 - [Install Mergeway tools](../../how-to/install/).
-- Learn [the repository model](../../explanation/repository-model/) exposed by the server.
-- Validate [the tutorial repository](../../tutorials/first-repository/) before connecting a client.
-
-Client configuration, security guidance, troubleshooting, and the full tool/resource reference will be added in the MCP documentation phase.
+- Follow [Inspect a repository with an AI client](../../tutorials/inspect-with-ai-client/).
+- Use the [MCP guides](../../how-to/mcp/) to connect, scope, serve, and troubleshoot the server.
+- Look up the [server and tool contract](../../reference/mcp/) or understand [MCP access and security](../../explanation/mcp-access-security/).

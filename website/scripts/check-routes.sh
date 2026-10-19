@@ -17,11 +17,15 @@ routes='
 /docs/tutorials/ docs/tutorials/index.html
 /docs/tutorials/first-repository/ docs/tutorials/first-repository/index.html
 /docs/tutorials/review-semantic-change/ docs/tutorials/review-semantic-change/index.html
+/docs/tutorials/inspect-with-ai-client/ docs/tutorials/inspect-with-ai-client/index.html
 /docs/how-to/ docs/how-to/index.html
 /docs/how-to/install/ docs/how-to/install/index.html
 /docs/reference/ docs/reference/index.html
 /docs/reference/cli/ docs/reference/cli/index.html
 /docs/reference/diff/ docs/reference/diff/index.html
+/docs/reference/mcp/ docs/reference/mcp/index.html
+/docs/reference/mcp/transports/ docs/reference/mcp/transports/index.html
+/docs/reference/mcp/tools/ docs/reference/mcp/tools/index.html
 /docs/reference/specification/ docs/reference/specification/index.html
 /docs/reference/specification/overview/ docs/reference/specification/overview/index.html
 /docs/reference/specification/terminology/ docs/reference/specification/terminology/index.html
@@ -41,6 +45,7 @@ routes='
 /docs/explanation/repository-model/ docs/explanation/repository-model/index.html
 /docs/explanation/validation-model/ docs/explanation/validation-model/index.html
 /docs/explanation/semantic-diff/ docs/explanation/semantic-diff/index.html
+/docs/explanation/mcp-access-security/ docs/explanation/mcp-access-security/index.html
 /docs/project/ docs/project/index.html'
 
 for cli_page in init validate version entity-list entity-show fmt config-lint config-export gen-erd list files get create update delete export; do
@@ -64,6 +69,14 @@ done
 routes="$routes
 /docs/how-to/diff/ docs/how-to/diff/index.html"
 
+for mcp_page in connect-stdio restrict-entities serve-http troubleshoot; do
+  routes="$routes
+/docs/how-to/mcp/$mcp_page/ docs/how-to/mcp/$mcp_page/index.html"
+done
+
+routes="$routes
+/docs/how-to/mcp/ docs/how-to/mcp/index.html"
+
 echo "$routes" | while read -r route file; do
   [ -n "$route" ] || continue
   if [ ! -s "$public_dir/$file" ]; then
@@ -74,6 +87,8 @@ done
 
 for alias_file in \
   cli-reference/diff.html \
+  cli-reference/mcp.html \
+  guides/use-mergeway-mcp-with-claude-and-codex.html \
   guides/communicate-changes-with-diff.html
 do
   if [ ! -s "$public_dir/$alias_file" ]; then
@@ -183,6 +198,23 @@ do
   fi
 done
 
+for term in \
+  entity_list \
+  entity_show \
+  object_list \
+  object_get \
+  repository_export \
+  files_list \
+  'MCP access and security' \
+  'streamable HTTP' \
+  'entity allow-list'
+do
+  if ! grep -q "$term" "$search_index"; then
+    echo "search index does not contain MCP term: $term" >&2
+    exit 1
+  fi
+done
+
 for term in init validate version 'entity list' 'entity show' fmt 'config lint' 'config export' gen-erd list files get create update delete export; do
   if ! grep -q "$term" "$search_index"; then
     echo "search index does not contain CLI command term: $term" >&2
@@ -221,4 +253,4 @@ for page in "$spec_source"/*.md; do
   fi
 done
 
-printf 'Verified 67 required routes, specification markers, legacy aliases, CLI and Diff search terms, navigation order, ERD alt text, and legacy-link isolation.\n'
+printf 'Verified 77 required routes, specification markers, legacy aliases, CLI, Diff, and MCP search terms, navigation order, ERD alt text, and legacy-link isolation.\n'

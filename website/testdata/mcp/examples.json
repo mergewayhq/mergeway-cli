@@ -1,0 +1,217 @@
+{
+  "protocol_version": "2025-11-25",
+  "tools": [
+    "entity_list",
+    "entity_show",
+    "files_list",
+    "object_get",
+    "object_list",
+    "repository_export"
+  ],
+  "examples": [
+    {
+      "tool": "entity_list",
+      "request": {},
+      "result": {
+        "entities": [
+          "Comment",
+          "Post",
+          "Tag",
+          "User"
+        ]
+      }
+    },
+    {
+      "tool": "entity_show",
+      "request": {
+        "entity": "User"
+      },
+      "result": {
+        "entity": "User",
+        "schema": {
+          "Ancestors": null,
+          "Descendants": null,
+          "Description": "Directory of users who can author and moderate posts",
+          "Extends": "",
+          "FieldOrder": [
+            "id",
+            "name",
+            "email",
+            "roles"
+          ],
+          "Fields": {
+            "email": {
+              "Default": null,
+              "Description": "Primary contact address for notifications",
+              "Enum": null,
+              "Format": "",
+              "Name": "email",
+              "Pattern": "",
+              "Properties": {},
+              "PropertyOrder": null,
+              "ReferenceTypes": null,
+              "Repeated": false,
+              "Required": true,
+              "Type": "string",
+              "Unique": false
+            },
+            "id": {
+              "Default": null,
+              "Description": "Stable identifier shared across data files",
+              "Enum": null,
+              "Format": "",
+              "Name": "id",
+              "Pattern": "",
+              "Properties": {},
+              "PropertyOrder": null,
+              "ReferenceTypes": null,
+              "Repeated": false,
+              "Required": true,
+              "Type": "string",
+              "Unique": false
+            },
+            "name": {
+              "Default": null,
+              "Description": "Display name rendered in UI surfaces",
+              "Enum": null,
+              "Format": "",
+              "Name": "name",
+              "Pattern": "",
+              "Properties": {},
+              "PropertyOrder": null,
+              "ReferenceTypes": null,
+              "Repeated": false,
+              "Required": true,
+              "Type": "string",
+              "Unique": false
+            },
+            "roles": {
+              "Default": null,
+              "Description": "Role slugs that drive permission checks",
+              "Enum": null,
+              "Format": "",
+              "Name": "roles",
+              "Pattern": "",
+              "Properties": {},
+              "PropertyOrder": null,
+              "ReferenceTypes": null,
+              "Repeated": true,
+              "Required": false,
+              "Type": "string",
+              "Unique": false
+            }
+          },
+          "Identifier": {
+            "Field": "id",
+            "Generated": false,
+            "Pattern": ""
+          },
+          "Include": [
+            {
+              "Path": "data/users/*.yaml",
+              "Selector": ""
+            },
+            {
+              "Path": "data/users/*.json",
+              "Selector": ""
+            }
+          ],
+          "InlineData": null,
+          "JSONSchema": "",
+          "Name": "User",
+          "Source": "<ROOT>/entities/User.yaml",
+          "Write": {
+            "Format": "yaml",
+            "Template": "{id}.yaml"
+          }
+        }
+      }
+    },
+    {
+      "tool": "object_list",
+      "request": {
+        "entity": "User"
+      },
+      "result": {
+        "entity": "User",
+        "objects": [
+          {
+            "file": "<ROOT>/data/users/alice.yaml",
+            "id": "user-alice",
+            "type": "User"
+          },
+          {
+            "file": "<ROOT>/data/users/bob.json",
+            "id": "user-bob",
+            "type": "User"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "object_get",
+      "request": {
+        "entity": "User",
+        "id": "user-alice"
+      },
+      "result": {
+        "object": {
+          "fields": {
+            "email": "alice@example.com",
+            "id": "user-alice",
+            "name": "Alice Example",
+            "roles": [
+              "admin",
+              "author"
+            ]
+          },
+          "file": "<ROOT>/data/users/alice.yaml",
+          "id": "user-alice",
+          "type": "User"
+        }
+      }
+    },
+    {
+      "tool": "repository_export",
+      "request": {
+        "entities": [
+          "Post"
+        ]
+      },
+      "result": {
+        "entities": {
+          "Post": [
+            {
+              "author": "user-alice",
+              "body": "We are excited to announce the product launch.\n",
+              "id": "post-001",
+              "status": "PUBLISHED",
+              "tags": [
+                "tag-product"
+              ],
+              "title": "Launch Day"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tool": "files_list",
+      "request": {
+        "entity": "User"
+      },
+      "result": {
+        "files": [
+          {
+            "file": "data/users/alice.yaml",
+            "type": "User"
+          },
+          {
+            "file": "data/users/bob.json",
+            "type": "User"
+          }
+        ]
+      }
+    }
+  ]
+}
