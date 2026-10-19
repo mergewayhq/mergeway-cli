@@ -20,7 +20,7 @@ make website-check
 make website-serve
 ```
 
-The production-like build excludes draft and future-dated content, uses the production base URL, promotes Hugo warnings to failures, and writes generated output to `website/public/`. `website-check` also asserts required routes, legacy aliases, search terms, and navigation order; rejects links into the legacy mdBook source tree; runs the first-repository tutorial against a temporary copy of `examples/full`; and runs Lychee against every generated HTML route through a loopback preview server. External links are excluded so the result does not depend on network availability or third-party state. The preview server prints its local URL (normally `http://localhost:1313/`) and preserves local preview links.
+The production-like build excludes draft and future-dated content, uses the production base URL, promotes Hugo warnings to failures, and writes generated output to `website/public/`. `website-check` also asserts required routes, legacy aliases, search terms, and navigation order; rejects links into the legacy mdBook source tree; checks the first-repository tutorial and normative specification fixture; derives CLI help coverage and executes CLI workflows against temporary copies of `examples/full`; and runs Lychee against every generated HTML route through a loopback preview server. External links are excluded so the result does not depend on network availability or third-party state. The preview server prints its local URL (normally `http://localhost:1313/`) and preserves local preview links.
 
 To remove only generated website output:
 

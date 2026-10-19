@@ -30,6 +30,8 @@ The CLI is the most direct interface to the specification and shares configurati
 
 - [Install Mergeway tools](../../how-to/install/).
 - [Build your first Mergeway repository](../../tutorials/first-repository/).
+- Look up every released operation in the [`mergeway-cli` reference](../../reference/cli/).
+- Follow the [record lifecycle](../../how-to/cli/manage-records/), choose a [validation scope](../../how-to/cli/choose-validation/), or configure [repository automation](../../how-to/cli/github-actions/).
 - Understand [the repository model](../../explanation/repository-model/) and [validation model](../../explanation/validation-model/).
 
-A complete command, flag, output, and exit-code reference will be migrated in the CLI documentation phase.
+The reference covers all 16 released repository operations, their flags and defaults, output and exit behavior, and file side effects. The how-to section adds safe mutation, layout, validation, export, ERD, pre-commit, and CI workflows.

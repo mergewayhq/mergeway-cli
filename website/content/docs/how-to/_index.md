@@ -11,5 +11,11 @@ bookToC: true
 How-to guides provide focused procedures for real tasks.
 
 - [Install Mergeway tools](install/) using a release archive or a clearly scoped alternative.
+- [Create, inspect, update, and delete records](cli/manage-records/).
+- [Choose configuration or repository validation](cli/choose-validation/).
+- [Split schemas and records across files](cli/split-files/).
+- [Validate in GitHub Actions](cli/github-actions/) and [format safely in CI](cli/format-ci/).
+- [Enforce formatting with pre-commit](cli/pre-commit/).
+- [Export repository data](cli/export-data/) or [generate an ERD](cli/generate-erd/).
 
-Repository automation, semantic comparison, MCP, and editor guides will be added as their commands and outcomes are verified. See [Components](../components/) for current availability boundaries.
+Semantic comparison, MCP, and editor guides will be added as their commands and outcomes are verified. See [Components](../components/) for current availability boundaries.

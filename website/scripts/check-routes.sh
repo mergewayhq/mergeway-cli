@@ -19,6 +19,7 @@ routes='
 /docs/how-to/ docs/how-to/index.html
 /docs/how-to/install/ docs/how-to/install/index.html
 /docs/reference/ docs/reference/index.html
+/docs/reference/cli/ docs/reference/cli/index.html
 /docs/reference/specification/ docs/reference/specification/index.html
 /docs/reference/specification/overview/ docs/reference/specification/overview/index.html
 /docs/reference/specification/terminology/ docs/reference/specification/terminology/index.html
@@ -38,6 +39,19 @@ routes='
 /docs/explanation/repository-model/ docs/explanation/repository-model/index.html
 /docs/explanation/validation-model/ docs/explanation/validation-model/index.html
 /docs/project/ docs/project/index.html'
+
+for cli_page in init validate version entity-list entity-show fmt config-lint config-export gen-erd list files get create update delete export; do
+  routes="$routes
+/docs/reference/cli/$cli_page/ docs/reference/cli/$cli_page/index.html"
+done
+
+for guide_page in manage-records choose-validation split-files github-actions pre-commit export-data generate-erd format-ci; do
+  routes="$routes
+/docs/how-to/cli/$guide_page/ docs/how-to/cli/$guide_page/index.html"
+done
+
+routes="$routes
+/docs/how-to/cli/ docs/how-to/cli/index.html"
 
 echo "$routes" | while read -r route file; do
   [ -n "$route" ] || continue
@@ -102,6 +116,33 @@ do
   fi
 done
 
+for alias_file in \
+  cli-reference/index.html \
+  cli-reference/init.html \
+  cli-reference/validate.html \
+  cli-reference/version.html \
+  cli-reference/entity-list.html \
+  cli-reference/entity-show.html \
+  cli-reference/fmt.html \
+  cli-reference/config-lint.html \
+  cli-reference/config-export.html \
+  cli-reference/gen-erd.html \
+  cli-reference/list.html \
+  cli-reference/files.html \
+  cli-reference/get.html \
+  cli-reference/create.html \
+  cli-reference/update.html \
+  cli-reference/delete.html \
+  cli-reference/export.html \
+  guides/setup-mergeway-github.html \
+  guides/setup-mergeway-pre-commit.html
+do
+  if [ ! -s "$public_dir/$alias_file" ]; then
+    echo "missing CLI legacy alias $public_dir/$alias_file" >&2
+    exit 1
+  fi
+done
+
 search_index=$(find "$public_dir" -maxdepth 1 -type f -name 'en.search-data*.json' -print -quit)
 if [ -z "$search_index" ]; then
   echo "missing generated search index in $public_dir" >&2
@@ -121,6 +162,23 @@ do
   fi
 done
 
+for term in init validate version 'entity list' 'entity show' fmt 'config lint' 'config export' gen-erd list files get create update delete export; do
+  if ! grep -q "$term" "$search_index"; then
+    echo "search index does not contain CLI command term: $term" >&2
+    exit 1
+  fi
+done
+
+erd_page=$public_dir/docs/how-to/cli/generate-erd/index.html
+grep -q '/images/cli/erd-example-full.svg' "$erd_page" || {
+  echo 'ERD guide does not render its example image' >&2
+  exit 1
+}
+grep -q 'alt="Entity-relationship diagram for the full example' "$erd_page" || {
+  echo 'ERD guide image is missing useful alt text' >&2
+  exit 1
+}
+
 spec_source=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)/content/docs/reference/specification
 for page in "$spec_source"/*.md; do
   if ! grep -q 'Normative v1' "$page"; then
@@ -129,4 +187,4 @@ for page in "$spec_source"/*.md; do
   fi
 done
 
-printf 'Verified 33 required routes, normative v1 markers, legacy aliases, component search terms, navigation order, and legacy-link isolation.\n'
+printf 'Verified 59 required routes, specification markers, legacy aliases, CLI search terms, navigation order, ERD alt text, and legacy-link isolation.\n'
