@@ -6,6 +6,11 @@ weight: 40
 params:
   bookFlatSection: true
   bookIcon: developer_guide
+menu:
+  home:
+    weight: 20
+    params:
+      bookIcon: developer_guide
 ---
 
 # Reference

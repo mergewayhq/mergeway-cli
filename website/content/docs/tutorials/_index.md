@@ -6,6 +6,11 @@ weight: 20
 params:
   bookFlatSection: true
   bookIcon: rocket_launch
+menu:
+  home:
+    weight: 10
+    params:
+      bookIcon: rocket_launch
 ---
 
 # Tutorials

@@ -4,6 +4,9 @@ description = 'Documentation for the Mergeway file-based database specification 
 defaultContentLanguage = 'en'
 disableKinds = ['taxonomy', 'term']
 
+[markup.goldmark.renderer]
+  unsafe = true
+
 [build]
   noJSConfigInAssets = true
 
