@@ -1,0 +1,3 @@
+{{ partial "docs/inject/toc-before" . }}
+{{ .TableOfContents | replaceRE ` id="TableOfContents"` "" | safeHTML }}
+{{ partial "docs/inject/toc-after" . }}

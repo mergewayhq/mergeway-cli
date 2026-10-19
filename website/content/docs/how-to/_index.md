@@ -6,6 +6,9 @@ weight: 30
 params:
   bookFlatSection: true
   bookIcon: lightbulb
+aliases:
+  - /guides/index.html
+  - /guides/README.html
 ---
 
 # How-to guides

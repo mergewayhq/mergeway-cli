@@ -6,6 +6,9 @@ mode: reference
 weight: 10
 params:
     bookCollapseSection: true
+aliases:
+  - /getting-started/schema-spec.html
+  - /getting-started/schema-spec/
 ---
 
 # Mergeway specification

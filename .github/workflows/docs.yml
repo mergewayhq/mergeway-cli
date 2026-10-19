@@ -38,7 +38,15 @@ jobs:
 
       - name: Build and validate website
         shell: devenv shell bash -- -e {0}
-        run: make website-check
+        run: make website-release-candidate
+
+      - name: Upload Hugo release candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: mergeway-website-release-candidate-${{ github.sha }}
+          path: mergeway-website-release-candidate.tar.gz
+          if-no-files-found: error
+          retention-days: 14
 
   build-and-deploy:
     runs-on: ubuntu-latest

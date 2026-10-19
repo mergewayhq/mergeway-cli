@@ -15,7 +15,7 @@ LDFLAGS := -X $(PKG)/internal/version.Commit=$(GIT_COMMIT) -X $(PKG)/internal/ve
 
 GOFILES := $(shell find . -type f -name '*.go' -not -path './.git/*' -not -path './.cache/*')
 
-.PHONY: check-go build build-cli build-diff build-lsp build-mcp fmt fmt-check lint test race coverage ci clean release docs-build docs-serve website-build website-check website-check-routes website-check-links website-check-tutorial website-check-specification website-check-cli website-check-diff website-check-mcp website-check-lsp website-check-content website-serve website-clean
+.PHONY: check-go build build-cli build-diff build-lsp build-mcp fmt fmt-check lint test race coverage ci clean release docs-build docs-serve website-build website-check website-check-routes website-check-links website-check-tutorial website-check-specification website-check-cli website-check-diff website-check-mcp website-check-lsp website-check-content website-check-release-candidate website-release-candidate website-serve website-clean
 
 check-go:
 	@command -v $(GO) >/dev/null 2>&1 || { \
@@ -77,7 +77,7 @@ docs-serve:
 website-build:
 	cd $(WEBSITE_DIR) && HUGO_CACHEDIR=$(HUGO_CACHEDIR) $(HUGO) --environment production --baseURL https://mergewayhq.github.io/ --buildDrafts=false --buildFuture=false --cleanDestinationDir --gc --minify --panicOnWarning
 
-website-check: website-build website-check-routes website-check-tutorial website-check-specification website-check-cli website-check-diff website-check-mcp website-check-lsp website-check-content website-check-links
+website-check: website-build website-check-routes website-check-tutorial website-check-specification website-check-cli website-check-diff website-check-mcp website-check-lsp website-check-content website-check-release-candidate website-check-links
 
 website-check-routes:
 	sh $(WEBSITE_DIR)/scripts/check-routes.sh $(WEBSITE_DIR)/public
@@ -105,6 +105,12 @@ website-check-lsp:
 
 website-check-content:
 	GOMODCACHE=$(PWD)/.cache/go GOCACHE=$(PWD)/.cache/gobuild sh $(WEBSITE_DIR)/scripts/check-content.sh $(WEBSITE_DIR)/public
+
+website-check-release-candidate:
+	GOMODCACHE=$(PWD)/.cache/go GOCACHE=$(PWD)/.cache/gobuild sh $(WEBSITE_DIR)/scripts/check-release-candidate.sh $(WEBSITE_DIR)/public
+
+website-release-candidate: website-check
+	tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -C $(WEBSITE_DIR)/public -czf mergeway-website-release-candidate.tar.gz .
 
 website-serve:
 	cd $(WEBSITE_DIR) && HUGO_CACHEDIR=$(HUGO_CACHEDIR) $(HUGO) server --buildDrafts=false --buildFuture=false --disableFastRender

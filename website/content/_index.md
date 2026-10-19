@@ -16,9 +16,14 @@ Use `mergeway-cli` to validate, inspect, modify, format, and export records. Add
 
 {{% columns %}}
 
-- ### Column
-- ### Column
-- ### Column
+- ### Define and validate {anchor=false}
+  Use the [version 1 specification](/docs/reference/specification/) and `mergeway-cli` to model, inspect, validate, and export repositories.
+
+- ### Review changes {anchor=false}
+  Use [`mergeway-diff`](/docs/components/diff/) to compare repository states as records and relationships instead of raw text.
+
+- ### Connect tools {anchor=false}
+  Give AI clients read-only access through [`mergeway-mcp`](/docs/components/mcp/) or editor clients diagnostics and navigation through [`mergeway-lsp`](/docs/components/lsp/).
 
 {{% /columns %}}
 

@@ -34,4 +34,6 @@ The extension source is in this repository and contributors can build a local VS
 
 Public installation, editing, settings, commands, and troubleshooting documentation wait for the reviewed extension distribution route and the VS Code documentation phase.
 
+For release-candidate search parity, the source-only manifest contributes the settings `mergeway.lsp.path` and `mergeway.lsp.trace.server`, plus the command `mergeway.restartLanguageServer`. These names describe the checked-in contributor extension only; they do not imply a supported public distribution channel.
+
 Contributors running the source-built LSP client can use the focused [extension troubleshooting notes](https://github.com/mergewayhq/mergeway-cli/blob/main/vscode/README.md#troubleshooting). They are contributor instructions, not a public installation claim.

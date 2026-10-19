@@ -6,6 +6,7 @@ weight: 20
 aliases:
   - /cli-reference/index.html
   - /cli-reference/
+  - /cli-reference/README.html
 params:
     bookCollapseSection: true
 ---

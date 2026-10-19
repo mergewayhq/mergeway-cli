@@ -4,6 +4,9 @@ description: Choose Mergeway documentation by component or by the kind of help y
 type: docs
 weight: 10
 bookToC: true
+aliases:
+  - /getting-started/index.html
+  - /getting-started/README.html
 ---
 
 # Documentation

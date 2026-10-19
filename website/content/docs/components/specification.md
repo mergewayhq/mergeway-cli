@@ -1,12 +1,12 @@
 ---
-title: Specification
+title: Specification component
 description: The shared repository and data model implemented by the Mergeway tools.
 type: docs
 weight: 10
 bookToC: true
 ---
 
-# Specification
+# Specification component
 
 The Mergeway specification defines how configuration, entity schemas, records, identifiers, references, and validation fit together in a file-based database. It is the contract shared by the CLI, Diff, MCP, LSP, and editor integrations.
 
