@@ -20,7 +20,7 @@ make website-check
 make website-serve
 ```
 
-The production-like build excludes draft and future-dated content, uses the production base URL, promotes Hugo warnings to failures, and writes generated output to `website/public/`. `website-check` also asserts required routes, legacy aliases, search terms, and navigation order; rejects links into the legacy mdBook source tree; checks the first-repository tutorial and normative specification fixture; derives CLI help coverage and executes CLI workflows against temporary copies of `examples/full`; verifies MCP and LSP protocol sessions against real binaries; and runs Lychee against every generated HTML route through a loopback preview server. External links are excluded so the result does not depend on network availability or third-party state. The preview server prints its local URL (normally `http://localhost:1313/`) and preserves local preview links.
+The production-like build excludes draft and future-dated content, uses the production base URL, promotes Hugo warnings to failures, and writes generated output to `website/public/`. `website-check` also asserts required routes, legacy aliases, search terms, and navigation order; rejects links into the legacy mdBook source tree; checks the first-repository tutorial and normative specification fixture; derives CLI help coverage and executes CLI workflows against temporary copies of `examples/full`; verifies advanced repository fixtures, migration-ledger coverage, canonical-page rendering, and duplicate-content hygiene; verifies MCP and LSP protocol sessions against real binaries; and runs Lychee against every generated HTML route through a loopback preview server. External links are excluded so the result does not depend on network availability or third-party state. The preview server prints its local URL (normally `http://localhost:1313/`) and preserves local preview links.
 
 To remove only generated website output:
 
@@ -42,6 +42,8 @@ The Hugo content tree is a migration target, not a second copy of `docs/`. Do no
 Hugo Book generates the primary sidebar from `content/docs`. Every section has a non-empty `_index.md`, and `weight` values use increments of ten. Home appears before the file tree, Components is the first tree section, and GitHub, Releases, Contributing, and the license appear in the auxiliary menu after it.
 
 Baseline front matter and page-mode guidance live in [the documentation authoring page](content/docs/project/documentation.md). Hugo archetypes for `tutorial`, `how-to`, `reference`, and `explanation` pages are in `archetypes/`. These templates are drafts by default so unfinished pages cannot appear as empty navigation nodes.
+
+The disposition of every legacy public mdBook source and relevant architecture note is recorded in [the migration ledger](migration-ledger.md). Update it when a legacy source gains a new canonical destination or an archive rationale changes.
 
 The site intentionally uses Hugo Book's bundled `favicon.svg` placeholder until project identity assets are reviewed. Site metadata identifies the repository and MIT license without adding a theme override.
 

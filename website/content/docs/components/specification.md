@@ -32,3 +32,4 @@ Specification version 1 is implemented by released tools for repositories declar
 - Use the [normative specification](../../reference/specification/) for exact version 1 behavior.
 - Read [The Mergeway repository model](../../explanation/repository-model/) for the public vocabulary.
 - Read [The validation model](../../explanation/validation-model/) to understand conformance checks.
+- Apply advanced features through the [repository modeling guides](../../how-to/repositories/) and compare trade-offs in [schema design choices](../../explanation/schema-design/).

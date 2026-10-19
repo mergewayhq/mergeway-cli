@@ -12,7 +12,8 @@ Use this guide when you are extending the CLI itself. For installation and every
 ### Optional
 
 - [`golangci-lint`](https://golangci-lint.run/) v2.4.0 or newer if you plan to run linting locally (CI uses v2.4.0)
-- [mdbook](https://rust-lang.github.io/mdBook/) for building and serving documentation locally
+- Hugo Extended 0.161.1 and Lychee 0.23.0 for the future public website (provided by devenv)
+- [mdbook](https://rust-lang.github.io/mdBook/) for the temporary legacy-site build
 
 ## Development Environment
 
@@ -42,7 +43,8 @@ The devenv.sh environment includes:
 Install the prerequisites manually:
 - Install Go 1.25.x
 - Install golangci-lint v2.4.0 or newer
-- Install mdbook if working on documentation
+- Install Hugo Extended and Lychee when working on the canonical website
+- Install mdbook only when checking the legacy site during the transition
 - Install graphviz if using the `gen-erd` command
 
 ## Project Layout
@@ -54,7 +56,9 @@ Install the prerequisites manually:
 - `internal/` contains shared packages that power metadata handling and integrity checks
 - `pkg/` contains public packages
 - `examples/` stores sample configuration and data for demos and local tests
-- `docs/` captures design notes and behavioral specs
+- `website/content/docs/` contains canonical user documentation for the Hugo website
+- `website/migration-ledger.md` records legacy-page dispositions
+- `docs/` remains the mdBook rollback source until production cutover; do not add a second canonical copy there
 - `e2e_test/` contains end-to-end tests
 
 ## LSP Architecture
@@ -101,8 +105,14 @@ If you add an editor-facing feature, prefer extending shared workspace/index hel
 
 ### Documentation
 
-- `make docs-build` builds the documentation site using `mdbook`
-- `make docs-serve` starts a local server to preview documentation
+- `make website-build` builds the production-like Hugo site into `website/public/`
+- `make website-check` runs the Hugo build, route/search/content/example checks, and internal-link validation
+- `make website-check-content` checks advanced examples, migration coverage, and orphan/duplicate reports
+- `make website-serve` starts the local Hugo preview
+- `make website-clean` removes generated Hugo output
+- `make docs-build` and `make docs-serve` retain the legacy mdBook build and preview during migration
+
+The Hugo site is the destination for new canonical user documentation, but the mdBook deployment remains recoverable until the cutover phase. Do not delete or redirect the mdBook source yet. Authoring conventions live in `website/content/docs/project/documentation.md`; the transition ledger lives in `website/migration-ledger.md`.
 
 ### All-in-one CI Check
 

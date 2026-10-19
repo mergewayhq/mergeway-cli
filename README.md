@@ -5,9 +5,11 @@
 For full product and documentation coverage, visit:
 
 - [Mergeway website](https://mergewayhq.github.io)
-- [Mergeway CLI getting started guide](https://mergewayhq.github.io/cli/getting-started/)
-- [Mergeway CLI reference documentation](https://mergewayhq.github.io/cli/reference/)
-- [Mergeway CLI guides](https://mergewayhq.github.io/cli/guides/)
+- [Build your first repository](https://mergewayhq.github.io/docs/tutorials/first-repository/)
+- [Mergeway CLI reference](https://mergewayhq.github.io/docs/reference/cli/)
+- [How-to guides](https://mergewayhq.github.io/docs/how-to/)
+
+The Hugo source for those routes is in `website/`. The legacy mdBook source in `docs/` remains the deployed rollback path until the website cutover; contributors should make new canonical user-documentation changes in Hugo and consult the migration ledger rather than copying pages between both trees.
 
 ## What It Does
 
@@ -103,8 +105,8 @@ make build
 - Build it locally with `make build` or extract it from a release archive.
 - Use `--format json` for machine-readable semantic diff output.
 - Snapshot modes and reporting workflow are documented here:
-  - [mergeway-diff reference](docs/src/cli-reference/diff.md)
-  - [Communicate Repository Changes with mergeway-diff](docs/src/guides/communicate-changes-with-diff.md)
+  - [mergeway-diff reference](website/content/docs/reference/diff/_index.md)
+  - [Semantic diff how-to guides](website/content/docs/how-to/diff/_index.md)
 
 ## Language Server
 
@@ -114,8 +116,8 @@ make build
 - Use `--log-file`, `--log-stderr`, or `--log-level` for debugging.
 - Editor setup is documented here:
   - [VS Code extension README](vscode/README.md)
-  - [Run mergeway-lsp manually](docs/src/getting-started/language-server.md)
-  - [Set up mergeway-lsp in VS Code and Neovim](docs/src/guides/setup-mergeway-lsp-editors.md)
+  - [mergeway-lsp reference](website/content/docs/reference/lsp/_index.md)
+  - [LSP client setup guides](website/content/docs/how-to/lsp/_index.md)
 
 Current limitations:
 
@@ -133,8 +135,8 @@ Current limitations:
 - Scope access with repeated `--entity` flags when a client should only see specific exact entity names.
 - The server does not allow create, update, or delete operations.
 - MCP startup and flags are documented here:
-  - [mergeway-mcp reference](docs/src/cli-reference/mcp.md)
-  - [setup for Claude and Codex](docs/src/guides/use-mergeway-mcp-with-claude-and-codex.md)
+  - [mergeway-mcp reference](website/content/docs/reference/mcp/_index.md)
+  - [MCP connection guides](website/content/docs/how-to/mcp/_index.md)
 
 ## Quick Start
 
@@ -174,7 +176,7 @@ Curious about JSON Schema-backed entities? `examples/json-schema` demonstrates h
 
 Want to see a reference union? `examples/reference-union` shows a minimal workspace where a field uses `User | Team`.
 
-For a deeper command reference, check [`docs/src/cli-reference/README.md`](docs/src/cli-reference/README.md).
+For the complete command reference, use the [Hugo CLI reference](website/content/docs/reference/cli/_index.md). The legacy mdBook reference remains available only during the staged website transition.
 
 ## Hacking on the CLI
 

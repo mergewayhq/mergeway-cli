@@ -18,5 +18,7 @@ Build a mental model before choosing commands or designing a repository:
 - [Semantic diff versus file diff](semantic-diff/) explains logical records, snapshots, and why line changes are not always data changes.
 - [MCP access and security](mcp-access-security/) explains read-only tools, entity scoping, and the surrounding trust boundaries.
 - [Editor architecture](editor-architecture/) explains the LSP process, workspace ownership, in-memory overlays, and validation feedback loop.
+- [Schema design choices](schema-design/) compares schema formats, record granularity, inheritance, unions, and identity strategies.
+- [Component architecture](component-architecture/) traces the shared repository core through each runnable interface.
 
-The [component overview](../components/) shows how the current tools relate to the shared specification.
+The [component overview](../components/) shows how the released tools relate to the shared specification. A scaling guide is deferred until measured operational evidence can support useful thresholds and trade-offs; the site does not invent capacity guidance from implementation structure alone.

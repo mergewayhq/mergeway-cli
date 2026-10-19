@@ -33,3 +33,5 @@ The extension source is in this repository and contributors can build a local VS
 - Use [the CLI tutorial](../../tutorials/first-repository/) for the supported first-use path today.
 
 Public installation, editing, settings, commands, and troubleshooting documentation wait for the reviewed extension distribution route and the VS Code documentation phase.
+
+Contributors running the source-built LSP client can use the focused [extension troubleshooting notes](https://github.com/mergewayhq/mergeway-cli/blob/main/vscode/README.md#troubleshooting). They are contributor instructions, not a public installation claim.

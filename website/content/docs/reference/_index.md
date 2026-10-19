@@ -17,4 +17,4 @@ menu:
 
 Reference documentation contains the normative Mergeway specification and exact released tool interfaces. It is intended for lookup and is tied to released behavior.
 
-Start with the [normative specification](specification/) for the version 1 repository contract, use the [`mergeway-cli` reference](cli/) for repository operations, compare revisions with [`mergeway-diff`](diff/), look up the [`mergeway-mcp` server and tools](mcp/), or integrate the [`mergeway-lsp` language server](lsp/). VS Code interfaces will be added in their verified phase.
+Start with the [normative specification](specification/) for the version 1 repository contract, use the [`mergeway-cli` reference](cli/) for repository operations, compare revisions with [`mergeway-diff`](diff/), look up the [`mergeway-mcp` server and tools](mcp/), or integrate the [`mergeway-lsp` language server](lsp/). The [VS Code component page](../components/vscode/) records why no public extension or visual-editor reference is available yet.

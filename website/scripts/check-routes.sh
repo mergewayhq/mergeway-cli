@@ -87,6 +87,20 @@ done
 routes="$routes
 /docs/how-to/lsp/ docs/how-to/lsp/index.html"
 
+for repository_page in reuse-json-schema load-jsonpath inheritance-reference-unions path-derived-data open-knowledge-format; do
+  routes="$routes
+/docs/how-to/repositories/$repository_page/ docs/how-to/repositories/$repository_page/index.html"
+done
+
+routes="$routes
+/docs/how-to/repositories/ docs/how-to/repositories/index.html
+/docs/how-to/cli/troubleshoot/ docs/how-to/cli/troubleshoot/index.html
+/docs/how-to/diff/troubleshoot/ docs/how-to/diff/troubleshoot/index.html
+/docs/explanation/schema-design/ docs/explanation/schema-design/index.html
+/docs/explanation/component-architecture/ docs/explanation/component-architecture/index.html
+/docs/project/contributing/ docs/project/contributing/index.html
+/docs/project/documentation/ docs/project/documentation/index.html"
+
 echo "$routes" | while read -r route file; do
   [ -n "$route" ] || continue
   if [ ! -s "$public_dir/$file" ]; then
@@ -102,7 +116,8 @@ for alias_file in \
   guides/communicate-changes-with-diff.html \
   cli-reference/lsp.html \
   getting-started/language-server.html \
-  guides/setup-mergeway-lsp-editors.html
+  guides/setup-mergeway-lsp-editors.html \
+  guides/json-schema.html
 do
   if [ ! -s "$public_dir/$alias_file" ]; then
     echo "missing Diff legacy alias $public_dir/$alias_file" >&2
@@ -228,6 +243,23 @@ do
 done
 
 for term in \
+  'Reuse a JSON Schema' \
+  'Load records with JSONPath' \
+  'Model inheritance and reference unions' \
+  'Derive identifiers and fields from paths' \
+  'Open Knowledge Format documents' \
+  'Schema design choices' \
+  'Component architecture' \
+  'Troubleshoot the CLI' \
+  'Troubleshoot semantic diff'
+do
+  if ! grep -qi "$term" "$search_index"; then
+    echo "search index does not contain Phase 10 term: $term" >&2
+    exit 1
+  fi
+done
+
+for term in \
   entity_list \
   entity_show \
   object_list \
@@ -282,4 +314,4 @@ for page in "$spec_source"/*.md; do
   fi
 done
 
-printf 'Verified 84 required routes, specification markers, legacy aliases, CLI, Diff, MCP, and LSP search terms, navigation order, ERD alt text, and legacy-link isolation.\n'
+printf 'Verified required routes, specification markers, legacy aliases, component and Phase 10 search terms, navigation order, ERD alt text, and legacy-link isolation.\n'

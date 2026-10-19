@@ -26,4 +26,4 @@ Choose a [component](components/) to understand its role in the suite, or browse
 - [The Mergeway repository model](explanation/repository-model/) defines repository, workspace, entity, and record.
 - [The validation model](explanation/validation-model/) explains format, schema, and reference checks.
 
-The existing mdBook documentation remains the production site during this migration. This Hugo site documents the first-use journey while later reference sections are still being reviewed.
+The existing mdBook documentation remains the production site until the reviewed Hugo site reaches the production-cutover phase. The Hugo content now covers the released specification, binaries, advanced repository workflows, and project authoring guidance; the unavailable visual-editor documentation remains explicitly gated by its source merge.

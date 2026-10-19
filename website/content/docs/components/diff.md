@@ -39,5 +39,6 @@ Diff compares committed revisions or a revision and working-tree state, then des
 - [Compare two Git revisions](../../how-to/diff/revisions/).
 - [Publish a semantic change summary](../../how-to/diff/publish-summary/).
 - [Consume JSON output in automation](../../how-to/diff/json-automation/).
+- [Troubleshoot revisions, snapshots, empty results, and automation](../../how-to/diff/troubleshoot/).
 
 Validate a repository with [`mergeway-cli validate`](../../reference/cli/validate/) before publishing a diff. Diff parses repository data so it can compare records, but it does not perform the full schema and relationship validation contract.

@@ -13,6 +13,7 @@ params:
 How-to guides provide focused procedures for real tasks.
 
 - [Install Mergeway tools](install/) using a release archive or a clearly scoped alternative.
+- [Model advanced repositories](repositories/) with JSON Schema, JSONPath, inheritance, reference unions, path-derived data, or OKF documents.
 - [Create, inspect, update, and delete records](cli/manage-records/).
 - [Choose configuration or repository validation](cli/choose-validation/).
 - [Split schemas and records across files](cli/split-files/).
@@ -23,5 +24,6 @@ How-to guides provide focused procedures for real tasks.
 - [Publish a semantic summary](diff/publish-summary/) or [consume JSON diff output](diff/json-automation/).
 - [Connect, scope, serve, and troubleshoot read-only MCP access](mcp/).
 - [Configure and troubleshoot an editor-neutral LSP client](lsp/).
+- Troubleshoot the [CLI](cli/troubleshoot/), [Diff](diff/troubleshoot/), [MCP](mcp/troubleshoot/), or [LSP](lsp/troubleshoot/) through focused component guides.
 
 See [Components](../components/) for current availability boundaries.

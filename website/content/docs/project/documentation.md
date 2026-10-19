@@ -33,4 +33,16 @@ Replace every placeholder before setting `draft: false`. Use site-root links for
 
 ## Validation
 
-From the repository root, run `make website-check`. It performs the production build with warnings promoted to failures, asserts the required routes and navigation order, rejects legacy mdBook-relative links, and validates generated internal links.
+From the repository root, run `make website-check`. It performs the production build with warnings promoted to failures, asserts required routes, aliases, search terms, and navigation order, rejects legacy mdBook-relative links, checks executable examples and migration coverage, reports orphan/duplicate content, and validates generated internal links.
+
+Use the narrower commands while drafting:
+
+```sh
+make website-build
+make website-check-content
+make website-serve
+```
+
+`website/content/docs/` is the canonical Hugo source. `website/migration-ledger.md` records the disposition of every legacy public page and relevant architecture note. The legacy `docs/` mdBook remains buildable during the transition; do not maintain a second canonical copy there.
+
+Every behavioral page should link to a useful page in another mode when the relationship exists: guides link to reference, reference links to tasks or explanation, and explanation links to an executable workflow. See [Contributing](../contributing/) for the repository-wide review process.
