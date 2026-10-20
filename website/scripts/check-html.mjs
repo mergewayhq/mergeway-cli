@@ -64,6 +64,15 @@ for (const file of htmlFiles) {
 
   canonicalPages += 1;
   if (!/<main\b/i.test(document)) fail(file, "missing main landmark");
+  const breadcrumb = document.match(/<nav\b[^>]*aria-label=(?:["']?Breadcrumb["']?)[^>]*>([\s\S]*?)<\/nav>/i);
+  if (path.relative(publicDir, file) === "index.html") {
+    if (breadcrumb) fail(file, "homepage must not render breadcrumbs");
+    if (!/<img\b[^>]*\bclass=(?:"[^"]*\blanding-logo\b[^"]*"|'[^']*\blanding-logo\b[^']*'|landing-logo(?=\s|>))[^>]*\bsrc=(?:"\/mergeway-logo\.svg"|'\/mergeway-logo\.svg'|\/mergeway-logo\.svg(?=\s|>))/i.test(document)) {
+      fail(file, "homepage is missing the Mergeway logo");
+    }
+  } else if (breadcrumb && /<li><a\s+href=(?:"\/(?:docs\/)?"|'\/(?:docs\/)?'|\/(?:docs\/)?(?=\s|>))/i.test(breadcrumb[1])) {
+    fail(file, "breadcrumb must not link to the homepage or documentation root");
+  }
   const headings = matches(document, /<h([1-6])\b/gi).map((match) => Number(match[1]));
   if (headings.length === 0 || headings[0] !== 1) fail(file, "heading outline does not begin with h1");
   for (let index = 1; index < headings.length; index += 1) {

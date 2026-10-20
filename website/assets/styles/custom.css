@@ -1,4 +1,11 @@
 /* Release-candidate accessibility safeguards layered on Hugo Book. */
+.landing-logo {
+  display: block;
+  width: min(100%, 20rem);
+  height: auto;
+  margin-bottom: var(--space-16);
+}
+
 .book-header-title {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -8,12 +15,20 @@
   color: red;
 }
 
+.book-brand {
+  font-size: 1.5rem;
+}
+
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 3px solid #0067c0;
   outline-offset: 3px;
 }
 
 @media (prefers-color-scheme: dark) {
+  .landing-logo {
+    filter: invert(1);
+  }
+
   :where(a, button, input, select, textarea, [tabindex]):focus-visible {
     outline-color: #70b7ff;
   }

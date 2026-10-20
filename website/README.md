@@ -64,7 +64,7 @@ Commit both `go.mod` and `go.sum`, then run both site builds. Never use an unqua
 
 The site has six narrow Hugo Book overrides:
 
-- `layouts/_partials/docs/inject/content-before.html` uses the theme's supported content-injection point to add breadcrumbs, which Hugo Book v13 does not provide.
+- `layouts/_partials/docs/inject/content-before.html` uses the theme's supported content-injection point to add page-configurable breadcrumbs without redundant home or documentation-root links, which Hugo Book v13 does not provide.
 - `layouts/_partials/docs/brand.html` keeps the brand linked to this single-language site's home page and uses a non-heading container so navigation chrome does not precede the page's `h1` in the document outline.
 - `layouts/404.html` keeps Hugo Book's not-found presentation but repairs its skipped heading level and gives the return link a descriptive name.
 - `layouts/_partials/docs/toc.html` removes Hugo's fixed `TableOfContents` ID because the responsive theme renders the table of contents twice, which would otherwise create duplicate IDs.

@@ -6,6 +6,7 @@ params:
   bookBreadcrumbs: false
 ---
 
+<img class="landing-logo" src="/mergeway-logo.svg" alt="Mergeway logo">
 
 # Mergeway {anchor=false}
 
