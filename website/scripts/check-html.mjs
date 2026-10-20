@@ -70,6 +70,12 @@ for (const file of htmlFiles) {
     if (!/<img\b[^>]*\bclass=(?:"[^"]*\blanding-logo\b[^"]*"|'[^']*\blanding-logo\b[^']*'|landing-logo(?=\s|>))[^>]*\bsrc=(?:"\/mergeway-logo\.svg"|'\/mergeway-logo\.svg'|\/mergeway-logo\.svg(?=\s|>))/i.test(document)) {
       fail(file, "homepage is missing the Mergeway logo");
     }
+    if (!/<a\b[^>]*\bhref=(?:"\/docs\/tutorials\/first-repository\/"|'\/docs\/tutorials\/first-repository\/'|\/docs\/tutorials\/first-repository\/(?=\s|>))[^>]*>Build your first repository<\/a>/i.test(document)) {
+      fail(file, "homepage is missing the first-repository call to action");
+    }
+    if (!/<a\b[^>]*\bhref=(?:"\/docs\/components\/"|'\/docs\/components\/'|\/docs\/components\/(?=\s|>))[^>]*>Choose a component<\/a>/i.test(document)) {
+      fail(file, "homepage is missing the component chooser call to action");
+    }
   } else if (breadcrumb && /<li><a\s+href=(?:"\/(?:docs\/)?"|'\/(?:docs\/)?'|\/(?:docs\/)?(?=\s|>))/i.test(breadcrumb[1])) {
     fail(file, "breadcrumb must not link to the homepage or documentation root");
   }

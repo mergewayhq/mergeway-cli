@@ -6,6 +6,18 @@
   margin-bottom: var(--space-16);
 }
 
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin: calc(var(--space-16) * 1.5) 0;
+}
+
+.markdown a.btn-primary[href] {
+  color: var(--body-background);
+  background: var(--color-link);
+}
+
 .book-header-title {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -43,4 +55,8 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+:root {
+  --color-visited-link: var(--color-link);
 }

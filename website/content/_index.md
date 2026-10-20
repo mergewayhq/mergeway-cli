@@ -13,6 +13,9 @@ params:
 Mergeway is a specification and suite of tools for reading and modifying a file-based database.  
 Schemas and records stay in ordinary YAML and JSON files, so teams can review data changes in Git while Mergeway checks structure and relationships.
 
+{{< button href="/docs/how-to/install/" class="btn-primary">}}Install mergeway-cli{{< /button >}}
+{{< button href="/docs/tutorials/first-repository/" >}}Build your first repository{{< /button >}}
+
 ## One repository model, several ways to work
 
 Use `mergeway-cli` to validate, inspect, modify, format, and export records. Add `mergeway-diff` for semantic reviews, `mergeway-mcp` for read-only AI-tool access, or `mergeway-lsp` for editor diagnostics and navigation. Every component implements the same repository model defined by the Mergeway specification.
