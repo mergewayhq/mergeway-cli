@@ -48,10 +48,27 @@ GitHub release archives are the default installation route. One platform archive
 | Method | Provides | When to use it |
 | --- | --- | --- |
 | Release archive | CLI, Diff, MCP, and LSP | Recommended for tutorials and matched suite versions. |
+| Nix flake | CLI, Diff, MCP, and LSP | Install or run the tools from Nix. |
 | Docker | CLI only | Run validation or other CLI operations in a Linux container. |
 | Go install | One requested binary at a time | Install from Go module source with a local Go toolchain. |
-| Nix flake | CLI only | Install or run the CLI from Nix. |
 | Source build | CLI, Diff, MCP, and LSP | Develop or test this repository. |
+
+### Nix
+
+Install all four tools from the flake:
+
+```sh
+nix profile install github:mergewayhq/mergeway-cli
+```
+
+You can also run each tool directly without installing it:
+
+```sh
+nix run github:mergewayhq/mergeway-cli -- version
+nix run github:mergewayhq/mergeway-cli#mergeway-diff -- --help
+nix run github:mergewayhq/mergeway-cli#mergeway-mcp -- --help
+nix run github:mergewayhq/mergeway-cli#mergeway-lsp -- --help
+```
 
 ### Docker
 
@@ -73,15 +90,6 @@ go install github.com/mergewayhq/mergeway-cli/cmd/mergeway-lsp@latest
 ```
 
 For reproducible automation, replace `@latest` with a release tag.
-
-### Nix
-
-The flake exposes the CLI, not the other three binaries:
-
-```sh
-nix profile install github:mergewayhq/mergeway-cli
-nix run github:mergewayhq/mergeway-cli -- version
-```
 
 ### Source
 
