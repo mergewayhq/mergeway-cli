@@ -1,6 +1,6 @@
 ---
 title: Component architecture
-description: Understand how the specification and shared Go core support the CLI, Diff, MCP, LSP, and editor integrations.
+description: Understand how the specification and shared Go core support the CLI, Python SDK, Diff, MCP, LSP, and editor integrations.
 type: docs
 mode: explanation
 weight: 80
@@ -18,6 +18,7 @@ repository files
 configuration + data + validation core
       │
       ├── mergeway-cli  operations, validation, formatting, export
+      │        └── JSON subprocess interface ── mergeway-python
       ├── mergeway-diff snapshots and semantic comparison
       ├── mergeway-mcp  read-only MCP tools
       └── mergeway-lsp  diagnostics and language features
@@ -32,7 +33,7 @@ configuration + data + validation core
 
 ## Workflow boundaries
 
-The [CLI](../../components/cli/) is the explicit mutation and automation interface. [Diff](../../components/diff/) builds logical snapshots rather than comparing lines. [MCP](../../components/mcp/) exposes a deliberately read-only tool surface. [LSP](../../components/lsp/) maintains workspace indexes and unsaved overlays, then maps shared validation into editor diagnostics.
+The [CLI](../../components/cli/) is the explicit mutation and automation interface. The [Python SDK](../../components/python/) invokes it as a subprocess and converts its JSON boundary into dictionaries or generated dataclasses; it does not link to the shared Go packages directly. [Diff](../../components/diff/) builds logical snapshots rather than comparing lines. [MCP](../../components/mcp/) exposes a deliberately read-only tool surface. [LSP](../../components/lsp/) maintains workspace indexes and unsaved overlays, then maps shared validation into editor diagnostics.
 
 The checked-in VS Code extension is an LSP client and does not redefine repository behavior. The separate visual editor assumed by the migration plan is not present in this repository, so no visual-editor architecture is claimed here. [Editor architecture](../editor-architecture/) covers the shipped LSP boundary.
 

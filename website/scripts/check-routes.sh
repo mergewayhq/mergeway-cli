@@ -11,6 +11,7 @@ routes='
 /docs/components/specification/ docs/components/specification/index.html
 /docs/components/cli/ docs/components/cli/index.html
 /docs/components/diff/ docs/components/diff/index.html
+/docs/components/python/ docs/components/python/index.html
 /docs/components/mcp/ docs/components/mcp/index.html
 /docs/components/lsp/ docs/components/lsp/index.html
 /docs/components/vscode/ docs/components/vscode/index.html
@@ -20,6 +21,9 @@ routes='
 /docs/tutorials/inspect-with-ai-client/ docs/tutorials/inspect-with-ai-client/index.html
 /docs/how-to/ docs/how-to/index.html
 /docs/how-to/install/ docs/how-to/install/index.html
+/docs/how-to/python/ docs/how-to/python/index.html
+/docs/how-to/python/install/ docs/how-to/python/install/index.html
+/docs/how-to/python/getting-started/ docs/how-to/python/getting-started/index.html
 /docs/reference/ docs/reference/index.html
 /docs/reference/cli/ docs/reference/cli/index.html
 /docs/reference/diff/ docs/reference/diff/index.html
@@ -154,6 +158,7 @@ for route in \
   /docs/components/specification/ \
   /docs/components/cli/ \
   /docs/components/diff/ \
+  /docs/components/python/ \
   /docs/components/mcp/ \
   /docs/components/lsp/ \
   /docs/components/vscode/
@@ -216,12 +221,24 @@ for term in \
   'Specification' \
   'mergeway-cli' \
   'mergeway-diff' \
+  'mergeway-python' \
   'mergeway-mcp' \
   'mergeway-lsp' \
   'VS Code'
 do
   if ! grep -q "$term" "$search_index"; then
     echo "search index does not contain component term: $term" >&2
+    exit 1
+  fi
+done
+
+for alias_file in \
+  python/index.html \
+  python/installation/index.html \
+  python/getting-started/index.html
+do
+  if [ ! -s "$public_dir/$alias_file" ]; then
+    echo "missing Python SDK legacy alias $public_dir/$alias_file" >&2
     exit 1
   fi
 done

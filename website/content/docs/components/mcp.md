@@ -2,7 +2,7 @@
 title: MCP
 description: Give MCP clients read-only, scoped access to a Mergeway repository.
 type: docs
-weight: 40
+weight: 50
 bookToC: true
 ---
 

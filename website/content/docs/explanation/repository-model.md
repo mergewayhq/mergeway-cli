@@ -48,6 +48,6 @@ mergeway.yaml
             -> one logical set of entities, records, and relationships
 ```
 
-Commands such as `files` expose physical sources. Commands such as `list`, `get`, validation, export, Diff, MCP, and LSP operate on the logical model appropriate to their purpose.
+Commands such as `files` expose physical sources. Commands such as `list`, `get`, validation, export, Diff, MCP, and LSP operate on the logical model appropriate to their purpose. The Python SDK reaches the same model through the CLI's JSON interface.
 
 Try the model in [Build your first Mergeway repository](../../tutorials/first-repository/), learn [how validation traverses it](../validation-model/), or visit the [Specification hub](../../components/specification/).

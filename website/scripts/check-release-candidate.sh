@@ -64,7 +64,7 @@ node website/scripts/check-html.mjs "$public_dir"
 search_index=$(find "$public_dir" -maxdepth 1 -type f -name 'en.search-data*.json' -print -quit)
 [ -n "$search_index" ] || { echo "missing search data" >&2; exit 1; }
 for term in \
-  'Specification' mergeway-cli mergeway-diff mergeway-mcp mergeway-lsp 'VS Code' \
+  'Specification' mergeway-cli mergeway-diff mergeway-python mergeway-mcp mergeway-lsp 'VS Code' \
   'config export' gen-erd mergeway.version identifier json_schema entity_list object_get \
   textDocumentSync workspaceSymbolProvider mergeway.lsp.path mergeway.lsp.trace.server \
   'unknown entity' 'already exists' 'configuration valid'

@@ -18,7 +18,7 @@ Mergeway takes the opposite starting point. YAML and JSON records live in a Git 
 - **Reviewable intent.** A pull request shows which schemas and records changed and why.
 - **Reproducible state.** A Git revision identifies the repository data used by a build or deployment.
 - **Early feedback.** Validation catches malformed files, schema violations, duplicate identifiers, and broken relationships before merge.
-- **Tool choice.** People can edit text directly, use an editor integration, automate with the CLI, or inspect through a read-only MCP client without changing the underlying format.
+- **Tool choice.** People can edit text directly, use an editor integration, automate with the CLI or Python SDK, or inspect through a read-only MCP client without changing the underlying format.
 - **Portable output.** Export turns the file layout into a consolidated YAML or JSON snapshot for downstream tools.
 
 ## What it does not try to replace
@@ -29,6 +29,6 @@ The file layout is also not the logical model. Teams may split records across ma
 
 ## One model across the suite
 
-The specification defines the model. `mergeway-cli` operates on it, `mergeway-diff` compares revisions semantically, `mergeway-lsp` reports editor feedback, and `mergeway-mcp` exposes read-only inspection. Because these tools share loading and validation behavior, a relationship that fails in the CLI should not silently mean something different in an editor or integration.
+The specification defines the model. `mergeway-cli` operates on it, `mergeway-python` wraps those CLI operations for Python, `mergeway-diff` compares revisions semantically, `mergeway-lsp` reports editor feedback, and `mergeway-mcp` exposes read-only inspection. Because these tools share the CLI or core loading and validation behavior, a relationship that fails in the CLI should not silently mean something different in an editor or integration.
 
 Continue with [The Mergeway repository model](../repository-model/), try [the first-repository tutorial](../../tutorials/first-repository/), or compare the [suite components](../../components/).

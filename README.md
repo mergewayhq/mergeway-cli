@@ -1,12 +1,13 @@
 # Mergeway CLI
 
-`mergeway-cli` is a command-line toolkit for keeping metadata in version control. It stores YAML and JSON objects on disk, validates their schemas, and verifies the integrity of relationships between those objects so your automation stays trustworthy. This repository also ships `mergeway-diff` for semantic repository snapshots, `mergeway-lsp` for editor integrations, and `mergeway-mcp` as a read-only MCP server for repository inspection workflows.
+`mergeway-cli` is a command-line toolkit for keeping metadata in version control. It stores YAML and JSON objects on disk, validates their schemas, and verifies the integrity of relationships between those objects so your automation stays trustworthy. This repository also ships `mergeway-diff` for semantic repository snapshots, `mergeway-lsp` for editor integrations, and `mergeway-mcp` as a read-only MCP server for repository inspection workflows. The separately published `mergeway` Python package wraps the CLI for typed Python automation.
 
 For full product and documentation coverage, visit:
 
 - [Mergeway website](https://mergewayhq.github.io)
 - [Build your first repository](https://mergewayhq.github.io/docs/tutorials/first-repository/)
 - [Mergeway CLI reference](https://mergewayhq.github.io/docs/reference/cli/)
+- [Mergeway Python SDK](https://mergewayhq.github.io/docs/components/python/)
 - [How-to guides](https://mergewayhq.github.io/docs/how-to/)
 
 The Hugo source for those routes is in `website/`. The legacy mdBook source in `docs/` remains the deployed rollback path until the website cutover; contributors should make new canonical user-documentation changes in Hugo and consult the migration ledger rather than copying pages between both trees.

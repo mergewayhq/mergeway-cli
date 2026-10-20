@@ -2,7 +2,7 @@
 title: LSP
 description: Add Mergeway diagnostics and repository-aware navigation to compatible editors.
 type: docs
-weight: 50
+weight: 60
 bookToC: true
 ---
 

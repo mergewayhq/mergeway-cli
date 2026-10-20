@@ -2,7 +2,7 @@
 title: VS Code
 description: Connect Visual Studio Code to Mergeway language features through the local LSP server.
 type: docs
-weight: 60
+weight: 70
 bookToC: true
 ---
 

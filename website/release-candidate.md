@@ -15,7 +15,7 @@ Two public surfaces exist and must not be conflated:
 
 `legacy-routes.tsv` records both inventories, every reviewed replacement, and three useful source-form aliases found in old navigation/source. Deployment-level static aliases handle the current `/cli/` tree and project-prefixed `/mergeway-cli/` tree; Hugo aliases handle historical unprefixed `.html` and trailing-slash forms.
 
-The empty blog/taxonomy indexes, legacy `llms` exports, and mdBook's aggregate print, table-of-contents, and project-specific 404 views are intentionally retired. The three `mergeway-python` routes have no equivalent in this repository and are explicitly marked out of scope rather than silently claimed as migrated. Independent parity review must accept that disposition or require the organization-site cutover to retain them before Phase 12. All CLI content routes receive aliases.
+The empty blog/taxonomy indexes, legacy `llms` exports, and mdBook's aggregate print, table-of-contents, and project-specific 404 views are intentionally retired. The three existing `mergeway-python` routes now map to the Python SDK component, installation, and getting-started pages in this repository. All CLI content routes receive aliases.
 
 During parity review, change content only to fix a release-blocking defect. A correction must update its relevant executable check and the Phase 11 evidence. New features, new workflows, broad rewrites, dependency updates, and navigation restructuring wait until the freeze is lifted after cutover review.
 
@@ -39,7 +39,7 @@ Automated checks require one English page title, production canonical, main land
 | Page class | Desktop | Mobile |
 | --- | --- | --- |
 | Home and documentation index | `/`, `/docs/` | `/`, `/docs/` |
-| Component hubs | all six under `/docs/components/` | all six under `/docs/components/` |
+| Component hubs | all seven under `/docs/components/` | all seven under `/docs/components/` |
 | Diátaxis samples | first-repository tutorial, install how-to, specification overview reference, metadata-as-code explanation | same four |
 | Long/deep reference | specification fields, CLI create, MCP tools, LSP server reference | same four |
 
@@ -51,7 +51,7 @@ For each viewport, keyboard through the menu toggle, search, sidebar, breadcrumb
 2. Download the CI artifact and verify its SHA-256 against the Actions log or locally rebuilt archive.
 3. Preserve the current `gh-pages` tip and the approved Hugo artifact identifier in the cutover record.
 4. Make the production change in `mergewayhq/mergewayhq.github.io`, whose Pages workflow owns the root host. Replace its generated `public` input with the unpacked approved artifact, or integrate this exact artifact as its root publish input. A change only to this repository's `gh-pages` publisher affects `/mergeway-cli/` and cannot cut over the organization root.
-5. Preserve or explicitly approve retirement of the organization site's Python pages and utility exports. Do not let an unrelated rebuild of this repository supply mutable documentation during the approved artifact deployment.
+5. Verify that the organization site's three Python routes redirect to the SDK pages in the approved artifact, and explicitly approve retirement of the utility exports. Do not let an unrelated rebuild of this repository supply mutable documentation during the approved artifact deployment.
 6. Deploy through the organization repository's `actions/deploy-pages` workflow, then crawl every non-retired entry in `legacy-routes.tsv`, the canonical route set, internal links, and anchors on the public host.
 7. Recheck the accessibility matrix on the public host. If any release blocker appears, execute rollback before accepting unrelated changes.
 

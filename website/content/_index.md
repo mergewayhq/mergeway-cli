@@ -18,7 +18,7 @@ Schemas and records stay in ordinary YAML and JSON files, so teams can review da
 
 ## One repository model, several ways to work
 
-Use `mergeway-cli` to validate, inspect, modify, format, and export records. Add `mergeway-diff` for semantic reviews, `mergeway-mcp` for read-only AI-tool access, or `mergeway-lsp` for editor diagnostics and navigation. Every component implements the same repository model defined by the Mergeway specification.
+Use `mergeway-cli` to validate, inspect, modify, format, and export records. Add `mergeway-diff` for semantic reviews, `mergeway-python` for typed Python automation, `mergeway-mcp` for read-only AI-tool access, or `mergeway-lsp` for editor diagnostics and navigation. Every component works with the same repository model defined by the Mergeway specification.
 
 {{% columns %}}
 
@@ -30,6 +30,9 @@ Use `mergeway-cli` to validate, inspect, modify, format, and export records. Add
 
 - ### Connect tools {anchor=false}
   Give AI clients read-only access through [`mergeway-mcp`](/docs/components/mcp/) or editor clients diagnostics and navigation through [`mergeway-lsp`](/docs/components/lsp/).
+
+- ### Automate with Python {anchor=false}
+  Use the [`mergeway` Python package](/docs/components/python/) to generate typed models and automate repository operations.
 
 {{% /columns %}}
 

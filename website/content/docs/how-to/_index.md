@@ -16,6 +16,7 @@ aliases:
 How-to guides provide focused procedures for real tasks.
 
 - [Install Mergeway tools](install/) using a release archive or a clearly scoped alternative.
+- [Install and use the Python SDK](python/) for typed repository automation.
 - [Model advanced repositories](repositories/) with JSON Schema, JSONPath, inheritance, reference unions, path-derived data, or OKF documents.
 - [Create, inspect, update, and delete records](cli/manage-records/).
 - [Choose configuration or repository validation](cli/choose-validation/).

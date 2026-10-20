@@ -38,9 +38,9 @@ legacy_path	live_status	disposition	destination	implementation
 /cli/reference/version/	live-sitemap	redirect	/docs/reference/cli/version/	generated-static-alias
 /llms-full.txt	live-sitemap	retired	-	legacy-site-export
 /llms.txt	live-sitemap	retired	-	legacy-site-export
-/python/	live-sitemap	retired	-	out-of-scope-python-component
-/python/getting-started/	live-sitemap	retired	-	out-of-scope-python-component
-/python/installation/	live-sitemap	retired	-	out-of-scope-python-component
+/python/	live-sitemap	redirect	/docs/components/python/	hugo-alias
+/python/getting-started/	live-sitemap	redirect	/docs/how-to/python/getting-started/	hugo-alias
+/python/installation/	live-sitemap	redirect	/docs/how-to/python/install/	hugo-alias
 /tags/	live-sitemap	retired	-	empty-taxonomy-index
 /mergeway-cli/	published	redirect	/	generated-static-alias
 /mergeway-cli/404.html	published	retired	-	project-404-handler
