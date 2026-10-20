@@ -2,10 +2,12 @@
 title: Mergeway
 description: Explore the Mergeway specification and tools for working with a file-based database.
 layout: landing
+params:
+  bookBreadcrumbs: false
 ---
 
 
-# Mergeway
+# Mergeway {anchor=false}
 
 Mergeway is a specification and suite of tools for reading and modifying a file-based database.  
 Schemas and records stay in ordinary YAML and JSON files, so teams can review data changes in Git while Mergeway checks structure and relationships.

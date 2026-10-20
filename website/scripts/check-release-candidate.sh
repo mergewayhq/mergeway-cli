@@ -25,16 +25,26 @@ trap cleanup EXIT HUP INT TERM
 
 published=$(awk -F '\t' 'NR > 1 && $2 == "published" { count++ } END { print count + 0 }' "$inventory")
 [ "$published" -eq 36 ] || { echo "expected 36 published live HTML routes, found $published" >&2; exit 1; }
+live_sitemap=$(awk -F '\t' 'NR > 1 && $2 == "live-sitemap" { count++ } END { print count + 0 }' "$inventory")
+[ "$live_sitemap" -eq 43 ] || { echo "expected 43 current live sitemap routes, found $live_sitemap" >&2; exit 1; }
+retired=$(awk -F '\t' 'NR > 1 && $3 == "retired" { count++ } END { print count + 0 }' "$inventory")
 
-while IFS='	' read -r legacy status disposition destination implementation; do
+while IFS='	' read -r legacy _status disposition destination implementation; do
   [ "$legacy" != "legacy_path" ] || continue
   relative=${legacy#/}
+  case "$relative" in
+    '') relative=index.html ;;
+    */) relative=${relative}index.html ;;
+  esac
   case "$disposition" in
     retained|system)
       [ -s "$public_dir/$relative" ] || { echo "missing retained route $legacy" >&2; exit 1; }
       ;;
     redirect)
-      [ "$implementation" = "hugo-alias" ] || { echo "unsupported redirect implementation for $legacy" >&2; exit 1; }
+      case "$implementation" in
+        hugo-alias|generated-static-alias) ;;
+        *) echo "unsupported redirect implementation for $legacy" >&2; exit 1 ;;
+      esac
       [ -s "$public_dir/$relative" ] || { echo "missing alias route $legacy" >&2; exit 1; }
       grep -Fq "url=https://mergewayhq.github.io$destination" "$public_dir/$relative" || {
         echo "alias $legacy does not target $destination" >&2
@@ -87,7 +97,7 @@ until curl --fail --silent --output /dev/null "$base_url/"; do
 done
 
 mapped=0
-while IFS='	' read -r legacy status disposition destination implementation; do
+while IFS='	' read -r legacy _status disposition destination _implementation; do
   [ "$legacy" != "legacy_path" ] || continue
   [ "$disposition" != "retired" ] || continue
   curl --fail --silent --output /dev/null "$base_url$legacy"
@@ -97,5 +107,5 @@ while IFS='	' read -r legacy status disposition destination implementation; do
   fi
 done < "$inventory"
 
-printf 'Legacy route inventory: %s published routes; %s redirects have reachable source files and destinations; 2 mdBook-only views intentionally retired.\n' "$published" "$mapped"
+printf 'Route inventory: %s current live sitemap routes and %s published mdBook routes; %s redirects have reachable source files and destinations; %s routes intentionally retired.\n' "$live_sitemap" "$published" "$mapped" "$retired"
 printf 'Production artifact hygiene, production canonicals, search coverage, focus/reduced-motion CSS, and static route crawling passed.\n'

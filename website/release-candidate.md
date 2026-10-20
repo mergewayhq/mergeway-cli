@@ -8,9 +8,14 @@ This runbook governs the Phase 11 artifact. Until Phase 12 is approved, the `bui
 
 ## Frozen inputs and route inventory
 
-The live-route snapshot is the complete set of HTML files in `origin/gh-pages` commit `6ca7115862b16dcd50bda0b53c855e12f73beef2`, deployed from source commit `6a8b671c4d8e2320f08ae828fff03ad6274c7ddf`. The root page was also fetched from `https://mergewayhq.github.io/` on 2026-10-19 and matched that mdBook deployment. `legacy-routes.tsv` records all 36 published HTML routes, their reviewed destinations, and three useful source-form aliases found in the deployed navigation/source.
+Two public surfaces exist and must not be conflated:
 
-`print.html` and `toc.html` are intentionally retired. They are mdBook application views rather than independent content pages: Hugo provides per-page browser printing and its persistent documentation navigation. The generated 404 route and home page are retained; all other published content routes receive Hugo aliases.
+- The organization site at `https://mergewayhq.github.io/` is built by `mergewayhq/mergewayhq.github.io`. Its sitemap was fetched on 2026-10-19 and contains 43 routes. Its source tip was `3e4b657b673e3a910f02b94dc428a310bb0fb9fb`; the live response identifies Hugo 0.154.2 and the repository's Pages workflow mounts CLI docs at `/cli/`.
+- The mdBook project site at `https://mergewayhq.github.io/mergeway-cli/` is the 36-HTML-file artifact in this repository's `origin/gh-pages` commit `0240a15aa3214f136ba2022c15eee17e2b756bb8`, deployed from source commit `f69b6af9915deb9deee7b1925b266ef0bb45c86a`.
+
+`legacy-routes.tsv` records both inventories, every reviewed replacement, and three useful source-form aliases found in old navigation/source. Deployment-level static aliases handle the current `/cli/` tree and project-prefixed `/mergeway-cli/` tree; Hugo aliases handle historical unprefixed `.html` and trailing-slash forms.
+
+The empty blog/taxonomy indexes, legacy `llms` exports, and mdBook's aggregate print, table-of-contents, and project-specific 404 views are intentionally retired. The three `mergeway-python` routes have no equivalent in this repository and are explicitly marked out of scope rather than silently claimed as migrated. Independent parity review must accept that disposition or require the organization-site cutover to retain them before Phase 12. All CLI content routes receive aliases.
 
 During parity review, change content only to fix a release-blocking defect. A correction must update its relevant executable check and the Phase 11 evidence. New features, new workflows, broad rewrites, dependency updates, and navigation restructuring wait until the freeze is lifted after cutover review.
 
@@ -45,22 +50,24 @@ For each viewport, keyboard through the menu toggle, search, sidebar, breadcrumb
 1. Require a green `website-check` job and reviewer approval of parity, redirects, accessibility, and rollback readiness for the exact commit.
 2. Download the CI artifact and verify its SHA-256 against the Actions log or locally rebuilt archive.
 3. Preserve the current `gh-pages` tip and the approved Hugo artifact identifier in the cutover record.
-4. Change only the publish input of `build-and-deploy` from `docs/book` to the checked `website/public` output (or the unpacked approved artifact); retain the existing GitHub Pages branch and action until post-cutover verification is complete.
-5. Deploy from `main`, then crawl every non-retired entry in `legacy-routes.tsv`, the canonical route set, internal links, and anchors on the public host.
-6. Recheck the accessibility matrix on the public host. If any release blocker appears, execute rollback before accepting unrelated changes.
+4. Make the production change in `mergewayhq/mergewayhq.github.io`, whose Pages workflow owns the root host. Replace its generated `public` input with the unpacked approved artifact, or integrate this exact artifact as its root publish input. A change only to this repository's `gh-pages` publisher affects `/mergeway-cli/` and cannot cut over the organization root.
+5. Preserve or explicitly approve retirement of the organization site's Python pages and utility exports. Do not let an unrelated rebuild of this repository supply mutable documentation during the approved artifact deployment.
+6. Deploy through the organization repository's `actions/deploy-pages` workflow, then crawl every non-retired entry in `legacy-routes.tsv`, the canonical route set, internal links, and anchors on the public host.
+7. Recheck the accessibility matrix on the public host. If any release blocker appears, execute rollback before accepting unrelated changes.
 
 Phase 11 does not authorize these production mutations.
 
 ## Rollback
 
-The last known-good mdBook site is `origin/gh-pages` commit `6ca7115862b16dcd50bda0b53c855e12f73beef2`. Verify its recoverability without changing production:
+The last known-good organization-site source is `mergewayhq/mergewayhq.github.io` commit `3e4b657b673e3a910f02b94dc428a310bb0fb9fb`. The last known-good mdBook project artifact is this repository's `origin/gh-pages` commit `0240a15aa3214f136ba2022c15eee17e2b756bb8`. Verify both without changing production:
 
 ```sh
-git cat-file -e 6ca7115862b16dcd50bda0b53c855e12f73beef2^{commit}
-git archive --format=tar 6ca7115862b16dcd50bda0b53c855e12f73beef2 | tar -tf - | sort
+git ls-remote https://github.com/mergewayhq/mergewayhq.github.io.git refs/heads/main
+git cat-file -e 0240a15aa3214f136ba2022c15eee17e2b756bb8^{commit}
+git archive --format=tar 0240a15aa3214f136ba2022c15eee17e2b756bb8 | tar -tf - | sort
 ```
 
-For an actual rollback, first record the failed Hugo deployment tip. A repository administrator then restores the known-good tree to `gh-pages` using a force-with-lease scoped to that recorded failed tip, or reruns the unchanged mdBook publisher from source commit `6a8b671c4d8e2320f08ae828fff03ad6274c7ddf`. Afterward, verify `/`, representative CLI/guide routes, all static assets, and the legacy route inventory on the public host. Never force-push without the expected remote tip and an incident record.
+For an actual root-site rollback, first record the failed organization-site deployment and source tip. A repository administrator reverts the cutover commit back to `3e4b657b673e3a910f02b94dc428a310bb0fb9fb` (or its reviewed successor) and reruns that repository's unchanged `actions/deploy-pages` workflow. The `/mergeway-cli/` project site remains separately recoverable by rerunning this repository's mdBook publisher from `f69b6af9915deb9deee7b1925b266ef0bb45c86a`; do not force-push either branch without the expected remote tip and an incident record. Afterward, verify `/`, `/cli/`, `/python/`, representative guide/reference routes, `/mergeway-cli/`, and static assets.
 
 ## Approval record
 

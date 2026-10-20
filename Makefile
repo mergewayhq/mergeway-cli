@@ -76,6 +76,7 @@ docs-serve:
 
 website-build:
 	cd $(WEBSITE_DIR) && HUGO_CACHEDIR=$(HUGO_CACHEDIR) $(HUGO) --environment production --baseURL https://mergewayhq.github.io/ --buildDrafts=false --buildFuture=false --cleanDestinationDir --gc --minify --panicOnWarning
+	sh $(WEBSITE_DIR)/scripts/generate-redirects.sh $(WEBSITE_DIR)/public
 
 website-check: website-build website-check-routes website-check-tutorial website-check-specification website-check-cli website-check-diff website-check-mcp website-check-lsp website-check-content website-check-release-candidate website-check-links
 

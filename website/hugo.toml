@@ -4,6 +4,10 @@ description = 'Documentation for the Mergeway file-based database specification 
 defaultContentLanguage = 'en'
 disableKinds = ['taxonomy', 'term']
 
+# Book configuration
+disablePathToLower = true
+enableGitInfo = true
+
 [markup.goldmark.renderer]
   unsafe = true
 
@@ -29,3 +33,4 @@ disableKinds = ['taxonomy', 'term']
   #BookEditLink = '{{ .Site.Params.BookRepo }}/edit/main/website/{{ .Path }}'
   BookLastChangeLink = '{{ .Site.Params.BookRepo }}/commit/{{ .GitInfo.Hash }}'
   BookFavicon = 'favicon.svg'
+  BookLogo = 'logo.svg'

@@ -3,8 +3,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
   margin: 0 var(--space-16);
-  font-size: 1.17em;
+  font-size: 2em;
   font-weight: bold;
+  color: red;
 }
 
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
