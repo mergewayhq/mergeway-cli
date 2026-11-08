@@ -215,3 +215,41 @@ func pathWithinRoot(root, path string) (bool, error) {
 	}
 	return true, nil
 }
+
+// ensureResolvedPathWithinRoot prevents a lexically safe target from escaping
+// through a symlink in an existing path component.
+func ensureResolvedPathWithinRoot(root, path string) error {
+	resolvedRoot, err := filepath.EvalSymlinks(root)
+	if err != nil {
+		return fmt.Errorf("resolve workspace root: %w", err)
+	}
+
+	existing := path
+	for {
+		_, err = os.Lstat(existing)
+		if err == nil {
+			break
+		}
+		if !os.IsNotExist(err) {
+			return fmt.Errorf("inspect path %s: %w", existing, err)
+		}
+		parent := filepath.Dir(existing)
+		if parent == existing {
+			return fmt.Errorf("resolve existing parent for %s", path)
+		}
+		existing = parent
+	}
+
+	resolvedExisting, err := filepath.EvalSymlinks(existing)
+	if err != nil {
+		return fmt.Errorf("resolve path %s: %w", existing, err)
+	}
+	inside, err := pathWithinRoot(resolvedRoot, resolvedExisting)
+	if err != nil {
+		return err
+	}
+	if !inside {
+		return fmt.Errorf("must stay within the workspace root")
+	}
+	return nil
+}

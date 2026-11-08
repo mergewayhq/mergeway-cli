@@ -256,6 +256,48 @@ func (s *Store) chooseCreateTarget(typeDef *config.TypeDefinition, id string) (*
 	return nil, fmt.Errorf("data: unable to resolve create target for type %s", typeDef.Name)
 }
 
+func (s *Store) chooseExplicitCreateTarget(typeDef *config.TypeDefinition, targetPath string) (*createTarget, error) {
+	cleanTarget := filepath.Clean(filepath.FromSlash(strings.TrimSpace(targetPath)))
+	if cleanTarget == "." || cleanTarget == "" {
+		return nil, fmt.Errorf("data: create target must be a non-empty file path")
+	}
+	if filepath.IsAbs(cleanTarget) {
+		return nil, fmt.Errorf("data: create target %q must be relative to the workspace root", targetPath)
+	}
+	if cleanTarget == ".." || strings.HasPrefix(cleanTarget, ".."+string(filepath.Separator)) {
+		return nil, fmt.Errorf("data: create target %q must stay within the workspace root", targetPath)
+	}
+
+	target := filepath.Join(s.root, cleanTarget)
+	if err := ensureResolvedPathWithinRoot(s.root, target); err != nil {
+		return nil, fmt.Errorf("data: create target %q: %w", targetPath, err)
+	}
+
+	for _, include := range typeDef.Include {
+		if include.Selector != "" || include.Path == "" {
+			continue
+		}
+
+		absPattern := include.Path
+		if !filepath.IsAbs(absPattern) {
+			absPattern = filepath.Join(s.root, filepath.Clean(include.Path))
+		}
+
+		matched, err := filepath.Match(absPattern, target)
+		if err != nil {
+			return nil, fmt.Errorf("data: match include %s: %w", include.Path, err)
+		}
+		if !matched {
+			continue
+		}
+
+		multi := !typeDef.Identifier.IsPath() && !strings.ContainsAny(absPattern, "*?[")
+		return &createTarget{Path: target, Format: detectFormat(target), Multi: multi}, nil
+	}
+
+	return nil, fmt.Errorf("data: target %q does not match any writable include for %s", targetPath, typeDef.Name)
+}
+
 func (s *Store) choosePathCreateTarget(typeDef *config.TypeDefinition, id string) (*createTarget, error) {
 	relID, err := normalizePathIdentifier(id)
 	if err != nil {

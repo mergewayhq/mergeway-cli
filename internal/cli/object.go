@@ -108,6 +108,7 @@ func newCreateCommand() *cobra.Command {
 	var typeName string
 	var filePath string
 	var idFlag string
+	var targetPath string
 
 	cmd := &cobra.Command{
 		Use:   "create",
@@ -142,8 +143,13 @@ func newCreateCommand() *cobra.Command {
 			}
 
 			if typeDef.Identifier.IsPath() {
+				if targetPath != "" {
+					if idFlag == "" {
+						idFlag = targetPath
+					}
+				}
 				if idFlag == "" {
-					_, _ = fmt.Fprintf(ctx.Stderr, "create: --id is required when %s uses identifier %s\n", typeName, typeDef.Identifier.Field)
+					_, _ = fmt.Fprintf(ctx.Stderr, "create: --id or --target is required when %s uses identifier %s\n", typeName, typeDef.Identifier.Field)
 					return newExitError(1)
 				}
 				payload[typeDef.Identifier.Field] = idFlag
@@ -161,7 +167,7 @@ func newCreateCommand() *cobra.Command {
 				return newExitError(1)
 			}
 
-			obj, err := store.Create(typeName, payload)
+			obj, err := store.CreateAt(typeName, payload, targetPath)
 			if err != nil {
 				_, _ = fmt.Fprintf(ctx.Stderr, "create: %v\n", err)
 				return newExitError(1)
@@ -175,6 +181,7 @@ func newCreateCommand() *cobra.Command {
 	cmd.Flags().StringVar(&typeName, "type", "", "Type identifier")
 	cmd.Flags().StringVar(&filePath, "file", "", "Path to payload file (defaults to STDIN)")
 	cmd.Flags().StringVar(&idFlag, "id", "", "Override object identifier")
+	cmd.Flags().StringVar(&targetPath, "target", "", "Workspace-relative output path")
 
 	return cmd
 }

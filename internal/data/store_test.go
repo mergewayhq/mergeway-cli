@@ -131,6 +131,90 @@ func TestStoreCreateUpdateDelete(t *testing.T) {
 	}
 }
 
+func TestStoreCreateAtFixedIncludeAppends(t *testing.T) {
+	repo := t.TempDir()
+	cfgBody := `mergeway:
+  version: 1
+
+entities:
+  Thing:
+    identifier: id
+    include:
+      - data/things.yaml
+    fields:
+      id: string
+      name: string
+`
+	if err := os.WriteFile(filepath.Join(repo, "mergeway.yaml"), []byte(cfgBody), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	cfg, err := config.Load(filepath.Join(repo, "mergeway.yaml"))
+	if err != nil {
+		t.Fatalf("load config: %v", err)
+	}
+	store, err := NewStore(repo, cfg)
+	if err != nil {
+		t.Fatalf("new store: %v", err)
+	}
+
+	created, err := store.CreateAt("Thing", map[string]any{"id": "thing-1", "name": "One"}, "data/things.yaml")
+	if err != nil {
+		t.Fatalf("CreateAt returned error: %v", err)
+	}
+	if created.File != filepath.Join(repo, "data", "things.yaml") {
+		t.Fatalf("unexpected create target %s", created.File)
+	}
+	body, err := os.ReadFile(created.File)
+	if err != nil {
+		t.Fatalf("read target: %v", err)
+	}
+	if !strings.Contains(string(body), "items:") || !strings.Contains(string(body), "thing-1") {
+		t.Fatalf("expected multi-object file, got %s", body)
+	}
+}
+
+func TestStoreCreateAtRejectsSymlinkEscape(t *testing.T) {
+	repo := t.TempDir()
+	outside := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(repo, "data"), 0o755); err != nil {
+		t.Fatalf("create data dir: %v", err)
+	}
+	if err := os.Symlink(outside, filepath.Join(repo, "data", "things")); err != nil {
+		t.Skipf("symlinks unavailable: %v", err)
+	}
+
+	cfgBody := `mergeway:
+  version: 1
+
+entities:
+  Thing:
+    identifier: id
+    include:
+      - data/things/*.yaml
+    fields:
+      id: string
+`
+	if err := os.WriteFile(filepath.Join(repo, "mergeway.yaml"), []byte(cfgBody), 0o644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	cfg, err := config.Load(filepath.Join(repo, "mergeway.yaml"))
+	if err != nil {
+		t.Fatalf("load config: %v", err)
+	}
+	store, err := NewStore(repo, cfg)
+	if err != nil {
+		t.Fatalf("new store: %v", err)
+	}
+
+	_, err = store.CreateAt("Thing", map[string]any{"id": "thing-1"}, "data/things/thing-1.yaml")
+	if err == nil || !strings.Contains(err.Error(), "workspace root") {
+		t.Fatalf("expected symlink escape error, got %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(outside, "thing-1.yaml")); !os.IsNotExist(err) {
+		t.Fatalf("expected no file outside workspace, err=%v", err)
+	}
+}
+
 func TestStoreInheritanceParentReads(t *testing.T) {
 	store, _ := setupInheritanceStore(t, false)
 

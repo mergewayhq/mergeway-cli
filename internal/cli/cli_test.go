@@ -136,6 +136,108 @@ func TestCreateAndList(t *testing.T) {
 	}
 }
 
+func TestCreateWithExplicitTarget(t *testing.T) {
+	repo := customIdentifierRepo(t)
+	payload := filepath.Join(t.TempDir(), "payload.yaml")
+	if err := os.WriteFile(payload, []byte("name: JSON Gadget\n"), 0o644); err != nil {
+		t.Fatalf("write payload: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{
+		"--root", repo,
+		"create", "--type", "Gadget", "--id", "gadget-json",
+		"--file", payload, "--target", "data/gadgets/custom-name.json",
+	}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("create exit %d stderr %s", code, stderr.String())
+	}
+
+	createdPath := filepath.Join(repo, "data", "gadgets", "custom-name.json")
+	body, err := os.ReadFile(createdPath)
+	if err != nil {
+		t.Fatalf("read explicit target: %v", err)
+	}
+	if !strings.Contains(string(body), `"slug": "gadget-json"`) {
+		t.Fatalf("expected JSON object at explicit target, got %s", body)
+	}
+
+	stdout.Reset()
+	stderr.Reset()
+	code = Run([]string{
+		"--root", repo,
+		"create", "--type", "Gadget", "--id", "gadget-other",
+		"--file", payload, "--target", "data/gadgets/custom-name.json",
+	}, stdout, stderr)
+	if code == 0 || !strings.Contains(stderr.String(), "already exists") {
+		t.Fatalf("expected existing target error, code=%d stderr=%s", code, stderr.String())
+	}
+	body, err = os.ReadFile(createdPath)
+	if err != nil {
+		t.Fatalf("read target after rejected overwrite: %v", err)
+	}
+	if strings.Contains(string(body), "gadget-other") {
+		t.Fatalf("existing target was overwritten: %s", body)
+	}
+}
+
+func TestCreateRejectsTargetOutsideWritableIncludes(t *testing.T) {
+	repo := customIdentifierRepo(t)
+	payload := filepath.Join(t.TempDir(), "payload.yaml")
+	if err := os.WriteFile(payload, []byte("name: Gadget\n"), 0o644); err != nil {
+		t.Fatalf("write payload: %v", err)
+	}
+
+	for _, target := range []string{"data/other/gadget.yaml", "../gadget.yaml", filepath.Join(repo, "data", "gadgets", "gadget.yaml")} {
+		t.Run(target, func(t *testing.T) {
+			stdout := &bytes.Buffer{}
+			stderr := &bytes.Buffer{}
+			code := Run([]string{
+				"--root", repo,
+				"create", "--type", "Gadget", "--id", "gadget-target",
+				"--file", payload, "--target", target,
+			}, stdout, stderr)
+			if code == 0 {
+				t.Fatalf("expected target %q to be rejected", target)
+			}
+		})
+	}
+}
+
+func TestCreatePathIdentifierAcceptsTarget(t *testing.T) {
+	repo := pathIdentifierRepo(t)
+	payload := filepath.Join(t.TempDir(), "note.yaml")
+	if err := os.WriteFile(payload, []byte("title: Target Note\n"), 0o644); err != nil {
+		t.Fatalf("write payload: %v", err)
+	}
+
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	code := Run([]string{
+		"--root", repo,
+		"create", "--type", "Note", "--file", payload,
+		"--target", "data/notes/from-target.yaml",
+	}, stdout, stderr)
+	if code != 0 {
+		t.Fatalf("create exit %d stderr %s", code, stderr.String())
+	}
+	if _, err := os.Stat(filepath.Join(repo, "data", "notes", "from-target.yaml")); err != nil {
+		t.Fatalf("expected target file: %v", err)
+	}
+
+	stdout.Reset()
+	stderr.Reset()
+	code = Run([]string{
+		"--root", repo,
+		"create", "--type", "Note", "--file", payload,
+		"--id", "data/notes/id.yaml", "--target", "data/notes/target.yaml",
+	}, stdout, stderr)
+	if code == 0 || !strings.Contains(stderr.String(), "must match") {
+		t.Fatalf("expected mismatched path identifier error, code=%d stderr=%s", code, stderr.String())
+	}
+}
+
 func TestListSortsIdentifiers(t *testing.T) {
 	repo := copyFixture(t)
 	payload := filepath.Join(repo, "data", "users", "user-new.yaml")
@@ -963,8 +1065,8 @@ func TestCreatePathIdentifierRequiresID(t *testing.T) {
 	if code == 0 {
 		t.Fatalf("expected create to require --id for path identifiers")
 	}
-	if !strings.Contains(stderr.String(), "--id is required") {
-		t.Fatalf("expected missing --id error, got %s", stderr.String())
+	if !strings.Contains(stderr.String(), "--id or --target is required") {
+		t.Fatalf("expected missing --id/--target error, got %s", stderr.String())
 	}
 }
 
@@ -1366,6 +1468,7 @@ entities:
       field: slug
     include:
       - data/gadgets/*.yaml
+      - data/gadgets/*.json
     fields:
       slug:
         type: string

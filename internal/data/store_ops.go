@@ -151,6 +151,12 @@ func (s *Store) LoadExactAll(typeName string) ([]*Object, error) {
 
 // Create writes a new object to disk.
 func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) {
+	return s.CreateAt(typeName, fields, "")
+}
+
+// CreateAt writes a new object to disk, optionally at an explicit
+// workspace-relative target that matches a writable include.
+func (s *Store) CreateAt(typeName string, fields map[string]any, targetPath string) (*Object, error) {
 	typeDef, err := s.requireType(typeName)
 	if err != nil {
 		return nil, err
@@ -160,6 +166,15 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 	if err != nil {
 		return nil, fmt.Errorf("data: %s create: %w", typeName, err)
 	}
+	if targetPath != "" && typeDef.Identifier.IsPath() {
+		normalizedTarget, err := normalizePathIdentifier(targetPath)
+		if err != nil {
+			return nil, fmt.Errorf("data: create target: %w", err)
+		}
+		if normalizedTarget != idValue {
+			return nil, fmt.Errorf("data: --id %q and --target %q must match for path identifiers", idValue, targetPath)
+		}
+	}
 
 	if loc, err := s.findHierarchyObject(typeDef, idValue); err != nil {
 		return nil, err
@@ -167,7 +182,12 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 		return nil, fmt.Errorf("data: %s %q already exists", typeName, idValue)
 	}
 
-	target, err := s.chooseCreateTarget(typeDef, idValue)
+	var target *createTarget
+	if targetPath == "" {
+		target, err = s.chooseCreateTarget(typeDef, idValue)
+	} else {
+		target, err = s.chooseExplicitCreateTarget(typeDef, targetPath)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -175,6 +195,9 @@ func (s *Store) Create(typeName string, fields map[string]any) (*Object, error) 
 	doc, err := s.loadFile(target.Path, typeDef.Name, "")
 	if err != nil && !errors.Is(err, errFileNotFound) {
 		return nil, err
+	}
+	if !target.Multi && doc != nil {
+		return nil, fmt.Errorf("data: create target %s already exists", target.Path)
 	}
 
 	normalized := cleanFieldsForType(typeDef, fields)
